@@ -16,20 +16,20 @@ public class Main {
         }
 
         System.out.println("2) Диапазон от сложения:");
-        Range[] range4 = new Range[range1.addRange(range2).length];
+        Range[] range4 = new Range[range1.unionWith(range2).length];
         for (int i = 0; i < range4.length; i++) {
-            range4[i] = range1.addRange(range2)[i];
+            range4[i] = range1.unionWith(range2)[i];
         }
         for (Range range : range4) {
             System.out.println("- " + range.toString() + ", длина диапазона: " + range.getLength()
                     + ", число " + userNumber + (range.isInside(userNumber) ? "" : " не") + " принадлежит диапазону");
         }
 
-        if (range1.deductRange(range2) == null) {
+        Range[] range5 = new Range[range1.deductRange(range2).length];
+        if (range5.length < 1) {
             System.out.println("3) Диапазон полностью вычли!");
         } else {
             System.out.println("3) Диапазон от вычитания:");
-            Range[] range5 = new Range[range1.deductRange(range2).length];
             for (int i = 0; i < range5.length; i++) {
                 range5[i] = range1.deductRange(range2)[i];
             }
