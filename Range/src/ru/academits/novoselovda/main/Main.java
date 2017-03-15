@@ -38,7 +38,7 @@ public class Main {
                         + ", число " + userNumber + (range.isInside(userNumber) ? "" : " не") + " принадлежит диапазону");
             }
         }
-        System.out.println("-------------------------------------------------------");
+        System.out.println("---------------------------------------------------------");
     }
 
     public static void main(String[] args) {
@@ -48,7 +48,7 @@ public class Main {
         System.out.println("- длина диапазона составляет: " + range1.getLength());
         double userNumber = -0.07000001;
         System.out.println("- число " + userNumber + (range1.isInside(userNumber) ? "" : " не") + " принадлежит диапазону");
-        System.out.println("-------------------------------------------------------");
+        System.out.println("---------------------------------------------------------");
 
         Range range2 = new Range(-5, 0);
         range1.setFrom(-10);
