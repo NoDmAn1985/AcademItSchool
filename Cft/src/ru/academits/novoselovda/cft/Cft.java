@@ -1,33 +1,31 @@
-package ru.academits.novoselovda.ctf;
+package ru.academits.novoselovda.cft;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class Ctf {
+public class Cft {
     private static String fileNameInput;
     private static String fileNameOutput;
     private static String typeOfInputData;
     private static String typeOfSort;
 
-    public static void sort(String[] args) throws FileNotFoundException {
+    public static void sort(String[] args) {
         if (args.length == 4) {
-            File fileInput = new File(args[0]);
-            if (!fileInput.exists()) {
-                System.out.printf("ОШИБКА: исходный файл (%s) не найден!\n", args[0]);
-            } else if (!(args[2].equals("-i") || args[2].equals("-s"))) {
-                System.out.printf("ОШИБКА: аргумент типа данных (%s) указан неверно!\n", args[2]);
-            } else if (!(args[3].equals("-a") || args[3].equals("-d"))) {
-                System.out.printf("ОШИБКА: аргумент способа сортировки (%s) указан неверно!\n", args[3]);
+            if (!args[2].equals("-i") && !args[2].equals("-s")) {
+                System.out.printf("ОШИБКА: аргумент типа данных (%s) указан неверно!%n", args[2]);
+            } else if (!args[3].equals("-a") && !args[3].equals("-d")) {
+                System.out.printf("ОШИБКА: аргумент способа сортировки (%s) указан неверно!%n", args[3]);
             } else {
                 fileNameInput = args[0];
                 fileNameOutput = args[1];
                 typeOfInputData = args[2];
                 typeOfSort = args[3];
-                workWithFiles();
+                try {
+                    writeToOutputFile(readFromInputFile());
+                } catch (NullPointerException exception) {
+                    System.out.println("нет данных для сортировки");
+                }
                 return;
             }
         } else if (args.length > 4) {
@@ -43,8 +41,8 @@ public class Ctf {
         System.out.println("\t4) -a - аргумент типа сортировки (\"-a\" - для сортировки повозрастанию, \"-d\" - поубыванию)");
     }
 
-    private static void workWithFiles() throws FileNotFoundException {
-        try (Scanner scanner = new Scanner(new FileInputStream(fileNameInput)); PrintWriter writer = new PrintWriter(fileNameOutput)) {
+    private static ArrayList readFromInputFile() {
+        try (Scanner scanner = new Scanner(new FileInputStream(fileNameInput))) {
             switch (typeOfInputData) {
                 case "-i":
                     ArrayList<Integer> arrayOfInts = new ArrayList<>();
@@ -52,21 +50,29 @@ public class Ctf {
                         arrayOfInts.add(scanner.nextInt());
                     }
                     insertionSortInts(arrayOfInts);
-                    for (Integer arrayOfInt : arrayOfInts) {
-                        writer.println(arrayOfInt);
-                    }
-                    break;
+                    return arrayOfInts;
                 case "-s":
                     ArrayList<String> arrayOfStrings = new ArrayList<>();
                     while (scanner.hasNextLine()) {
                         arrayOfStrings.add(scanner.nextLine());
                     }
                     insertionSortStrings(arrayOfStrings);
-                    for (String arrayOfString : arrayOfStrings) {
-                        writer.println(arrayOfString);
-                    }
-                    break;
+                    return arrayOfStrings;
             }
+        } catch (FileNotFoundException exception) {
+            System.out.printf("ОШИБКА: исходный файл (%s) не найден!%n", fileNameInput);
+        }
+        return null;
+    }
+
+    private static void writeToOutputFile(ArrayList arrayList) {
+        try (PrintWriter writer = new PrintWriter(fileNameOutput)) {
+            for (Object element : arrayList) {
+                writer.println(element);
+
+            }
+        } catch (IOException exception) {
+            System.out.printf("ОШИБКА: конечный файл (%s) нельзя записать%n", fileNameOutput);
         }
     }
 

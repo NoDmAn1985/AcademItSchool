@@ -1,11 +1,11 @@
 package ru.academits.novoselovda.main;
 
-import ru.academits.novoselovda.ctf.Ctf;
+import ru.academits.novoselovda.cft.Cft;
 
 import java.io.FileNotFoundException;
 
 public class Main {
     public static void main(String[] args) throws FileNotFoundException {
-        Ctf.sort(args);
+        Cft.sort(args);
     }
 }
