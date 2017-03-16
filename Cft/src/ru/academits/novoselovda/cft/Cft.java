@@ -23,8 +23,8 @@ public class Cft {
                 typeOfSort = args[3];
                 try {
                     writeToOutputFile(readFromInputFile());
-                } catch (NullPointerException exception) {
-                    System.out.println("нет данных для сортировки");
+                } catch (FileNotFoundException exception) {
+                    System.out.printf("ОШИБКА: исходный файл (%s) не найден!%n", fileNameInput);
                 }
                 return;
             }
@@ -41,7 +41,7 @@ public class Cft {
         System.out.println("\t4) -a - аргумент типа сортировки (\"-a\" - для сортировки повозрастанию, \"-d\" - поубыванию)");
     }
 
-    private static ArrayList readFromInputFile() {
+    private static ArrayList readFromInputFile() throws FileNotFoundException {
         try (Scanner scanner = new Scanner(new FileInputStream(fileNameInput))) {
             switch (typeOfInputData) {
                 case "-i":
@@ -60,16 +60,16 @@ public class Cft {
                     return arrayOfStrings;
             }
         } catch (FileNotFoundException exception) {
-            System.out.printf("ОШИБКА: исходный файл (%s) не найден!%n", fileNameInput);
+            System.out.print(""); //иначе ругается на мгновенный throw
+            throw exception;
         }
         return null;
     }
 
-    private static void writeToOutputFile(ArrayList arrayList) {
+    private static void writeToOutputFile(ArrayList<?> arrayList) {
         try (PrintWriter writer = new PrintWriter(fileNameOutput)) {
             for (Object element : arrayList) {
                 writer.println(element);
-
             }
         } catch (IOException exception) {
             System.out.printf("ОШИБКА: конечный файл (%s) нельзя записать%n", fileNameOutput);
