@@ -15,7 +15,7 @@ public class Main {
             System.out.println("-----------------------------------------------------------------");
             Vector vector1 = new Vector(array1);
             System.out.println("Вектор1: " + vector1.toString() + ", длиной " + vector1.getSize());
-            double[] array2 = {-1, 2, -3, 4, 6};
+            double[] array2 = {-1, 2, -3};
             Vector vector2 = new Vector(array2);
             System.out.println("Вектор2: " + vector2.toString() + ", длиной " + vector2.getSize());
             vector1.add(vector2);

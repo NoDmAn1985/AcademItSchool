@@ -57,19 +57,20 @@ public class Vector {
 
     public void add(Vector vector) {
         for (int i = 0; i < n; i++) {
-            components[i] = components[i] + vector.components[i];
+            components[i] = components[i] + ((i < vector.n) ? vector.components[i] : 0);
         }
     }
 
     public void diff(Vector vector) {
         for (int i = 0; i < n; i++) {
-            components[i] = components[i] - vector.components[i];
+            components[i] = components[i] - ((i < vector.n) ? vector.components[i] : 0);
         }
     }
 
     public double scalarProduct(Vector vector) {
         double production = 0;
-        for (int i = 0; i < n; i++) {
+        int length = (n > vector.n) ? vector.n : n;
+        for (int i = 0; i < length; i++) {
             production += components[i] * vector.components[i];
         }
         return production;
