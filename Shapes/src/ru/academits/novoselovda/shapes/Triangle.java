@@ -7,14 +7,13 @@ public class Triangle implements Shape {
     private double sideX2Y2X3Y3;
     private double sideX3Y3X1Y1;
 
-
     public Triangle(double x1, double y1, double x2, double y2, double x3, double y3) {
         if (Math.abs((x3 - x1) * (y2 - y1) - (y3 - y1) * (x2 - x1)) > 1.0e-10) {
-            sideX1Y1X2Y2 = Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
-            sideX2Y2X3Y3 = Math.sqrt(Math.pow(x2 - x3, 2) + Math.pow(y2 - y3, 2));
-            sideX3Y3X1Y1 = Math.sqrt(Math.pow(x3 - x1, 2) + Math.pow(y3 - y1, 2));
-            this.width = Math.max(x1, Math.max(x2, x3)) - Math.min(x1, Math.min(x2, x3));
-            this.height = Math.max(y1, Math.max(y2, y3)) - Math.min(y1, Math.min(y2, y3));
+            sideX1Y1X2Y2 = getSide(x1, y1, x2, y2);
+            sideX2Y2X3Y3 = getSide(x2, y2, x3, y3);
+            sideX3Y3X1Y1 = getSide(x3, y3, x1, y1);
+            this.width = getSideByAxis(x1, x2, x3);
+            this.height = getSideByAxis(y1, y2, y3);
         } else {
             String message = String.format("ОШИБКА: вершины треугольника [(%f, %f)," +
                     "(%f, %f) и (%f, %f)] лежат на одной прямой", x1, y1, x2, y2, x3, y3);
@@ -48,16 +47,28 @@ public class Triangle implements Shape {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         Triangle triangle = (Triangle) o;
-        return (Double.compare(triangle.width, width) == 0
-                && Double.compare(triangle.height, height) == 0);
+        return (triangle.width == width && triangle.height == height);
     }
 
     @Override
     public int hashCode() {
+        final int prime = 37;
         return prime + (int) (width + height + sideX1Y1X2Y2
                 + sideX2Y2X3Y3 + sideX3Y3X1Y1);
+    }
+
+    private double getSide(double x1, double y1, double x2, double y2) {
+        return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
+    }
+
+    private double getSideByAxis(double a, double b, double c) {
+        return Math.max(a, Math.max(b, c)) - Math.min(a, Math.min(b, c));
     }
 }

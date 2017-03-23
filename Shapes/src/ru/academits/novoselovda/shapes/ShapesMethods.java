@@ -1,15 +1,8 @@
 package ru.academits.novoselovda.shapes;
 
+import java.util.Comparator;
+
 public class ShapesMethods {
-    public void printMax(Shape[] shapes, int rate, String parameter) {
-        if (rate > shapes.length) {
-            System.out.println("Заданное место превышает длину массива");
-            return;
-        }
-        System.out.printf("На %d месте по %s находится - %s%n"
-                , rate, (parameter.equals("площадь") ? "площади" : "периметру")
-                , getMaxOfThisParameter(shapes, rate, parameter, Double.MAX_VALUE));
-    }
 
     public void printArray(Shape[] shapes) {
         for (int i = 0; i < shapes.length; i++) {
@@ -18,36 +11,21 @@ public class ShapesMethods {
         }
     }
 
-    private String getMaxOfThisParameter(Shape[] shapes, int rate, String parameter, double maxToSkeep) {
-        int indexOfShape = 0;
-        double maximum = 0;
-        double valueOfThisParameter;
-        final double EPSILON = 1.0e-10;
-        for (int i = 0; i < shapes.length; i++) {
-            switch (parameter) {
-                case "площадь":
-                    valueOfThisParameter = shapes[i].getArea();
-                    break;
-                case "периметр":
-                    valueOfThisParameter = shapes[i].getPerimeter();
-                    break;
-                default:
-                    throw new RuntimeException("ОШИБКА: передан неверный параметр для поиска" +
-                            "(введите \"периметр\" или \"площадь\")");
+    public void insertionSortOfArray(Shape[] shapes, Comparator<Shape> comparator) {
+        for (int i = 1; i < shapes.length; i++) {
+            if (comparator.compare(shapes[i], shapes[i - 1]) > 0) {
+                Shape temp = shapes[i];
+                int j = i - 1;
+                while (j >= 0) {
+                    if (comparator.compare(temp, shapes[j]) > 0) {
+                        shapes[j + 1] = shapes[j];
+                    } else {
+                        break;
+                    }
+                    --j;
+                }
+                shapes[j + 1] = temp;
             }
-            if (maxToSkeep - valueOfThisParameter > EPSILON
-                    && valueOfThisParameter - maximum > EPSILON) {
-                maximum = valueOfThisParameter;
-                indexOfShape = i;
-            }
-        }
-        if (maximum == 0) {
-            return "пусто";
-        } else if (rate == 1) {
-            return String.format("%s (%s: %.2f)", shapes[indexOfShape].toString(), parameter, maximum);
-        } else {
-            return getMaxOfThisParameter(shapes, rate - 1, parameter, maximum);
         }
     }
-
 }

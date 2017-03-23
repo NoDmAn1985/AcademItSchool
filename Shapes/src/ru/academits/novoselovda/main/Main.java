@@ -20,8 +20,17 @@ public class Main {
             ShapesMethods shapesMethods = new ShapesMethods();
             shapesMethods.printArray(shapes);
             System.out.println();
-            shapesMethods.printMax(shapes, 1, "площадь");
-            shapesMethods.printMax(shapes, 2, "периметр");
+
+            shapesMethods.insertionSortOfArray(shapes, new ShapeComparatorByArea());
+            int position = 1;
+            System.out.printf("На %d месте по площади находится %s и площадью %.2f%n"
+                    , position, shapes[position - 1].toString(), shapes[position - 1].getArea());
+
+            shapesMethods.insertionSortOfArray(shapes, new ShapeComparatorByPerimeter());
+            position = 2;
+            System.out.printf("На %d месте по площади находится %s и площадью %.2f%n"
+                    , position, shapes[position - 1].toString(), shapes[position - 1].getPerimeter());
+
 
         } catch (RuntimeException exception) {
             System.out.println(exception.getMessage());
