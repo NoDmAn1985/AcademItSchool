@@ -2,6 +2,8 @@ package ru.academits.novoselovda.main;
 
 import ru.academits.novoselovda.shapes.*;
 
+import java.util.Arrays;
+
 public class Main {
     public static void main(String[] args) {
         try {
@@ -21,12 +23,12 @@ public class Main {
             shapesMethods.printArray(shapes);
             System.out.println();
 
-            shapesMethods.insertionSortOfArray(shapes, new ShapeComparatorByArea());
+            Arrays.sort(shapes, new ShapeComparatorByArea());
             int position = 1;
             System.out.printf("На %d месте по площади находится %s и площадью %.2f%n"
                     , position, shapes[position - 1].toString(), shapes[position - 1].getArea());
 
-            shapesMethods.insertionSortOfArray(shapes, new ShapeComparatorByPerimeter());
+            Arrays.sort(shapes, new ShapeComparatorByPerimeter());
             position = 2;
             System.out.printf("На %d месте по площади находится %s и площадью %.2f%n"
                     , position, shapes[position - 1].toString(), shapes[position - 1].getPerimeter());

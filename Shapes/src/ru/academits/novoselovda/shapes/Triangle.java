@@ -64,11 +64,11 @@ public class Triangle implements Shape {
                 + sideX2Y2X3Y3 + sideX3Y3X1Y1);
     }
 
-    private double getSide(double x1, double y1, double x2, double y2) {
+    private static double getSide(double x1, double y1, double x2, double y2) {
         return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
     }
 
-    private double getSideByAxis(double a, double b, double c) {
+    private static double getSideByAxis(double a, double b, double c) {
         return Math.max(a, Math.max(b, c)) - Math.min(a, Math.min(b, c));
     }
 }
