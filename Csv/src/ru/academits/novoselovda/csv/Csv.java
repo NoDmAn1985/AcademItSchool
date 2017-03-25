@@ -20,6 +20,7 @@ public class Csv {
             }
         } catch (FileNotFoundException exception) {
             System.out.println("ОШИБКА: исходный файл не найден");
+            help();
         }
         return stringArrayList;
     }
@@ -27,18 +28,24 @@ public class Csv {
     private void writeToHtml(String outputFilePath, ArrayList<String> tableRows) {
         try (PrintWriter writer = new PrintWriter(outputFilePath)) {
             writer.println("<html>");
-            writer.println("<body>");
-            writer.println("<table cellpadding=\"5\" border=\"1\">");
-            writer.println("<tbody align=\"center\">");
+            writer.println("\t<head>");
+            writer.println("\t\t<title align=\"center\">HTML table from your's csv-file</title>");
+            writer.println("\t\t<meta charset=\"utf-8\">");
+            writer.println("\t\t<meta name=\"GENERATOR\" content=\"IntelliJ IDEA 2017.1\">");
+            writer.println("\t</head>");
+            writer.println("\t<body>");
+            writer.println("\t\t<table cellpadding=\"5\" border=\"1\">");
+            writer.println("\t\t\t<tbody align=\"center\">");
             for (String row : tableRows) {
-                writer.println(row);
+                writer.println("\t\t\t\t" + row);
             }
-            writer.println("</tbody>");
-            writer.println("</table>");
-            writer.println("</body>");
+            writer.println("\t\t\t</tbody>");
+            writer.println("\t\t</table>");
+            writer.println("\t</body>");
             writer.println("</html>");
-        } catch (IOException exception) {
+        }catch (IOException ioException) {
             System.out.println("ОШИБКА: нет возможности записать файл");
+            help();
         }
     }
 
@@ -46,22 +53,22 @@ public class Csv {
         ArrayList<String> tableRows = new ArrayList<>();
         StringBuilder row = new StringBuilder();
         boolean isCellSurroundedByQuotes = false;
-        for (int i = 0; i < stringsFromCsv.size(); i++) {
+        for (String stringFromCsv : stringsFromCsv) {
             if (!isCellSurroundedByQuotes) {
                 row.append("<tr><td>");
             }
             boolean isQuote = false;
             int begin = 0;
-            for (int j = 0; j < stringsFromCsv.get(i).length(); j++) {
-                isCellSurroundedByQuotes = (stringsFromCsv.get(i).charAt(begin) == '"');
-                char character = stringsFromCsv.get(i).charAt(j);
+            for (int j = 0; j < stringFromCsv.length(); j++) {
+                isCellSurroundedByQuotes = (stringFromCsv.charAt(begin) == '"');
+                char character = stringFromCsv.charAt(j);
                 switch (character) {
                     case ',':
                         if (!isCellSurroundedByQuotes || isQuote) {
                             row.append("</td><td>");
                             isQuote = false;
                             isCellSurroundedByQuotes = false;
-                            begin = (j + 1 < stringsFromCsv.get(i).length() - 1) ? j + 1 : 0;
+                            begin = (j + 1 < stringFromCsv.length() - 1) ? j + 1 : 0;
                         } else {
                             row.append(character);
                         }
@@ -73,6 +80,15 @@ public class Csv {
                             }
                             isQuote = !isQuote;
                         }
+                        break;
+                    case '>':
+                        row.append("&gt");
+                        break;
+                    case '<':
+                        row.append("&lt");
+                        break;
+                    case '&':
+                        row.append("&amp");
                         break;
                     default:
                         row.append(character);
@@ -87,5 +103,11 @@ public class Csv {
             }
         }
         return tableRows;
+    }
+
+    public static void help() {
+        System.out.println("Подсказка: для правильной работы программы необходимо ввести аргументы через пробел, где:");
+        System.out.println("- первый аргумент - адрес и имя исходного csv-файла, например: in.csv");
+        System.out.println("- второй аргумент - адрес и имя итогового html-файла, например: out.html");
     }
 }

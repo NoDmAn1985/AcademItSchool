@@ -1,47 +1,36 @@
 package ru.academits.novoselovda.vector;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 
 public class Vector {
-    private int n;
-    private double[] components;
+    private ArrayList<Double> components = new ArrayList<>();
 
     public Vector(int n) {
-        if (n <= 0) {
-            throw new IllegalArgumentException("ОШИБКА: размерность вектора должна быть больше нуля");
+        testOnPositive(n);
+        for (int i = 0; i < n; i++) {
+            components.add(0.0);
         }
-        this.n = n;
-        components = new double[n];
     }
 
     public Vector(Vector vector) {
-        this.n = vector.n;
-        components = new double[n];
-        this.components = vector.components;
+        this.components.addAll(vector.components);
     }
 
     public Vector(double[] components) {
-        this.components = components;
-        this.n = components.length;
+        for (double component : components) {
+            this.components.add(component);
+        }
     }
 
-    public Vector(int n, double[] array) {
-        if (n <= 0) {
-            throw new IllegalArgumentException("ОШИБКА: размерность вектора должна быть больше нуля");
-        }
-        this.n = n;
-        if (array.length < n) {
-            this.components = new double[n];
-            for (int i = 0; i < n; i++) {
-                this.components[i] = (i < array.length) ? array[i] : 0;
-            }
-        } else {
-            this.components = array;
+    public Vector(int n, double[] components) {
+        testOnPositive(n);
+        for (int i = 0; i < Math.max(components.length, n); i++) {
+            this.components.add((i < components.length) ? components[i] : 0);
         }
     }
 
     public int getSize() {
-        return n;
+        return components.size();
     }
 
     @Override
@@ -56,86 +45,100 @@ public class Vector {
     }
 
     public void add(Vector vector) {
-        for (int i = 0; i < n; i++) {
-            components[i] = components[i] + ((i < vector.n) ? vector.components[i] : 0);
+        for (int i = 0; i < Math.max(this.components.size(), vector.components.size()); i++) {
+            double newDouble = ((i < this.components.size()) ? this.components.get(i) : 0)
+                    + ((i < vector.components.size()) ? vector.components.get(i) : 0);
+            if (i < this.components.size()) {
+                this.components.set(i, newDouble);
+            } else {
+                this.components.add(newDouble);
+            }
         }
     }
 
     public void diff(Vector vector) {
-        for (int i = 0; i < n; i++) {
-            components[i] = components[i] - ((i < vector.n) ? vector.components[i] : 0);
+        for (int i = 0; i < Math.max(this.components.size(), vector.components.size()); i++) {
+            double newDouble = ((i < this.components.size()) ? this.components.get(i) : 0)
+                    - ((i < vector.components.size()) ? vector.components.get(i) : 0);
+            if (i < this.components.size()) {
+                this.components.set(i, newDouble);
+            } else {
+                this.components.add(newDouble);
+            }
         }
     }
 
-    public double scalarProduct(Vector vector) {
-        double production = 0;
-        int length = (n > vector.n) ? vector.n : n;
-        for (int i = 0; i < length; i++) {
-            production += components[i] * vector.components[i];
+    public void scalarProduct(double scalar) {
+        for (int i = 0; i < components.size(); i++) {
+            components.set(i, scalar * components.get(i));
         }
-        return production;
     }
 
     public void reverse() {
-        for (int i = 0; i < n; i++) {
-            components[i] = -components[i];
+        for (int i = 0; i < components.size(); i++) {
+            components.set(i, -components.get(i));
         }
     }
 
     public double getComponent(int index) {
-        if (index >= n) {
-            throw new RuntimeException("ОШИБКА: запрашиваемый индекс превышает предел массива");
-        }
-        return components[index];
+        testOfEntrance(index);
+        return components.get(index);
     }
 
     public void setComponent(int index, double component) {
-        if (index >= n) {
-            throw new RuntimeException("ОШИБКА: запрашиваемый индекс превышает предел массива");
-        }
-        this.components[index] = component;
+        testOfEntrance(index);
+        this.components.set(index, component);
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         Vector vector = (Vector) o;
-        return (n == vector.n && Arrays.equals(components, vector.components));
+        return (this.components.equals(vector.components));
     }
 
     @Override
     public int hashCode() {
         final int prime = 37;
-        int hash = 1;
-        hash = prime * hash + n;
-        return prime * hash + Arrays.hashCode(components);
+        return prime + components.hashCode();
     }
 
     public static Vector sum(Vector vector1, Vector vector2) {
-        int length = (vector1.n > vector2.n) ? vector1.n : vector2.n;
-        double[] newComponents = new double[length];
-        for (int i = 0; i < length; i++) {
-            newComponents[i] = ((i < vector1.n) ? vector1.components[i] : 0) + ((i < vector2.n) ? vector2.components[i] : 0);
-        }
-        return new Vector(newComponents);
+        Vector vectorNew = new Vector(vector1);
+        vectorNew.add(vector2);
+        return vectorNew;
     }
 
     public static Vector residual(Vector vector1, Vector vector2) {
-        int length = (vector1.n > vector2.n) ? vector1.n : vector2.n;
-        double[] newComponents = new double[length];
-        for (int i = 0; i < length; i++) {
-            newComponents[i] = ((i < vector1.n) ? vector1.components[i] : 0) - ((i < vector2.n) ? vector2.components[i] : 0);
-        }
-        return new Vector(newComponents);
+        Vector vectorNew = new Vector(vector1);
+        vectorNew.diff(vector2);
+        return vectorNew;
     }
 
     public static double scalarProduct(Vector vector1, Vector vector2) {
-        int length = (vector1.n > vector2.n) ? vector2.n : vector1.n;
+        int length = Math.min(vector1.getSize(), vector2.getSize());
         double production = 0;
         for (int i = 0; i < length; i++) {
-            production += vector1.components[i] * vector2.components[i];
+            production += vector1.components.get(i) * vector2.components.get(i);
         }
         return production;
     }
+
+    private void testOfEntrance(int index) {
+        if (index >= components.size()) {
+            throw new IllegalArgumentException("ОШИБКА: запрашиваемый индекс превышает предел вектора");
+        }
+    }
+
+    private static void testOnPositive(int n) {
+        if (n <= 0) {
+            throw new IllegalArgumentException("ОШИБКА: размерность вектора должна быть больше нуля");
+        }
+    }
+
 }
