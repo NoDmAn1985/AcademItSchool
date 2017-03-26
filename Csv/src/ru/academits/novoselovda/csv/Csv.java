@@ -29,7 +29,7 @@ public class Csv {
         try (PrintWriter writer = new PrintWriter(outputFilePath)) {
             writer.println("<html>");
             writer.println("\t<head>");
-            writer.println("\t\t<title align=\"center\">HTML table from your's csv-file</title>");
+            writer.println("\t\t<title>HTML table from your's csv-file</title>");
             writer.println("\t\t<meta charset=\"utf-8\">");
             writer.println("\t\t<meta name=\"GENERATOR\" content=\"IntelliJ IDEA 2017.1\">");
             writer.println("\t</head>");
@@ -37,7 +37,7 @@ public class Csv {
             writer.println("\t\t<table cellpadding=\"5\" border=\"1\">");
             writer.println("\t\t\t<tbody align=\"center\">");
             for (String row : tableRows) {
-                writer.println("\t\t\t\t" + row);
+                writer.printf("\t\t\t\t%s%n", row);
             }
             writer.println("\t\t\t</tbody>");
             writer.println("\t\t</table>");
@@ -82,13 +82,13 @@ public class Csv {
                         }
                         break;
                     case '>':
-                        row.append("&gt");
+                        row.append("&gt;");
                         break;
                     case '<':
-                        row.append("&lt");
+                        row.append("&lt;");
                         break;
                     case '&':
-                        row.append("&amp");
+                        row.append("&amp;");
                         break;
                     default:
                         row.append(character);

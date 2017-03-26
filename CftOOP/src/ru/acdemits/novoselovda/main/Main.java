@@ -2,7 +2,6 @@ package ru.acdemits.novoselovda.main;
 
 import ru.academits.novoselovda.cft.Cft;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public class Main {
@@ -10,12 +9,9 @@ public class Main {
         try {
             Cft cft = new Cft(args);
             cft.sort();
-        } catch (IllegalArgumentException illegalException) {
-            illegalException.getMessage();
-        } catch (FileNotFoundException exception) {
-            exception.getMessage();
-        } catch (IOException exception2) {
-            exception2.getMessage();
+        } catch (IOException | IllegalArgumentException exception) {
+            System.out.println(exception.getMessage());
         }
+
     }
 }

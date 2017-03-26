@@ -13,7 +13,7 @@ public class Cft {
     private String outputFilePath;
     private boolean isIntegerInInputFile;
     private boolean isSortingUp;
-    final private String HELP =
+    final private static String HELP =
             String.format("Для сортировки данных в исходном файле необходимо ввести следующие параметры через пробел,%n" +
                     "например: in.txt out.txt -i -a%n" +
                     "\t1) in.txt - имя и расширение исходного файла,%n" +
@@ -48,17 +48,17 @@ public class Cft {
         if (isIntegerInInputFile) {
             ArrayList<Integer> array = readIntegerFromInputFile();
             if (isSortingUp) {
-                insertionSortStrings(array, new IntegerComparatorUp());
+                insertionSortStrings(array, new IntegerComparator());
             } else {
-                insertionSortStrings(array, new IntegerComparatorDown());
+                insertionSortStrings(array, new IntegerComparator().reversed());
             }
             writeToOutputFile(array);
         } else {
             ArrayList<String> array = readStringsFromInputFile();
             if (isSortingUp) {
-                insertionSortStrings(array, new StringComparatorUp());
+                insertionSortStrings(array, new StringComparator());
             } else {
-                insertionSortStrings(array, new StringComparatorDown());
+                insertionSortStrings(array, new StringComparator().reversed());
             }
             writeToOutputFile(array);
         }

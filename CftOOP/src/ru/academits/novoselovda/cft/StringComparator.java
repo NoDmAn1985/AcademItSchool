@@ -2,9 +2,9 @@ package ru.academits.novoselovda.cft;
 
 import java.util.Comparator;
 
-public class StringComparatorDown implements Comparator<String> {
+public class StringComparator implements Comparator<String> {
     @Override
     public int compare(String o1, String o2) {
-        return -o1.compareTo(o2);
+        return o1.compareTo(o2);
     }
 }

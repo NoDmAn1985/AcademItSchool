@@ -20,7 +20,7 @@ public class Main {
             System.out.println("Вектор5: " + vector5 + ", длиной " + vector5.getSize());
             vector4.add(vector5);
             System.out.println("Вектор4 = Вектор4 + Вектор5: " + vector4 + ", длиной " + vector4.getSize());
-            vector4.diff(vector5);
+            vector4.subtract(vector5);
             System.out.println("Вектор4 = Вектор4 - Вектор5: " + vector4 + ", длиной " + vector4.getSize());
             int scalar = 10;
             vector4.scalarProduct(10);
@@ -43,11 +43,11 @@ public class Main {
             System.out.println("Вектор6: " + vector6 + ", длиной " + vector6.getSize());
             Vector vector7 = Vector.sum(vector4, vector6);
             System.out.println("Сумма Вектора4 и Вектора6: " + vector7 + ", длиной " + vector7.getSize());
-            vector7 = Vector.residual(vector4, vector6);
+            vector7 = Vector.subtract(vector4, vector6);
             System.out.println("Разность Вектора4 и Вектора6: " + vector7 + ", длиной " + vector7.getSize());
             System.out.println("Скалярное произведение Вектора4 и Вектора6: " + Vector.scalarProduct(vector4, vector6));
         } catch (RuntimeException exception) {
-            exception.getMessage();
+            System.out.println(exception.getMessage());
         }
     }
 }
