@@ -98,6 +98,7 @@ public class Csv {
                 row.append("</td></tr>");
                 tableRows.add(row.toString());
                 row.delete(0, row.length());
+                isCellSurroundedByQuotes = false;
             } else {
                 row.append("<br/>");
             }
