@@ -20,7 +20,6 @@ public class Vector {
 
     public Vector(int n, double[] components) {
         testOnPositive(n);
-        this.components = new double[n];
         this.components = Arrays.copyOf(components, Math.min(n, components.length));
     }
 
@@ -42,8 +41,7 @@ public class Vector {
     public void add(Vector vector) {
         if (vector.components.length > this.components.length) {
             double[] old = this.components;
-            this.components = new double[vector.components.length];
-            this.components = Arrays.copyOf(old, this.components.length);
+            this.components = Arrays.copyOf(old, vector.components.length);
         }
         for (int i = 0; i < vector.components.length; i++) {
             this.components[i] = this.components[i] + vector.components[i];
@@ -53,8 +51,7 @@ public class Vector {
     public void subtract(Vector vector) {
         if (vector.components.length > this.components.length) {
             double[] old = this.components;
-            this.components = new double[vector.components.length];
-            this.components = Arrays.copyOf(old, this.components.length);
+            this.components = Arrays.copyOf(old, vector.components.length);
         }
         for (int i = 0; i < vector.components.length; i++) {
             this.components[i] = this.components[i] - vector.components[i];
@@ -68,9 +65,7 @@ public class Vector {
     }
 
     public void reverse() {
-        for (int i = 0; i < this.components.length; i++) {
-            this.components[i] = -1 * this.components[i];
-        }
+        scalarProduct(-1);
     }
 
     public double getComponent(int index) {
@@ -123,8 +118,8 @@ public class Vector {
     }
 
     private void testOfEntrance(int index) {
-        if (index >= components.length) {
-            throw new IllegalArgumentException("ОШИБКА: запрашиваемый индекс превышает предел вектора");
+        if (index < 0 || index >= components.length) {
+            throw new IllegalArgumentException("ОШИБКА: запрашиваемый индекс не найден в векторе");
         }
     }
 
