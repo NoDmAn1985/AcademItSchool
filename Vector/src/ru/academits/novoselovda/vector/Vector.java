@@ -20,7 +20,7 @@ public class Vector {
 
     public Vector(int n, double[] components) {
         testOnPositive(n);
-        this.components = Arrays.copyOf(components, Math.min(n, components.length));
+        this.components = Arrays.copyOf(components, n);
     }
 
     public int getSize() {

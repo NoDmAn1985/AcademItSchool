@@ -6,8 +6,7 @@ import java.util.Comparator;
 class Sort {
 
     static <T extends Comparable<T>> void byInsertion(ArrayList<T> array, boolean isSortingUp) {
-        Comparator<T> comparator;
-        comparator = (isSortingUp) ? Comparator.naturalOrder() : Comparator.reverseOrder();
+        Comparator<T> comparator = (isSortingUp) ? Comparator.naturalOrder() : Comparator.reverseOrder();
         for (int i = 1; i < array.size(); i++) {
             if (comparator.compare(array.get(i), array.get(i - 1)) < 0) {
                 T temp = array.get(i);
