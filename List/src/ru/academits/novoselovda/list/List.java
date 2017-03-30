@@ -1,11 +1,13 @@
 package ru.academits.novoselovda.list;
 
-public class List<E> {
+import java.util.ArrayList;
+
+public class List<T> {
     private int length;
-    private Node head;
+    private Node<T> head;
 
     public List() {
-        this.head = new Node();
+        this.head = null;
         length = 0;
     }
 
@@ -17,10 +19,10 @@ public class List<E> {
         return head.getNext();
     }
 
-    public Node getNode(int userIndex) {
+    public Node<T> getNode(int userIndex) {
         testOfEntrance(userIndex);
         int index = 0;
-        for (Node p = head.getNext(); p != null; p = p.getNext()) {
+        for (Node<T> p = head.getNext(); p != null; p = p.getNext()) {
             if (index == userIndex) {
                 return p;
             }
@@ -29,68 +31,76 @@ public class List<E> {
         return null;
     }
 
-    public String getNodeData(int userIndex) {
-        return getNode(userIndex).toString();
+    public T getNodeData(int userIndex) {
+        return getNode(userIndex).getData();
     }
 
-    public void setNodeData(E userData, int userIndex) {
-        Node temp = getNode(userIndex);
-        if (temp != null) {
-            temp.setData(userData);
-        }
+    public T setNodeData(T userData, int userIndex) {
+        Node<T> temp = getNode(userIndex);
+        T oldData = temp.getData();
+        temp.setData(userData);
+        return oldData;
     }
 
-    public void dellNode(int userIndex) {
+    public Node<T> deleteNode(int userIndex) {
         testOfEntrance(userIndex);
+        Node<T> oldNode = new Node<>();
         if (userIndex > 0) {
-            Node temp = getNode(userIndex - 1);
+            Node<T> temp = getNode(userIndex - 1);
+            oldNode = temp;
             temp.setNext(temp.getNext().getNext());
         } else {
             head.setNext(head.getNext().getNext());
         }
         --length;
+        return oldNode;
     }
 
-    public void insertNode(Node userNode, int userIndex) {
+    public void insertNode(Node<T> userNode, int userIndex) {
         if (userIndex > 0) {
-            Node temp = getNode(userIndex - 1);
+            Node<T> temp = getNode(userIndex - 1);
             userNode.setNext(temp.getNext());
             temp.setNext(userNode);
         } else {
             if (length > 0) {
                 userNode.setNext(head.getNext());
             }
-            head.setNext(userNode);
+            head = new Node<T>(null, userNode);
         }
         ++length;
     }
 
-    public void dellNode(E userData) {
-        for (Node p = head; p.getNext() != null; p = p.getNext()) {
+    public Node<T> deleteNode(T userData) {
+        Node<T> oldNode = new Node<>();
+        for (Node<T> p = head; p.getNext() != null; p = p.getNext()) {
             if (p.getNext().getData().equals(userData)) {
+                oldNode = p.getNext();
                 if (p.getNext().getNext() != null) {
                     p.setNext(p.getNext().getNext());
                 } else {
                     p.setNext(null);
                 }
                 --length;
-                break;
+                return oldNode;
             }
         }
+        return null;
     }
 
-    public void dellNexNode(Node userNode) {
+    public Node<T> deleteNexNode(Node<T> userNode) {
         if (userNode.getNext() != null) {
+            Node<T> oldNode = new Node<>();
+            oldNode = userNode.getNext();
             userNode.setNext(userNode.getNext().getNext());
             --length;
+            return oldNode;
         } else {
             throw new IllegalArgumentException("ОШИБКА: не удалось удалить следующий узел, так как его нет");
         }
-
     }
 
-    public void insertNextNode(Node nodeToInsert, Node userNode) {
-        Node temp = userNode.getNext();
+    public void insertNextNode(Node<T> nodeToInsert, Node<T> userNode) {
+        Node<T> temp = userNode.getNext();
         if (temp != null) {
             nodeToInsert.setNext(temp);
             userNode.setNext(nodeToInsert);
@@ -103,7 +113,7 @@ public class List<E> {
     public void reverseOfList() {
         if (length > 1) {
             boolean isFirst = true;
-            for (Node prevPrev = head, prev = prevPrev.getNext(), p = prev.getNext();
+            for (Node<T> prevPrev = head, prev = prevPrev.getNext(), p = prev.getNext();
                  p != null; prevPrev = prevPrev.getNext(), prev = p, p = p.getNext()) {
                 if (isFirst) {
                     prev.setNext(null);
@@ -120,7 +130,7 @@ public class List<E> {
         }
     }
 
-    public int getIndex(Node node) {
+    public int getIndex(Node<T> node) {
         int index = 0;
         for (Node p = head.getNext(); p != null; p = p.getNext()) {
             if (p.equals(node)) {
@@ -132,18 +142,18 @@ public class List<E> {
     }
 
     public List cloneList() {
-        Node[] nodes = new Node[length];
+        ArrayList<Node<T>> nodes = new ArrayList<>(length);
         for (int i = 0; i < length; i++) {
-            nodes[i] = new Node();
+            nodes.add(i, new Node<T>());
         }
         int link;
         int index = 0;
-        List newList = new List();
-        for (Node p = head.getNext(); p != null; p = p.getNext()) {
+        List<T> newList = new List<>();
+        for (Node<T> p = head.getNext(); p != null; p = p.getNext()) {
             link = (p.getRandomNext() != null) ? getIndex(p.getRandomNext()) : -1;
-            nodes[index].setData(p.getData());
-            nodes[index].setRandomNext((link != -1) ? nodes[link] : null);
-            newList.insertNode(nodes[index], index);
+            nodes.get(index).setData(p.getData());
+            nodes.get(index).setRandomNext((link != -1) ? nodes.get(link) : null);
+            newList.insertNode(nodes.get(index), index);
             ++index;
         }
         return newList;
@@ -168,7 +178,7 @@ public class List<E> {
 
     private void testOfEntrance(int index) {
         if (index < 0 || index >= length) {
-            throw new IllegalArgumentException("ОШИБКА: индекс в списке не найден");
+            throw new IndexOutOfBoundsException("ОШИБКА: индекс в списке не найден");
         }
     }
 }

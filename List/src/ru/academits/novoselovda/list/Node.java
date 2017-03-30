@@ -2,46 +2,47 @@ package ru.academits.novoselovda.list;
 
 import java.util.Objects;
 
-public class Node<E> {
-    private E data;
-    private Node next;
-    private Node randomNext;
+public class Node<T> {
+    private T data;
+    private Node<T> next;
+    private Node<T> randomNext;
 
     public Node() {
         this.data = null;
         this.next = null;
     }
 
-    public Node(E data) {
+    public Node(T data) {
         this.data = data;
         this.next = null;
     }
-    public Node(E data, Node next) {
+
+    public Node(T data, Node<T> next) {
         this.data = data;
         this.next = next;
     }
 
-    public E getData() {
+    public T getData() {
         return data;
     }
 
-    public void setData(E data) {
+    public void setData(T data) {
         this.data = data;
     }
 
-    Node getNext() {
+    Node<T> getNext() {
         return next;
     }
 
-    void setNext(Node next) {
+    void setNext(Node<T> next) {
         this.next = next;
     }
 
-    public void setRandomNext(Node randomNext) {
+    public void setRandomNext(Node<T> randomNext) {
         this.randomNext = randomNext;
     }
 
-    public Node getRandomNext() {
+    public Node<T> getRandomNext() {
         return randomNext;
     }
 

@@ -23,13 +23,13 @@ public class Main {
     public static void main(String[] args) {
         try {
             List<String> singleList = new List<>();
-            Node node1 = new Node<>("первый элемент");
+            Node<String> node1 = new Node<>("первый элемент");
             singleList.insertNode(node1, 0);
-            Node node2 = new Node<>("второй элемент");
+            Node<String> node2 = new Node<>("второй элемент");
             singleList.insertNode(node2, 0);
-            Node node3 = new Node<>("третий элемент");
+            Node<String> node3 = new Node<>("третий элемент");
             singleList.insertNode(node3, 1);
-            Node node4 = new Node<>("четвёртый элемент");
+            Node<String> node4 = new Node<>("четвёртый элемент");
             singleList.insertNode(node4, 3);
             System.out.println(singleList);
             System.out.println("получение размера списка: " + singleList.getLength());
@@ -42,22 +42,22 @@ public class Main {
             userIndex = 3;
             System.out.println("получение узла по индексу " + userIndex + ": "
                     + singleList.getNode(userIndex).getData());
-            singleList.dellNode(userIndex);
+            singleList.deleteNode(userIndex);
             System.out.println("удаление элемента по индексу " + userIndex + ": " + singleList);
             System.out.println("размер списка: " + singleList.getLength());
-            Node node5 = new Node<>("пятый элемент");
+            Node<String> node5 = new Node<>("пятый элемент");
             singleList.insertNode(node5, userIndex);
             System.out.println("вставка элемента по индексу " + userIndex + ": " + singleList);
             System.out.println("размер списка: " + singleList.getLength());
             userData = "второй элемент";
-            singleList.dellNode(userData);
+            singleList.deleteNode(userData);
             System.out.println("удаление узла по значению  - " + userData + ": " + singleList);
             System.out.println("размер списка: " + singleList.getLength());
-            Node node6 = new Node<>("шестой элемент");
+            Node<String> node6 = new Node<>("шестой элемент");
             singleList.insertNextNode(node6, node3);
             System.out.println("вставка 6 узла после указанного 3 узла: " + singleList);
             System.out.println("размер списка: " + singleList.getLength());
-            singleList.dellNexNode(node3);
+            singleList.deleteNexNode(node3);
             System.out.println("удаление узла после указанного 3 узла: " + singleList);
             System.out.println("размер списка: " + singleList.getLength());
             singleList.reverseOfList();
@@ -85,7 +85,7 @@ public class Main {
                 System.out.println(cloneList.getNode(i) + " ссылается на "
                         + cloneList.getNode(i).getRandomNext());
             }
-        } catch (IllegalArgumentException exception) {
+        } catch (IndexOutOfBoundsException | IllegalArgumentException exception) {
             System.out.println(exception.getMessage());
         }
     }
