@@ -16,6 +16,7 @@ package ru.academits.novoselovda.main;
 Надо создать копию этого списка, чтобы в копии эти произвольные ссылки ссылались на соответствующие элементы в копии.
 
  */
+
 import ru.academits.novoselovda.list.List;
 import ru.academits.novoselovda.list.Node;
 
@@ -44,28 +45,21 @@ public class Main {
                     + singleList.getNode(userIndex).getData());
             singleList.deleteNode(userIndex);
             System.out.println("удаление элемента по индексу " + userIndex + ": " + singleList);
-            System.out.println("размер списка: " + singleList.getLength());
             Node<String> node5 = new Node<>("пятый элемент");
             singleList.insertNode(node5, userIndex);
             System.out.println("вставка элемента по индексу " + userIndex + ": " + singleList);
-            System.out.println("размер списка: " + singleList.getLength());
             userData = "второй элемент";
             singleList.deleteNode(userData);
             System.out.println("удаление узла по значению  - " + userData + ": " + singleList);
-            System.out.println("размер списка: " + singleList.getLength());
             Node<String> node6 = new Node<>("шестой элемент");
             singleList.insertNextNode(node6, node3);
             System.out.println("вставка 6 узла после указанного 3 узла: " + singleList);
-            System.out.println("размер списка: " + singleList.getLength());
-            singleList.deleteNexNode(node3);
+            singleList.deleteNextNode(node3);
             System.out.println("удаление узла после указанного 3 узла: " + singleList);
-            System.out.println("размер списка: " + singleList.getLength());
             singleList.reverseOfList();
             System.out.println("разворот списка за линейное время: " + singleList);
-            System.out.println("размер списка: " + singleList.getLength());
             System.out.println("------------------------ЗАДАНИЕ С *-----------------------------------------");
             node1.setData("первый элемент");
-            singleList.insertNode(node2, 0);
             singleList.insertNode(node4, 0);
             singleList.insertNode(node6, 0);
             System.out.println("оригниальный список: " + singleList);
@@ -85,6 +79,13 @@ public class Main {
                 System.out.println(cloneList.getNode(i) + " ссылается на "
                         + cloneList.getNode(i).getRandomNext());
             }
+            System.out.println("------------------------ПРОВЕРКА-----------------------------------------");
+            cloneList.deleteNode(0);
+            cloneList.deleteNode(0);
+            cloneList.deleteNode(0);
+            cloneList.deleteNode(0);
+            cloneList.deleteNode(0);
+            System.out.println("клонированный список: " + cloneList);
         } catch (IndexOutOfBoundsException | IllegalArgumentException exception) {
             System.out.println(exception.getMessage());
         }

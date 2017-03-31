@@ -16,13 +16,13 @@ public class List<T> {
     }
 
     public Node getFirstNode() {
-        return head.getNext();
+        return head;
     }
 
     public Node<T> getNode(int userIndex) {
         testOfEntrance(userIndex);
         int index = 0;
-        for (Node<T> p = head.getNext(); p != null; p = p.getNext()) {
+        for (Node<T> p = head; p != null; p = p.getNext()) {
             if (index == userIndex) {
                 return p;
             }
@@ -44,13 +44,14 @@ public class List<T> {
 
     public Node<T> deleteNode(int userIndex) {
         testOfEntrance(userIndex);
-        Node<T> oldNode = new Node<>();
+        Node<T> oldNode;
         if (userIndex > 0) {
             Node<T> temp = getNode(userIndex - 1);
             oldNode = temp;
             temp.setNext(temp.getNext().getNext());
         } else {
-            head.setNext(head.getNext().getNext());
+            oldNode = head;
+            head = head.getNext();
         }
         --length;
         return oldNode;
@@ -63,33 +64,46 @@ public class List<T> {
             temp.setNext(userNode);
         } else {
             if (length > 0) {
-                userNode.setNext(head.getNext());
+                userNode.setNext(head);
+                head = userNode;
             }
-            head = new Node<T>(null, userNode);
+            head = userNode;
         }
         ++length;
     }
 
     public Node<T> deleteNode(T userData) {
-        Node<T> oldNode = new Node<>();
-        for (Node<T> p = head; p.getNext() != null; p = p.getNext()) {
-            if (p.getNext().getData().equals(userData)) {
-                oldNode = p.getNext();
-                if (p.getNext().getNext() != null) {
-                    p.setNext(p.getNext().getNext());
-                } else {
-                    p.setNext(null);
+        Node<T> oldNode;
+        if (length == 1 && head.equals(userData)) {
+            oldNode = head;
+            head = null;
+            --length;
+            return oldNode;
+        } else if (length > 1) {
+            for (Node<T> p = head; p.getNext() != null; p = p.getNext()) {
+                if (head.getData().equals(userData)) {
+                    oldNode = head;
+                    head = head.getNext();
+                    --length;
+                    return oldNode;
+                } else if (p.getNext().getData().equals(userData)) {
+                    oldNode = p.getNext();
+                    if (p.getNext().getNext() != null) {
+                        p.setNext(p.getNext().getNext());
+                    } else {
+                        p.setNext(null);
+                    }
+                    --length;
+                    return oldNode;
                 }
-                --length;
-                return oldNode;
             }
         }
         return null;
     }
 
-    public Node<T> deleteNexNode(Node<T> userNode) {
+    public Node<T> deleteNextNode(Node<T> userNode) {
         if (userNode.getNext() != null) {
-            Node<T> oldNode = new Node<>();
+            Node<T> oldNode;
             oldNode = userNode.getNext();
             userNode.setNext(userNode.getNext().getNext());
             --length;
@@ -112,18 +126,12 @@ public class List<T> {
 
     public void reverseOfList() {
         if (length > 1) {
-            boolean isFirst = true;
-            for (Node<T> prevPrev = head, prev = prevPrev.getNext(), p = prev.getNext();
-                 p != null; prevPrev = prevPrev.getNext(), prev = p, p = p.getNext()) {
-                if (isFirst) {
-                    prev.setNext(null);
-                    isFirst = false;
-                } else {
-                    prev.setNext(prevPrev);
-                }
+            for (Node<T> prevPrev = null, prev = head, p = prev.getNext();
+                 p != null; prevPrev = prev, prev = p, p = p.getNext()) {
+                prev.setNext(prevPrev);
                 if (p.getNext() == null) {
-                    head.setNext(p);
-                    p.setNext(prev);
+                    head = p;
+                    head.setNext(prev);
                     break;
                 }
             }
@@ -132,7 +140,7 @@ public class List<T> {
 
     public int getIndex(Node<T> node) {
         int index = 0;
-        for (Node p = head.getNext(); p != null; p = p.getNext()) {
+        for (Node p = head; p != null; p = p.getNext()) {
             if (p.equals(node)) {
                 return index;
             }
@@ -144,12 +152,12 @@ public class List<T> {
     public List cloneList() {
         ArrayList<Node<T>> nodes = new ArrayList<>(length);
         for (int i = 0; i < length; i++) {
-            nodes.add(i, new Node<T>());
+            nodes.add(i, new Node<>());
         }
         int link;
         int index = 0;
         List<T> newList = new List<>();
-        for (Node<T> p = head.getNext(); p != null; p = p.getNext()) {
+        for (Node<T> p = head; p != null; p = p.getNext()) {
             link = (p.getRandomNext() != null) ? getIndex(p.getRandomNext()) : -1;
             nodes.get(index).setData(p.getData());
             nodes.get(index).setRandomNext((link != -1) ? nodes.get(link) : null);
@@ -165,11 +173,11 @@ public class List<T> {
             StringBuilder listToString = new StringBuilder();
             listToString.append("[");
             int index = 0;
-            for (Node p = head.getNext(); p != null; p = p.getNext()) {
+            for (Node p = head; p != null; p = p.getNext()) {
                 listToString.append(p.getData()).append("(").append(index).append("), ");
                 ++index;
             }
-            listToString.delete(listToString.length() - 2, listToString.length()).append("]");
+            listToString.delete(listToString.length() - 2, listToString.length()).append("], длиной ").append(length);
             return listToString.toString();
         } else {
             return "список пуст";
