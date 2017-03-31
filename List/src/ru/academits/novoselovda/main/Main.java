@@ -62,29 +62,22 @@ public class Main {
             node1.setData("первый элемент");
             singleList.insertNode(node4, 0);
             singleList.insertNode(node6, 0);
-            System.out.println("оригниальный список: " + singleList);
             node6.setRandomNext(node1);
             node4.setRandomNext(node6);
             node2.setRandomNext(node1);
             node5.setRandomNext(node3);
             node1.setRandomNext(node4);
             node3.setRandomNext(null);
-            for (int i = 0; i < singleList.getLength(); i++) {
-                System.out.println(singleList.getNode(i) + " ссылается на "
-                        + singleList.getNode(i).getRandomNext());
-            }
+            System.out.println("оригниальный список: " + singleList);
+            System.out.println("оригниальный список: " + singleList);
             List cloneList = singleList.cloneList();
             System.out.println("клонированный список: " + cloneList);
-            for (int i = 0; i < cloneList.getLength(); i++) {
-                System.out.println(cloneList.getNode(i) + " ссылается на "
-                        + cloneList.getNode(i).getRandomNext());
-            }
             System.out.println("------------------------ПРОВЕРКА-----------------------------------------");
-            cloneList.deleteNode(0);
-            cloneList.deleteNode(0);
-            cloneList.deleteNode(0);
-            cloneList.deleteNode(0);
-            cloneList.deleteNode(0);
+            System.out.println("удаляю: " + cloneList.deleteNode(0));
+            System.out.println("удаляю: " + cloneList.deleteNode(0));
+            System.out.println("удаляю: " + cloneList.deleteNode(0));
+            System.out.println("удаляю: " + cloneList.deleteNode(0));
+            System.out.println("удаляю: " + cloneList.deleteNode(0));
             System.out.println("клонированный список: " + cloneList);
         } catch (IndexOutOfBoundsException | IllegalArgumentException exception) {
             System.out.println(exception.getMessage());
