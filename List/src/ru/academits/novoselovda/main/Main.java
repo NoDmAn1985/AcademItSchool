@@ -69,9 +69,10 @@ public class Main {
             node1.setRandomNext(node4);
             node3.setRandomNext(null);
             System.out.println("оригниальный список: " + singleList);
-            System.out.println("оригниальный список: " + singleList);
             List cloneList = singleList.cloneList();
             System.out.println("клонированный список: " + cloneList);
+            List smartCloneList = singleList.smartClone();
+            System.out.println("умный клон списка: " + smartCloneList);
             System.out.println("------------------------ПРОВЕРКА-----------------------------------------");
             System.out.println("удаляю: " + cloneList.deleteNode(0));
             System.out.println("удаляю: " + cloneList.deleteNode(0));

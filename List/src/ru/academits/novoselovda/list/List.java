@@ -2,7 +2,7 @@ package ru.academits.novoselovda.list;
 
 import java.util.ArrayList;
 
-public class List<T> {
+public class List<T> implements Cloneable {
     private int length;
     private Node<T> head;
 
@@ -73,27 +73,17 @@ public class List<T> {
     }
 
     public Node<T> deleteNode(T userData) {
-        Node<T> oldNode;
+        Node<T> oldNode = new Node<>();
         if (length == 1 && head.getData().equals(userData)) {
-            oldNode = head;
-            head = null;
-            --length;
-            return oldNode;
+            return replaceHead(null);
         } else if (length > 1) {
             if (head.getData().equals(userData)) {
-                oldNode = head;
-                head = head.getNext();
-                --length;
-                return oldNode;
+                return replaceHead(head.getNext());
             } else {
                 for (Node<T> p = head; p.getNext() != null; p = p.getNext()) {
                     if (p.getNext().getData().equals(userData)) {
                         oldNode = p.getNext();
-                        if (p.getNext().getNext() != null) {
-                            p.setNext(p.getNext().getNext());
-                        } else {
-                            p.setNext(null);
-                        }
+                        p.setNext(p.getNext().getNext());
                         --length;
                         return oldNode;
                     }
@@ -162,10 +152,24 @@ public class List<T> {
             link = (p.getRandomNext() != null) ? getIndex(p.getRandomNext()) : -1;
             nodes.get(index).setData(p.getData());
             nodes.get(index).setRandomNext((link != -1) ? nodes.get(link) : null);
-            newList.insertNode(nodes.get(index), index);
+            nodes.get(index).setNext((index < length - 1) ? nodes.get(index + 1) : null);
+            if (index == 0) {
+                newList.insertNode(nodes.get(0), 0);
+            } else {
+                ++newList.length;
+            }
             ++index;
         }
         return newList;
+    }
+
+    public List<?> smartClone() {
+        try {
+            return (List<?>) super.clone();
+        } catch (CloneNotSupportedException exception) {
+            System.out.println("ОШИБКА: умное клонирование не удалось");
+        }
+        return null;
     }
 
     @Override
@@ -185,6 +189,13 @@ public class List<T> {
         } else {
             return "список пуст";
         }
+    }
+
+    private Node<T> replaceHead(Node<T> newHead) {
+        Node<T> oldNode = head;
+        head = newHead;
+        --length;
+        return oldNode;
     }
 
     private void testOfEntrance(int index) {
