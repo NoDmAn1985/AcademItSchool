@@ -68,19 +68,17 @@ public class Main {
             node5.setRandomNext(node3);
             node1.setRandomNext(node4);
             node3.setRandomNext(null);
+            System.out.println("удаляю: " + singleList.deleteNode(0));
+            System.out.println("удаляю: " + singleList.deleteNode(0));
+            System.out.println("удаляю: " + singleList.deleteNode(0));
+            System.out.println("удаляю: " + singleList.deleteNode(0));
+            System.out.println("удаляю: " + singleList.deleteNode(0));
             System.out.println("оригниальный список: " + singleList);
             List cloneList = singleList.cloneList();
             System.out.println("клонированный список: " + cloneList);
             List smartCloneList = singleList.smartClone();
             System.out.println("умный клон списка: " + smartCloneList);
             System.out.println("оригниальный список: " + singleList);
-            System.out.println("------------------------ПРОВЕРКА-----------------------------------------");
-            System.out.println("удаляю: " + cloneList.deleteNode(0));
-            System.out.println("удаляю: " + cloneList.deleteNode(0));
-            System.out.println("удаляю: " + cloneList.deleteNode(0));
-            System.out.println("удаляю: " + cloneList.deleteNode(0));
-            System.out.println("удаляю: " + cloneList.deleteNode(0));
-            System.out.println("клонированный список: " + cloneList);
         } catch (IndexOutOfBoundsException | IllegalArgumentException exception) {
             System.out.println(exception.getMessage());
         }

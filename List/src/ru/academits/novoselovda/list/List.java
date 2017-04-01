@@ -164,6 +164,10 @@ public class List<T> implements Cloneable {
     }
 
     public List<T> smartClone() {
+        List<T> newList = new List<>();
+        if (length == 0) {
+            return newList;
+        }
         ArrayList<Node<T>> nodes = new ArrayList<>(length);
         int index = 0;
         for (Node<T> p = head; p != null; p = p.getNext().getNext()) {
@@ -179,7 +183,6 @@ public class List<T> implements Cloneable {
                 nodes.get(index).setRandomNext(nodes.get(index).getRandomNext().getNext());
             }
         }
-        List<T> newList = new List<>();
         newList.insertNode(nodes.get(0), 0);
         index = 0;
         for (Node<T> p = head; p != null; p = p.getNext()) {
