@@ -163,13 +163,34 @@ public class List<T> implements Cloneable {
         return newList;
     }
 
-    public List<?> smartClone() {
-        try {
-            return (List<?>) super.clone();
-        } catch (CloneNotSupportedException exception) {
-            System.out.println("ОШИБКА: умное клонирование не удалось");
+    public List<T> smartClone() {
+        ArrayList<Node<T>> nodes = new ArrayList<>(length);
+        int index = 0;
+        for (Node<T> p = head; p != null; p = p.getNext().getNext()) {
+            nodes.add(new Node<>());
+            nodes.get(index).setData(p.getData());
+            nodes.get(index).setRandomNext(p.getRandomNext());
+            nodes.get(index).setNext(p.getNext());
+            p.setNext(nodes.get(index));
+            ++index;
         }
-        return null;
+        for (index = 0; index < length; index++) {
+            if (nodes.get(index).getRandomNext() != null) {
+                nodes.get(index).setRandomNext(nodes.get(index).getRandomNext().getNext());
+            }
+        }
+        List<T> newList = new List<>();
+        newList.insertNode(nodes.get(0), 0);
+        index = 0;
+        for (Node<T> p = head; p != null; p = p.getNext()) {
+            p.setNext(p.getNext().getNext());
+            if (index < nodes.size() - 1) {
+                nodes.get(index).setNext((nodes.get(index + 1)));
+            }
+            ++index;
+        }
+        newList.length = index;
+        return newList;
     }
 
     @Override

@@ -73,6 +73,7 @@ public class Main {
             System.out.println("клонированный список: " + cloneList);
             List smartCloneList = singleList.smartClone();
             System.out.println("умный клон списка: " + smartCloneList);
+            System.out.println("оригниальный список: " + singleList);
             System.out.println("------------------------ПРОВЕРКА-----------------------------------------");
             System.out.println("удаляю: " + cloneList.deleteNode(0));
             System.out.println("удаляю: " + cloneList.deleteNode(0));
