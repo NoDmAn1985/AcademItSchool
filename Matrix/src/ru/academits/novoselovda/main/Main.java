@@ -35,20 +35,20 @@ public class Main {
             System.out.println("2.	Методы:");
             System.out.println("a.	Получение размеров матрицы");
             System.out.println(matrix4);
-            System.out.println(matrix4.getAmountOfLines());
-            System.out.println(matrix4.getAmountOfRows());
+            System.out.println(matrix4.getRowsCount());
+            System.out.println(matrix4.getColumnsCount());
             System.out.println(matrix4.getSizeToString());
 
             System.out.println("b.	Получение и задание вектора-строки по индексу");
-            System.out.println(matrix4.getLine(1));
+            System.out.println(matrix4.getRow(1));
             double[] array1 = {9.9, 8.8, 7.7};
             Vector vector = new Vector(array1);
-            matrix4.setLine(matrix4.getAmountOfLines(), vector);
+            matrix4.setRow(matrix4.getRowsCount(), vector);
             System.out.println(matrix4);
             System.out.println(matrix4.getSizeToString());
 
             System.out.println("c.	Получение вектора-столбца по индексу");
-            System.out.println(matrix4.getRow(2));
+            System.out.println(matrix4.getColumn(2));
 
             System.out.println("d.	Транспонирование матрицы");
             System.out.println(matrix4);

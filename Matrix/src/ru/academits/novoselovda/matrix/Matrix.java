@@ -30,151 +30,155 @@ c.	Умножение матриц
 
  */
 public class Matrix {
-    private int amountOfRows;
-    private int amountOfLines;
-    private Vector[] matrixLines;
+    private Vector[] rows;
 
-    public Matrix(int amountOfLines, int amountOfRows) {
-        testOnZeroNumberOfElements(amountOfRows, amountOfLines);
-        this.amountOfRows = amountOfRows;
-        this.amountOfLines = amountOfLines;
-        matrixLines = new Vector[this.amountOfLines];
-        for (int i = 0; i < amountOfLines; i++) {
-            matrixLines[i] = new Vector(amountOfRows);
+    public Matrix(int rowsCount, int columnsCount) {
+        testOnZeroNumberOfElements(rowsCount, columnsCount);
+        rows = new Vector[rowsCount];
+        for (int i = 0; i < rowsCount; i++) {
+            rows[i] = new Vector(columnsCount);
         }
     }
 
     public Matrix(Matrix matrix) {
-        this.amountOfRows = matrix.amountOfRows;
-        this.amountOfLines = matrix.amountOfLines;
-        this.matrixLines = new Vector[this.amountOfLines];
-        for (int i = 0; i < this.amountOfLines; i++) {
-            this.matrixLines[i] = new Vector(matrix.matrixLines[i]);
+        this.rows = new Vector[matrix.rows.length];
+        for (int i = 0; i < matrix.rows.length; i++) {
+            this.rows[i] = new Vector(matrix.rows[i]);
         }
     }
 
     public Matrix(double[][] matrixElements) {
         testOnZeroNumberOfElements(matrixElements);
-        this.amountOfLines = matrixElements.length;
         int maximum = matrixElements[0].length;
-        for (int i = 1; i < this.amountOfLines; i++) {
+        for (int i = 1; i < matrixElements.length; i++) {
             maximum = Math.max(maximum, matrixElements[i].length);
         }
-        this.amountOfRows = maximum;
-        this.matrixLines = new Vector[amountOfLines];
-        for (int i = 0; i < this.amountOfLines; i++) {
-            this.matrixLines[i] = new Vector(this.amountOfRows, matrixElements[i]);
+        this.rows = new Vector[matrixElements.length];
+        for (int i = 0; i < matrixElements.length; i++) {
+            this.rows[i] = new Vector(maximum, matrixElements[i]);
         }
     }
 
     public Matrix(Vector[] vectors) {
-        this.amountOfLines = vectors.length;
         int maximum = vectors[0].getSize();
-        for (int i = 1; i < this.amountOfLines; i++) {
+        for (int i = 1; i < vectors.length; i++) {
             maximum = Math.max(maximum, vectors[i].getSize());
         }
-        this.amountOfRows = maximum;
-        matrixLines = new Vector[amountOfLines];
-        for (int i = 0; i < this.amountOfLines; i++) {
-            if (vectors[i].getSize() < this.amountOfRows) {
-                this.matrixLines[i] = new Vector(amountOfRows);
-                this.matrixLines[i].add(vectors[i]);
+        rows = new Vector[vectors.length];
+        for (int i = 0; i < vectors.length; i++) {
+            if (vectors[i].getSize() < maximum) {
+                this.rows[i] = new Vector(maximum);
+                this.rows[i].add(vectors[i]);
             } else {
-                this.matrixLines[i] = new Vector(vectors[i]);
+                this.rows[i] = new Vector(vectors[i]);
             }
         }
     }
 
-    public int getAmountOfRows() {
-        return amountOfRows;
+    public int getColumnsCount() {
+        return this.rows[0].getSize();
     }
 
-    public int getAmountOfLines() {
-        return amountOfLines;
+    public int getRowsCount() {
+        return this.rows.length;
     }
 
     public String getSizeToString() {
-        return amountOfLines + " x " + amountOfRows;
+        return getRowsCount() + " x " + getColumnsCount();
     }
 
-    public Vector getLine(int indexOfLine) {
-        testIndexEntranceInNumberOfLines(indexOfLine);
-        return matrixLines[indexOfLine];
+    public Vector getRow(int rowIndex) {
+        testIndexEntranceInNumberOfRows(rowIndex);
+        return new Vector(rows[rowIndex]);
     }
 
-    public void setLine(int indexOfLine, Vector userVector) {
-        if (indexOfLine == amountOfLines) {
-            Vector[] tempArray = this.matrixLines;
-            this.amountOfLines = indexOfLine + 1;
-            this.matrixLines = new Vector[amountOfLines];
-            this.matrixLines = Arrays.copyOf(tempArray, amountOfLines);
-            this.matrixLines[indexOfLine] = new Vector(amountOfRows);
-            this.matrixLines[indexOfLine].add(userVector);
+    public void setRow(int rowIndex, Vector userVector) {
+        if (rowIndex == rows.length) {
+            int rowLength = rows[0].getSize();
+            Vector[] tempArray = this.rows;
+            this.rows = new Vector[this.rows.length + 1];
+            if (userVector.getSize() > rowLength) {
+                changeVectorsSize(userVector.getSize(), rowIndex);
+            } else {
+                this.rows = Arrays.copyOf(tempArray, this.rows.length);
+            }
+            this.rows[rowIndex] = new Vector(rows[0].getSize());
+            this.rows[rowIndex].add(userVector);
             return;
         }
-        testIndexEntranceInNumberOfLines(indexOfLine);
-        matrixLines[indexOfLine] = new Vector(userVector);
+        if (userVector.getSize() > rows[0].getSize()) {
+            changeVectorsSize(userVector.getSize(), rowIndex);
+        }
+        testIndexEntranceInNumberOfRows(rowIndex);
+        rows[rowIndex] = new Vector(userVector);
     }
 
-    public Vector getRow(int indexOfRow) {
-        testIndexEntranceInNumberOfRows(indexOfRow);
-        double[] arrayOfRowElements = new double[amountOfLines];
-        for (int i = 0; i < amountOfLines; i++) {
-            arrayOfRowElements[i] = matrixLines[i].getComponent(indexOfRow);
+    public Vector getColumn(int indexOfRow) {
+        testIndexEntranceInNumberOfColumns(indexOfRow);
+        double[] arrayOfRowElements = new double[rows.length];
+        for (int i = 0; i < rows.length; i++) {
+            arrayOfRowElements[i] = rows[i].getComponent(indexOfRow);
         }
         return new Vector(arrayOfRowElements);
     }
 
     public void transpose() {
-        Matrix transposedMatrix = new Matrix(this.amountOfRows, this.amountOfLines);
-        for (int i = 0; i < this.amountOfRows; i++) {
-            transposedMatrix.setLine(i, this.getRow(i));
+        Vector[] tempArray = new Vector[rows[0].getSize()];
+        for (int i = 0; i < rows[0].getSize(); i++) {
+            tempArray[i] = new Vector(this.getColumn(i));
         }
-        this.amountOfLines = transposedMatrix.amountOfLines;
-        this.amountOfRows = transposedMatrix.amountOfRows;
-        this.matrixLines = Arrays.copyOf(transposedMatrix.matrixLines, this.amountOfLines);
+        this.rows = Arrays.copyOf(tempArray, tempArray.length);
     }
 
     public void scalarProduct(double scalar) {
-        for (int i = 0; i < amountOfLines; i++) {
-            this.matrixLines[i].scalarProduct(scalar);
+        for (int i = 0; i < rows.length; i++) {
+            this.rows[i].scalarProduct(scalar);
         }
     }
 
     public double getDeterminant() {
         testSquareOfMatrix();
         double determinant = 0;
-        if (this.amountOfLines <= 3) {
-            double[] productOfElementsInDiagonalDown = new double[amountOfRows];
+        if (this.rows.length == 1) {
+            determinant = this.rows[0].getComponent(0);
+        } else if (this.rows.length == 2) {
+            determinant = this.rows[0].getComponent(0) * this.rows[1].getComponent(1)
+                    - this.rows[0].getComponent(1) * this.rows[1].getComponent(0);
+        } else if (this.rows.length == 3) {
+            double[] productOfElementsInDiagonalDown = new double[this.rows.length];
             Arrays.fill(productOfElementsInDiagonalDown, 1.0);
-            double[] productOfElementsInDiagonalUp = new double[amountOfRows];
+            double[] productOfElementsInDiagonalUp = new double[this.rows.length];
             Arrays.fill(productOfElementsInDiagonalUp, 1.0);
-            for (int index = 0; index < amountOfRows; index++) {
-                for (int line = 0; line < this.amountOfRows; line++) {
-                    int posForDiagonalDown = (index + line < this.amountOfRows) ? index + line : index + line - amountOfRows;
-                    int posForDiagonalUp = (index - line >= 0) ? index - line : index - line + this.amountOfRows;
-                    productOfElementsInDiagonalDown[index] *= matrixLines[line].getComponent(posForDiagonalDown);
-                    productOfElementsInDiagonalUp[index] *= matrixLines[line].getComponent(posForDiagonalUp);
+            for (int index = 0; index < this.rows.length; index++) {
+                for (int row = 0; row < this.rows.length; row++) {
+                    int posForDiagonalDown = (index + row < this.rows.length) ? index + row :
+                            index + row - this.rows.length;
+                    int posForDiagonalUp = (index - row >= 0) ? index - row : index - row + this.rows.length;
+                    productOfElementsInDiagonalDown[index] *= this.rows[row].getComponent(posForDiagonalDown);
+                    productOfElementsInDiagonalUp[index] *= this.rows[row].getComponent(posForDiagonalUp);
                 }
                 determinant = determinant + productOfElementsInDiagonalDown[index] - productOfElementsInDiagonalUp[index];
             }
-        } else if (this.amountOfLines > 3) {
-            Matrix tempMatrix = new Matrix(this);
+        } else if (this.rows.length > 3) {
+            Vector[] tempMatrix = new Vector[rows.length];
+            for (int i = 0; i < rows.length; i++) {
+                tempMatrix[i] = new Vector(rows[i]);
+            }
             determinant = 1;
-            for (int row = 0; row < tempMatrix.amountOfRows - 1; row++) {
-                for (int i = row + 1; i < tempMatrix.amountOfLines; i++) {
-                    if (tempMatrix.matrixLines[i].getComponent(row) != 0) {
-                        double rate = tempMatrix.matrixLines[i].getComponent(row)
-                                / tempMatrix.matrixLines[row].getComponent(row);
-                        Vector tempVector = new Vector(tempMatrix.matrixLines[row]);
+            for (int row = 0; row < tempMatrix.length - 1; row++) {
+                for (int i = row + 1; i < tempMatrix.length; i++) {
+                    if (tempMatrix[i].getComponent(row) != 0) {
+                        double rate = tempMatrix[i].getComponent(row)
+                                / tempMatrix[row].getComponent(row);
+                        Vector tempVector = new Vector(tempMatrix[row]);
                         tempVector.scalarProduct(rate);
-                        tempMatrix.matrixLines[i].subtract(tempVector);
+                        tempMatrix[i].subtract(tempVector);
                     }
                 }
-                determinant *= tempMatrix.matrixLines[row].getComponent(row);
+                determinant *= tempMatrix[row].getComponent(row);
             }
-            determinant *= tempMatrix.matrixLines[tempMatrix.amountOfLines - 1]
-                    .getComponent(tempMatrix.amountOfLines - 1);
+            determinant *= tempMatrix[tempMatrix.length - 1]
+                    .getComponent(tempMatrix.length - 1);
         }
         return Math.round(determinant);
     }
@@ -183,33 +187,33 @@ public class Matrix {
     public String toString() {
         StringBuilder matrixToString = new StringBuilder();
         matrixToString.append("{ ");
-        for (int i = 0; i < amountOfLines - 1; i++) {
-            matrixToString.append(matrixLines[i].toString()).append(", ");
+        for (int i = 0; i < rows.length - 1; i++) {
+            matrixToString.append(rows[i].toString()).append(", ");
         }
-        matrixToString.append(matrixLines[amountOfLines - 1].toString()).append(" }");
+        matrixToString.append(rows[rows.length - 1].toString()).append(" }");
         return matrixToString.toString();
     }
 
     public Vector productWithVector(Vector userVector) {
         testOpportunityToProduct(userVector);
-        Vector newVector = new Vector(this.amountOfLines);
-        for (int i = 0; i < this.amountOfLines; i++) {
-            newVector.setComponent(i, Vector.scalarProduct(userVector, matrixLines[i]));
+        Vector newVector = new Vector(rows.length);
+        for (int i = 0; i < rows.length; i++) {
+            newVector.setComponent(i, Vector.scalarProduct(userVector, rows[i]));
         }
         return newVector;
     }
 
     public void add(Matrix userMatrix) {
         testEqualSize(userMatrix);
-        for (int i = 0; i < amountOfLines; i++) {
-            this.matrixLines[i].add(userMatrix.matrixLines[i]);
+        for (int i = 0; i < rows.length; i++) {
+            this.rows[i].add(userMatrix.rows[i]);
         }
     }
 
     public void subtract(Matrix userMatrix) {
         testEqualSize(userMatrix);
-        for (int i = 0; i < amountOfLines; i++) {
-            this.matrixLines[i].subtract(userMatrix.matrixLines[i]);
+        for (int i = 0; i < rows.length; i++) {
+            this.rows[i].subtract(userMatrix.rows[i]);
         }
     }
 
@@ -228,60 +232,65 @@ public class Matrix {
 
     public static Matrix product(Matrix matrix1, Matrix matrix2) {
         testOpportunityToProduct(matrix1, matrix2);
-        Matrix productMatrix = new Matrix(matrix1.amountOfLines, matrix2.amountOfRows);
-        for (int i = 0; i < matrix1.amountOfLines; i++) {
-            for (int j = 0; j < matrix2.amountOfRows; j++) {
-                productMatrix.getLine(i).setComponent(j, Vector.scalarProduct(matrix1.getLine(i), matrix2.getRow(j)));
+        Matrix productMatrix = new Matrix(matrix1.rows.length, matrix2.rows[0].getSize());
+        for (int i = 0; i < matrix1.rows.length; i++) {
+            for (int k = 0; k < matrix2.rows[0].getSize(); k++) {
+                double product = 0;
+                for (int j = 0; j < matrix1.rows[0].getSize(); j++) {
+                    product += matrix1.rows[i].getComponent(j) * matrix2.rows[j].getComponent(k);
+
+                }
+                productMatrix.rows[i].setComponent(k, product);
             }
         }
         return productMatrix;
     }
 
-    private void testIndexEntranceInNumberOfRows(int index) {
-        if (index < 0 || index >= amountOfRows) {
+    private void testIndexEntranceInNumberOfColumns(int index) {
+        if (index < 0 || index >= this.rows[0].getSize()) {
             throw new IllegalArgumentException("ОШИБКА: запрашиваемый индекс ("
                     + index + ") не найден, значение должно находиться в интервале [0, "
-                    + amountOfRows + ")");
+                    + this.rows[0].getSize() + ")");
         }
     }
 
-    private void testIndexEntranceInNumberOfLines(int index) {
-        if (index < 0 || index >= amountOfLines) {
+    private void testIndexEntranceInNumberOfRows(int index) {
+        if (index < 0 || index >= this.rows.length) {
             throw new IllegalArgumentException("ОШИБКА: запрашиваемый индекс ("
                     + index + ") не найден, значение должно находиться в интервале [0, "
-                    + amountOfLines + ")");
+                    + this.rows.length + ")");
         }
     }
 
     private void testSquareOfMatrix() {
-        if (this.amountOfLines != this.amountOfRows) {
+        if (this.rows.length != this.rows[0].getSize()) {
             throw new IllegalArgumentException("ОШИБКА: матрица размером " + this.getSizeToString()
                     + " не квадратная");
         }
     }
 
     private void testEqualSize(Matrix userMatrix) {
-        if (this.amountOfLines != userMatrix.amountOfLines || this.amountOfRows != userMatrix.amountOfRows) {
+        if (this.rows.length != userMatrix.rows.length || this.rows[0].getSize() != userMatrix.rows[0].getSize()) {
             throw new IllegalArgumentException("ОШИБКА: матрицы должны быть одинакового размера");
         }
     }
 
     private static void testOpportunityToProduct(Matrix matrix1, Matrix matrix2) {
-        if (matrix1.amountOfRows != matrix2.amountOfLines) {
+        if (matrix1.rows[0].getSize() != matrix2.rows.length) {
             throw new IllegalArgumentException("ОШИБКА: количество столбцов матрицы 1"
                     + " должно совпадать с количеством строк матрицы 2");
         }
     }
 
     private void testOpportunityToProduct(Vector vector) {
-        if (this.amountOfRows != vector.getSize()) {
+        if (this.rows[0].getSize() != vector.getSize()) {
             throw new IllegalArgumentException("ОШИБКА: количество столбцов матрицы"
                     + " должно совпадать с количеством строк элементов в векторе");
         }
     }
 
-    private void testOnZeroNumberOfElements(int amountOfRows, int amountOfLines) {
-        if (amountOfRows <= 0 || amountOfLines <= 0) {
+    private void testOnZeroNumberOfElements(int rowsCount, int columnCount) {
+        if (rowsCount <= 0 || columnCount <= 0) {
             throw new IllegalArgumentException("ОШИБКА: количество элементов в строке/столбце, должно быть больше 0");
         }
     }
@@ -289,6 +298,16 @@ public class Matrix {
     private void testOnZeroNumberOfElements(double[][] userArray) {
         if (userArray.length == 0 || userArray[0].length == 0) {
             throw new IllegalArgumentException("ОШИБКА: количество элементов в строке/столбце, должно быть больше 0");
+        }
+    }
+
+    private void changeVectorsSize(int newSize, int indexToSkip) {
+        for (int i = 0; i < rows.length; i++) {
+            if (i == indexToSkip) {
+                continue;
+            }
+            this.rows[i] = new Vector(newSize);
+            this.rows[i].add(rows[i]);
         }
     }
 }
