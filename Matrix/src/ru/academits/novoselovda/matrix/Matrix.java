@@ -2,8 +2,6 @@ package ru.academits.novoselovda.matrix;
 
 import ru.academits.novoselovda.vector.Vector;
 
-import java.util.Arrays;
-
 /*
 Реализовать класс матрицы Matrix с использованием класса Vector – хранить строки как массив векторов
 Реализовать:
@@ -94,23 +92,17 @@ public class Matrix {
 
     public void setRow(int rowIndex, Vector userVector) {
         testOnVectorSize(userVector);
-        if (rowIndex == rows.length) {
-            Vector[] tempArray = this.rows;
-            this.rows = new Vector[this.rows.length + 1];
-            this.rows = Arrays.copyOf(tempArray, this.rows.length);
-            this.rows[rowIndex] = new Vector(this.getColumnsCount());
-            this.rows[rowIndex].add(userVector);
-            return;
-        }
         testIndexEntranceInNumberOfRows(rowIndex);
-        rows[rowIndex] = new Vector(userVector);
+        for (int i = 0; i < userVector.getSize(); i++) {
+            rows[rowIndex].setComponent(i, userVector.getComponent(i));
+        }
     }
 
-    public Vector getColumn(int indexOfRow) {
-        testIndexEntranceInNumberOfColumns(indexOfRow);
+    public Vector getColumn(int indexOfColumn) {
+        testIndexEntranceInNumberOfColumns(indexOfColumn);
         double[] arrayOfColumnElements = new double[rows.length];
         for (int i = 0; i < rows.length; i++) {
-            arrayOfColumnElements[i] = rows[i].getComponent(indexOfRow);
+            arrayOfColumnElements[i] = rows[i].getComponent(indexOfColumn);
         }
         return new Vector(arrayOfColumnElements);
     }
@@ -138,25 +130,34 @@ public class Matrix {
             determinant = this.rows[0].getComponent(0) * this.rows[1].getComponent(1)
                     - this.rows[0].getComponent(1) * this.rows[1].getComponent(0);
         } else {
-            Vector[] tempMatrix = new Vector[rows.length];
-            for (int i = 0; i < rows.length; i++) {
-                tempMatrix[i] = new Vector(rows[i]);
-            }
+            Matrix tempMatrix = new Matrix(this);
             determinant = 1;
-            for (int row = 0; row < tempMatrix.length - 1; row++) {
-                for (int i = row + 1; i < tempMatrix.length; i++) {
-                    if (tempMatrix[i].getComponent(row) != 0) {
-                        double rate = tempMatrix[i].getComponent(row)
-                                / tempMatrix[row].getComponent(row);
-                        Vector tempVector = new Vector(tempMatrix[row]);
-                        tempVector.scalarProduct(rate);
-                        tempMatrix[i].subtract(tempVector);
+            for (int column = 0; column < tempMatrix.getColumnsCount() - 1; column++) {
+                if (column != 0 && tempMatrix.rows[0].getComponent(0) == 0) {
+                    determinant = 0;
+                    break;
+                }
+                if (tempMatrix.rows[column].getComponent(column) == 0) {
+                    if (changeZeroRowWithNotZeroRow(tempMatrix, column)) {
+                        determinant = -determinant;
+                    } else {
+                        determinant *= tempMatrix.rows[column].getComponent(column);
+                        continue;
                     }
                 }
-                determinant *= tempMatrix[row].getComponent(row);
+                for (int row = column + 1; row < tempMatrix.rows.length; row++) {
+                    if (tempMatrix.rows[row].getComponent(column) != 0) {
+                        double rate = tempMatrix.rows[row].getComponent(column)
+                                / tempMatrix.rows[column].getComponent(column);
+                        Vector tempVector = new Vector(tempMatrix.rows[column]);
+                        tempVector.scalarProduct(rate);
+                        tempMatrix.rows[row].subtract(tempVector);
+                    }
+                }
+                determinant *= tempMatrix.rows[column].getComponent(column);
             }
-            determinant *= tempMatrix[tempMatrix.length - 1]
-                    .getComponent(tempMatrix.length - 1);
+            determinant *= tempMatrix.rows[tempMatrix.rows.length - 1]
+                    .getComponent(tempMatrix.rows.length - 1);
         }
         return determinant;
     }
@@ -169,6 +170,17 @@ public class Matrix {
             matrixToString.append(rows[i].toString()).append(", ");
         }
         matrixToString.append(rows[rows.length - 1].toString()).append(" }");
+        return matrixToString.toString();
+    }
+
+    //для дебага
+    private String matrixToString() {
+        StringBuilder matrixToString = new StringBuilder();
+        matrixToString.append("{\n");
+        for (int i = 0; i < rows.length - 1; i++) {
+            matrixToString.append(rows[i].toString()).append("\n");
+        }
+        matrixToString.append(rows[rows.length - 1].toString()).append("\n}");
         return matrixToString.toString();
     }
 
@@ -284,4 +296,19 @@ public class Matrix {
             throw new IllegalArgumentException("ОШИБКА: длина передаваемого вектора превышает допустимое значение");
         }
     }
+
+    private boolean changeZeroRowWithNotZeroRow(Matrix matrix, int zeroRowIndex) {
+        boolean isAnyChanges = false;
+        for (int i = zeroRowIndex + 1; i < matrix.rows.length; i++) {
+            if (matrix.rows[i].getComponent(zeroRowIndex) != 0) {
+                Vector tempRow = new Vector(matrix.rows[zeroRowIndex]);
+                matrix.setRow(zeroRowIndex, matrix.rows[i]);
+                matrix.setRow(i, tempRow);
+                isAnyChanges = true;
+                break;
+            }
+        }
+        return isAnyChanges;
+    }
+
 }

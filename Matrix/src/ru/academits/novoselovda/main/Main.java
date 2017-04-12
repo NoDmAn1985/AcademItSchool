@@ -43,7 +43,7 @@ public class Main {
             System.out.println(matrix4.getRow(1));
             double[] array1 = {9.9, 8.8, 7.7};
             Vector vector = new Vector(array1);
-            matrix4.setRow(matrix4.getRowsCount(), vector);
+            matrix4.setRow(matrix4.getRowsCount() - 1, vector);
             System.out.println(matrix4);
             System.out.println(matrix4.getSizeToString());
 
@@ -61,9 +61,10 @@ public class Main {
 
             System.out.println("f.	Вычисление определителя матрицы");
             double[][] array2 = {
-                    {2, 1, 3},
-                    {1, -4, 1},
-                    {5, 1, -2}};
+                    {0, 1, 3, 0},
+                    {-9, -4, 1, 4},
+                    {0, -4, 1, 3},
+                    {0, 1, -2, 0}};
             Matrix matrix5 = new Matrix(array2);
             System.out.println(matrix5.getDeterminant());
 
