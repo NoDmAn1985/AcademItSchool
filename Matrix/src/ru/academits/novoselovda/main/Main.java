@@ -61,11 +61,9 @@ public class Main {
 
             System.out.println("f.	Вычисление определителя матрицы");
             double[][] array2 = {
-                    {2, 1, 3, 1, 15},
-                    {1, 4, 1, 2, -22},
-                    {4, 1, 2, 3, 65},
-                    {24, -1, -2, 0, -5},
-                    {9, 6, 7, 8, 49}};
+                    {2, 1, 3},
+                    {1, -4, 1},
+                    {5, 1, -2}};
             Matrix matrix5 = new Matrix(array2);
             System.out.println(matrix5.getDeterminant());
 
@@ -81,7 +79,7 @@ public class Main {
             Matrix matrix6 = new Matrix(array3);
             System.out.println(matrix6);
             double[] array4 = {2, 3, 5};
-            System.out.println(matrix6.productWithVector(new Vector(array4)));
+            System.out.println(matrix6.product(new Vector(array4)));
 
             System.out.println("i.	Сложение матриц");
             double[][] array5 = {
@@ -101,6 +99,7 @@ public class Main {
             matrix7.subtract(matrix8);
             System.out.println(matrix7);
 
+            System.out.println();
             System.out.println("3.	Статические методы:");
             double[][] array7 = {
                     {1, 1, 1},
