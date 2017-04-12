@@ -292,8 +292,8 @@ public class Matrix {
     }
 
     private void testOnVectorSize(Vector vector) {
-        if (vector.getSize() > this.getColumnsCount()) {
-            throw new IllegalArgumentException("ОШИБКА: длина передаваемого вектора превышает допустимое значение");
+        if (vector.getSize() != this.getColumnsCount()) {
+            throw new IllegalArgumentException("ОШИБКА: длина передаваемого вектора не соответствует количеству столбцов матрицы");
         }
     }
 
