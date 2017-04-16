@@ -1,6 +1,6 @@
 package ru.academits.novoselovda.notes;
 
-public class Notes {
+public class Note {
     public enum Values {
         TEN(10),
         FIFTY(50),
@@ -16,18 +16,18 @@ public class Notes {
             return value;
         }
     }
-    public static final int VALUE_COUNT = 6;
     private int value;
     private Values name;
-    private int count;
+    private Note previousNote;
+    private Note nextNote;
 
-    public Notes(Values name, int count) {
-        if (count < 0) {
-            throw new IllegalArgumentException("ОШИБКА: количество создаваемых денег не может быть отрицательным");
-        }
+
+
+    public Note(Values name, Note previousNote, Note nextNote) {
+        this.previousNote = previousNote;
+        this.nextNote = nextNote;
         this.name = name;
         this.value = name.value;
-        this.count = count;
     }
 
     public int getValueInt() {
@@ -38,16 +38,19 @@ public class Notes {
         return name;
     }
 
-    public int getCount() {
-        return count;
+    public Note getPreviousNote() {
+        return previousNote;
     }
 
-    public void addCount(int count) {
-        this.count += count;
+    public void setPreviousNote(Note previousNote) {
+        this.previousNote = previousNote;
     }
 
-    public void deductCount(int count) {
-        this.count = this.count - count;
+    public Note getNextNote() {
+        return nextNote;
     }
 
+    public void setNextNote(Note nextNote) {
+        this.nextNote = nextNote;
+    }
 }
