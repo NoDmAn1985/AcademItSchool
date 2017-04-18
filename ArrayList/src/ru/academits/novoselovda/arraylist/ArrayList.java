@@ -54,9 +54,9 @@ public class ArrayList<T> implements List<T> {
             return (T1[]) Arrays.copyOf(array, length, a.getClass());
         }
         System.arraycopy(array, 0, a, 0, length);
-//        if (a.length > length) {
-//            a[length] = null;
-//        }
+        if (a.length > length) {
+            a[length] = null;
+        }
         return a;
     }
 
@@ -74,7 +74,6 @@ public class ArrayList<T> implements List<T> {
         int index = indexOf(o);
         if (index > 0) {
             remove(index);
-            ++modificationsCount;
             return true;
         }
         return false;
@@ -82,15 +81,16 @@ public class ArrayList<T> implements List<T> {
 
     @Override
     public boolean containsAll(Collection<?> c) {
+        if (c.size() == 0) {
+            throw new NullPointerException();
+        }
         boolean[] isCollectionContains = new boolean[c.size()];
         Arrays.fill(isCollectionContains, false);
         int count = 0;
         for (Object element : array) {
             int index = 0;
             for (Object object : c) {
-                if (!isCollectionContains[index] &&
-                        ((object == null && element == null) ||
-                                (object != null && element != null && element.equals(object)))) {
+                if (!isCollectionContains[index] && Objects.equals(element, object)) {
                     isCollectionContains[index] = true;
                     ++count;
                     if (count == c.size()) {
@@ -106,33 +106,43 @@ public class ArrayList<T> implements List<T> {
 
     @Override
     public boolean addAll(Collection<? extends T> c) {
-        boolean isAdd = false;
-        for (T object : c) {
-            add(object);
-            isAdd = true;
-            ++modificationsCount;
+        if (c.size() == 0) {
+            throw new NullPointerException();
         }
-        return isAdd;
+        return addAll(length, c);
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public boolean addAll(int index, Collection<? extends T> c) {
-        boolean isAdd = false;
-        for (T object : c) {
-            add(index, object);
-            ++index;
-            isAdd = true;
+        if (c.size() == 0) {
+            throw new NullPointerException();
         }
-        return isAdd;
+        if (index != length) {
+            testOfEntrance(index);
+        }
+        if (length + c.size() < array.length) {
+            ensureCapacity(length + c.size());
+        }
+        T[] tempArray = (T[]) c.toArray();
+        if (index != length) {
+            System.arraycopy(array, index, array, index + tempArray.length, length - index);
+        }
+        System.arraycopy(tempArray, 0, array, index, tempArray.length);
+        length += tempArray.length;
+        modificationsCount += tempArray.length;
+        return true;
     }
 
     @Override
     public boolean removeAll(Collection<?> c) {
         boolean isRemove = false;
+        if (c.size() == 0) {
+            throw new NullPointerException();
+        }
         for (Object object : c) {
             for (int i = 0; i < length; i++) {
-                if ((object == null && array[i] == null) ||
-                        (object != null && array[i] != null && array[i].equals(object))) {
+                if (Objects.equals(array[i], object)) {
                     remove(i);
                     isRemove = true;
                     ++modificationsCount;
@@ -145,18 +155,12 @@ public class ArrayList<T> implements List<T> {
 
     @Override
     public boolean retainAll(Collection<?> c) {
+        if (c.size() == 0) {
+            throw new NullPointerException();
+        }
         for (int i = 0; i < length; ++i) {
-            boolean isEquals = false;
-            for (Object object : c) {
-                if ((object == null && array[i] == null) ||
-                        (object != null && array[i] != null && array[i].equals(object))) {
-                    isEquals = true;
-                    break;
-                }
-            }
-            if (!isEquals) {
+            if (!c.contains(array[i])) {
                 remove(i);
-                --i;
             }
         }
         return length != 0;
@@ -213,7 +217,7 @@ public class ArrayList<T> implements List<T> {
     @Override
     public int indexOf(Object o) {
         for (int i = 0; i < length; ++i) {
-            if ((o == null && array[i] == null) || (o != null && array[i] != null && array[i].equals(o))) {
+            if (Objects.equals(array[i], o)) {
                 return i;
             }
         }
@@ -222,11 +226,9 @@ public class ArrayList<T> implements List<T> {
 
     @Override
     public int lastIndexOf(Object o) {
-        if (o != null) {
-            for (int i = length - 1; i > 0; --i) {
-                if (array[i].equals(o)) {
-                    return i;
-                }
+        for (int i = length - 1; i > 0; --i) {
+            if (Objects.equals(array[i], o)) {
+                return i;
             }
         }
         return -1;

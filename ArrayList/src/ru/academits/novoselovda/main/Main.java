@@ -91,8 +91,10 @@ public class Main {
         }
 
         System.out.println("retainAll(Collection<?> c)");
+        java.util.ArrayList<String> collection3 = new java.util.ArrayList<>();
+        collection3.add("tt");
         for (int i = 0; i < lists.length; i++) {
-            System.out.println("\tлист № " + i + " > " + lists[i].retainAll(collection) +
+            System.out.println("\tлист № " + i + " > " + lists[i].retainAll(collection3) +
                     " > " + lists[i] + " > " + lists[i].size());
         }
 
