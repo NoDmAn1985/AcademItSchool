@@ -72,7 +72,7 @@ public class ArrayList<T> implements List<T> {
     @Override
     public boolean remove(Object o) {
         int index = indexOf(o);
-        if (index > 0) {
+        if (index >= 0) {
             remove(index);
             return true;
         }
@@ -81,9 +81,6 @@ public class ArrayList<T> implements List<T> {
 
     @Override
     public boolean containsAll(Collection<?> c) {
-        if (c.size() == 0) {
-            throw new NullPointerException();
-        }
         boolean[] isCollectionContains = new boolean[c.size()];
         Arrays.fill(isCollectionContains, false);
         int count = 0;
@@ -115,9 +112,6 @@ public class ArrayList<T> implements List<T> {
     @Override
     @SuppressWarnings("unchecked")
     public boolean addAll(int index, Collection<? extends T> c) {
-        if (c.size() == 0) {
-            throw new NullPointerException();
-        }
         if (index != length) {
             testOfEntrance(index);
         }
@@ -137,9 +131,6 @@ public class ArrayList<T> implements List<T> {
     @Override
     public boolean removeAll(Collection<?> c) {
         boolean isRemove = false;
-        if (c.size() == 0) {
-            throw new NullPointerException();
-        }
         for (Object object : c) {
             for (int i = 0; i < length; i++) {
                 if (Objects.equals(array[i], object)) {
@@ -155,9 +146,6 @@ public class ArrayList<T> implements List<T> {
 
     @Override
     public boolean retainAll(Collection<?> c) {
-        if (c.size() == 0) {
-            throw new NullPointerException();
-        }
         for (int i = 0; i < length; ++i) {
             if (!c.contains(array[i])) {
                 remove(i);
@@ -401,16 +389,25 @@ public class ArrayList<T> implements List<T> {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        ArrayList arrayList = (ArrayList) o;
-        return (length == arrayList.length && Arrays.equals(array, arrayList.array));
+        ListIterator<T> t1 = listIterator();
+        ListIterator<?> t2 = ((List<?>) o).listIterator();
+        while (t1.hasNext() && t2.hasNext()) {
+            T o1 = t1.next();
+            Object o2 = t2.next();
+            if (!(o1 == null ? o2 == null : o1.equals(o2))) {
+                return false;
+            }
+        }
+        return !(t1.hasNext() || t2.hasNext());
     }
 
     @Override
     public int hashCode() {
         int prime = 37;
         int hash = 1;
-        hash = prime * hash + length;
-        hash = prime * hash + Arrays.hashCode(array);
+        for (T element : this) {
+            hash = prime * hash + (element == null ? 0 : element.hashCode());
+        }
         return hash;
     }
 }
