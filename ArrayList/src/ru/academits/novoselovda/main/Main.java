@@ -214,5 +214,14 @@ public class Main {
                 listIterator.previous();
             }
         }
+        ArrayList<String> list1 = new ArrayList<>();
+        list1.add("dfsdf");
+        list1.add("dfsdsdaf");
+        list1.add("ddsdaf");
+        list1.remove(1);
+        ArrayList<String> list2 = new ArrayList<>();
+        list2.add("dfsdf");
+        list2.add("ddsdaf");
+        System.out.println(list1.equals(list2));
     }
 }

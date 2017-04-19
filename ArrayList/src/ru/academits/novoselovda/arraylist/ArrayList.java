@@ -82,7 +82,6 @@ public class ArrayList<T> implements List<T> {
     @Override
     public boolean containsAll(Collection<?> c) {
         boolean[] isCollectionContains = new boolean[c.size()];
-        Arrays.fill(isCollectionContains, false);
         int count = 0;
         for (Object element : array) {
             int index = 0;
@@ -146,12 +145,14 @@ public class ArrayList<T> implements List<T> {
 
     @Override
     public boolean retainAll(Collection<?> c) {
+        boolean isRetainAll = false;
         for (int i = 0; i < length; ++i) {
             if (!c.contains(array[i])) {
                 remove(i);
+                isRetainAll = true;
             }
         }
-        return length != 0;
+        return isRetainAll;
     }
 
     @Override
@@ -241,18 +242,19 @@ public class ArrayList<T> implements List<T> {
 
         @Override
         public boolean hasPrevious() {
-            return nextIndex() != 0;
+            return nextIndex > 0;
         }
 
         @Override
         @SuppressWarnings("unchecked")
         public T previous() {
-            checkForModifications();
-            if (hasPrevious()) {
-                --nextIndex;
-                --previousIndex;
+            if (!hasPrevious()) {
+                throw new NoSuchElementException();
             }
-            return (T) ArrayList.this.array[nextIndex()];
+            checkForModifications();
+            --nextIndex;
+            --previousIndex;
+            return (T) ArrayList.this.array[nextIndex];
         }
 
         @Override
@@ -309,25 +311,26 @@ public class ArrayList<T> implements List<T> {
 
         @Override
         public boolean hasNext() {
-            return nextIndex != length;
+            return nextIndex < length;
         }
 
         @Override
         @SuppressWarnings("unchecked")
         public T next() {
-            checkForModifications();
-            if (hasNext()) {
-                ++previousIndex;
-                ++nextIndex;
+            if (previousIndex == length) {
+                throw new NoSuchElementException();
             }
+            checkForModifications();
+            ++previousIndex;
+            ++nextIndex;
             return (T) ArrayList.this.array[previousIndex];
         }
 
         void checkForModifications() {
-            if (modificationsCount != expectedModCount)
+            if (modificationsCount != expectedModCount) {
                 throw new ConcurrentModificationException();
+            }
         }
-
     }
 
     @Override
@@ -389,16 +392,16 @@ public class ArrayList<T> implements List<T> {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        ListIterator<T> t1 = listIterator();
-        ListIterator<?> t2 = ((List<?>) o).listIterator();
-        while (t1.hasNext() && t2.hasNext()) {
-            T o1 = t1.next();
-            Object o2 = t2.next();
-            if (!(o1 == null ? o2 == null : o1.equals(o2))) {
+        ArrayList<?> tempList = (ArrayList<?>) o;
+        if (this.length != tempList.length) {
+            return false;
+        }
+        for (int i = 0; i < length; ++i) {
+            if (!Objects.equals(this.array[i], tempList.array[i])) {
                 return false;
             }
         }
-        return !(t1.hasNext() || t2.hasNext());
+        return true;
     }
 
     @Override
