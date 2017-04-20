@@ -1,8 +1,8 @@
 package ru.academits.novoselovda.main;
 
 import ru.academits.novoselovda.cashmachine.CashMachine;
-import ru.academits.novoselovda.notes.BundleOfMoney;
-import ru.academits.novoselovda.notes.Note;
+import ru.academits.novoselovda.notes.Money;
+import ru.academits.novoselovda.notes.Values;
 
 public class Main {
     public static void main(String[] args) {
@@ -15,14 +15,21 @@ public class Main {
 
  */
 
-        BundleOfMoney[] cashMachineMoney = new BundleOfMoney[Note.Values.values().length];
-//        cashMachineMoney[3] = new BundleOfMoney(Note.Values.TEN, 15, null, null);
-        cashMachineMoney[1] = new BundleOfMoney(Note.Values.FIFTY, 100, null, null);
-//        cashMachineMoney[2] = new BundleOfMoney(Notes.Values.ONE_HUNDRED, 100);
-        cashMachineMoney[0] = new BundleOfMoney(Note.Values.FIVE_HUNDREDS, 90, null, null);
-        cashMachineMoney[4] = new BundleOfMoney(Note.Values.ONE_THOUSAND, 200, null, null);
-//        cashMachineMoney[5] = new BundleOfMoney(Note.Values.FIVE_THOUSANDS, 100, null, null);
+        Money[] cashMachineMoney = new Money[Values.values().length];
+//        cashMachineMoney[3] = new Money(Values.TEN, 15);
+        cashMachineMoney[1] = new Money(Values.FIFTY, 100);
+//        cashMachineMoney[2] = new Money(Values.ONE_HUNDRED, 100);
+        cashMachineMoney[0] = new Money(Values.FIVE_HUNDREDS, 90);
+        cashMachineMoney[4] = new Money(Values.ONE_THOUSAND, 200);
+//        cashMachineMoney[5] = new Money(Values.FIVE_THOUSANDS, 100);
+
         CashMachine vtb24 = new CashMachine(cashMachineMoney);
-        vtb24.mainMenu();
+
+        Money[] userMoney = new Money[Values.values().length];
+        userMoney[3] = new Money(Values.TEN, 15);
+        userMoney[2] = new Money(Values.ONE_HUNDRED, 90);
+        userMoney[0] = new Money(Values.FIVE_HUNDREDS, 90);
+
+        vtb24.mainMenu(userMoney);
     }
 }
