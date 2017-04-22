@@ -1,6 +1,7 @@
 package ru.academits.novoselovda.main;
 
-import ru.academits.novoselovda.cashmachine.CashMachine;
+import ru.academits.novoselovda.cashmachine.controller.Controller;
+import ru.academits.novoselovda.cashmachine.view.ConsoleMainMenu;
 import ru.academits.novoselovda.notes.Money;
 import ru.academits.novoselovda.notes.Values;
 
@@ -23,13 +24,17 @@ public class Main {
         cashMachineMoney[4] = new Money(Values.ONE_THOUSAND, 200);
 //        cashMachineMoney[5] = new Money(Values.FIVE_THOUSANDS, 100);
 
-        CashMachine vtb24 = new CashMachine(cashMachineMoney);
-
         Money[] userMoney = new Money[Values.values().length];
         userMoney[3] = new Money(Values.TEN, 15);
         userMoney[2] = new Money(Values.ONE_HUNDRED, 90);
         userMoney[0] = new Money(Values.FIVE_HUNDREDS, 90);
 
-        vtb24.mainMenu(userMoney);
+        try {
+            Controller controller = new Controller(cashMachineMoney, userMoney);
+            ConsoleMainMenu cashMachine = new ConsoleMainMenu(controller);
+            cashMachine.show();
+        } catch (IllegalArgumentException exception) {
+            System.out.println(exception.getMessage());
+        }
     }
 }

@@ -1,17 +1,16 @@
-package ru.academits.novoselovda.cashmachine;
+package ru.academits.novoselovda.cashmachine.model;
 
 import ru.academits.novoselovda.notes.Money;
 import ru.academits.novoselovda.notes.Values;
 
-class NotesBase {
+public class NotesBase {
     private int maxNotesCount;
     private int length;
     private int[] arrayOfCounts;
     private Values[] arrayOfValues;
     private int sum;
-    private Values minNote;
 
-    NotesBase(Money[] startMoney, int maxNotesCount) {
+    public NotesBase(Money[] startMoney, int maxNotesCount) {
         this.maxNotesCount = maxNotesCount;
         this.length = Values.values().length;
         this.arrayOfCounts = new int[length];
@@ -24,7 +23,7 @@ class NotesBase {
         add(startMoney);
     }
 
-    void add(Money[] cashMoney) {
+    public void add(Money[] cashMoney) throws IllegalArgumentException {
         boolean[] isVerified = new boolean[length];
         int[] tempArrayOfCounts = new int[length];
         int tempSum = 0;
@@ -47,10 +46,9 @@ class NotesBase {
             arrayOfCounts[i] += tempArrayOfCounts[i];
         }
         sum += tempSum;
-        getMinNote();
     }
 
-    int[] subtract(int requiredSum, int requiredNoteNumber) throws IllegalArgumentException {
+    public int[] subtract(int requiredSum, int requiredNoteNumber) throws IllegalArgumentException {
         int[] tempArrayOfCounts = new int[length];
         int leftSum = requiredSum;
         for (int i = requiredNoteNumber; i > 0; i--) {
@@ -81,17 +79,23 @@ class NotesBase {
             arrayOfCounts[i] -= tempArrayOfCounts[i];
         }
         sum -= requiredSum;
-        getMinNote();
         return tempArrayOfCounts;
     }
 
-    void status(Storage storage) {
-        System.out.printf("№\t%5s%8s%8s%n", "номинал", "в базе", "в банк.");
-        for (int i = 0; i < length; i++) {
-            System.out.printf("%d)\t%5d%8d%8d%n", i, this.arrayOfValues[i].getCost(),
-                    this.arrayOfCounts[i], storage.getCount(i));
-        }
-        System.out.println("Итого в банкомате: " + this.sum);
+    public int getNoteCount(int index) {
+        return this.arrayOfCounts[index];
+    }
+
+    public int getNoteValue(int index) {
+        return this.arrayOfValues[index].getCost();
+    }
+
+    public int getSize() {
+        return this.arrayOfCounts.length;
+    }
+
+    public int getSum() {
+        return this.sum;
     }
 
     @Override
@@ -106,20 +110,27 @@ class NotesBase {
         return sb.toString();
     }
 
-    void testRequiredSum(int requiredSum) throws IllegalArgumentException {
+    public void testRequiredSum(int requiredSum) throws IllegalArgumentException {
         if (requiredSum < 0) {
             throw new IllegalArgumentException("ОШИБКА: запрашиваемая сумма должна быть положительной");
         }
-        if (requiredSum % this.minNote.getCost() > 0) {
+        Values minNote = arrayOfValues[0];
+        for (int i = 0; i < length; i++) {
+            if (this.arrayOfCounts[i] > 0) {
+                minNote = arrayOfValues[i];
+                break;
+            }
+        }
+        if (requiredSum % minNote.getCost() > 0) {
             throw new IllegalArgumentException("ОШИБКА: запрашиваемая сумма должна быть кратна "
-                    + this.minNote.getCost());
+                    + minNote.getCost());
         }
         if (requiredSum > this.sum) {
             throw new IllegalArgumentException("ОШИБКА: в банкомате недостаточно средств");
         }
     }
 
-    void testRequiredNote(int requiredSum, int number) throws IllegalArgumentException {
+    public void testRequiredNote(int requiredSum, int number) throws IllegalArgumentException {
         if (number < 0 || number >= length || this.arrayOfCounts[number] == 0) {
             throw new IllegalArgumentException("ОШИБКА: нет такого номера");
         }
@@ -139,15 +150,6 @@ class NotesBase {
             if (requiredSum < cashOpportunity) {
                 throw new IllegalArgumentException("ОШИБКА: данных купюр недостаточно, но остаток " +
                         "можно выдать купюрами более низкого номинала");
-            }
-        }
-    }
-
-    private void getMinNote() {
-        for (int i = 0; i < length; i++) {
-            if (this.arrayOfCounts[i] > 0) {
-                this.minNote = arrayOfValues[i];
-                return;
             }
         }
     }
