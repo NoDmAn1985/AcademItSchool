@@ -5,6 +5,7 @@ import ru.academits.novoselovda.linkedlist.LinkedList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.ListIterator;
+import java.util.NoSuchElementException;
 
 public class Main {
     public static void main(String[] args) {
@@ -74,14 +75,22 @@ public class Main {
 
         System.out.println("getFirst()");
         for (int i = 0; i < lists.length; i++) {
-            System.out.println("\tлист № " + i + " > " + lists[i].getFirst() +
-                    " > " + lists[i] + " > " + lists[i].size());
+            try {
+                System.out.println("\tлист № " + i + " > " + lists[i].getFirst() +
+                        " > " + lists[i] + " > " + lists[i].size());
+            } catch (NoSuchElementException exception) {
+                System.out.println("ОШИБКА: нет такого элемента");
+            }
         }
 
         System.out.println("getLast()");
         for (int i = 0; i < lists.length; i++) {
-            System.out.println("\tлист № " + i + " > " + lists[i].getLast() +
-                    " > " + lists[i] + " > " + lists[i].size());
+            try {
+                System.out.println("\tлист № " + i + " > " + lists[i].getLast() +
+                        " > " + lists[i] + " > " + lists[i].size());
+            } catch (NoSuchElementException exception) {
+                System.out.println("ОШИБКА: нет такого элемента");
+            }
         }
 
         System.out.println("peekFirst()");
@@ -128,8 +137,12 @@ public class Main {
 
         System.out.println("element()");
         for (int i = 0; i < lists.length; i++) {
-            System.out.println("\tлист № " + i + " > " + lists[i].element() +
-                    " > " + lists[i] + " > " + lists[i].size());
+            try {
+                System.out.println("\tлист № " + i + " > " + lists[i].element() +
+                        " > " + lists[i] + " > " + lists[i].size());
+            } catch (NoSuchElementException exception) {
+                System.out.println("ОШИБКА: нет такого элемента");
+            }
         }
 
         System.out.println("peek()");
