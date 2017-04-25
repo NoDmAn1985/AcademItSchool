@@ -3,23 +3,29 @@ package ru.academits.novoselovda.cashmachine.model;
 import ru.academits.novoselovda.notes.Money;
 import ru.academits.novoselovda.notes.Values;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 public class NotesBase {
     private int maxNotesCount;
     private int length;
-    private int[] arrayOfCounts;
-    private Values[] arrayOfValues;
+    private Money[] machinesDeposit;
     private int sum;
+
 
     public NotesBase(Money[] startMoney, int maxNotesCount) {
         this.maxNotesCount = maxNotesCount;
         this.length = Values.values().length;
-        this.arrayOfCounts = new int[length];
-        this.arrayOfValues = new Values[length];
+        this.machinesDeposit = new Money[length];
         int index = 0;
         for (Values value : Values.values()) {
-            arrayOfValues[index] = value;
+            machinesDeposit[index] = new Money(value, 0);
             ++index;
         }
+        initStartDeposit(sort(startMoney));
+    }
+
+    private void initStartDeposit(Money[] startMoney) {
         add(startMoney);
     }
 
@@ -30,39 +36,41 @@ public class NotesBase {
         for (Money money : cashMoney) {
             if (money != null && money.getCount() > 0) {
                 for (int i = 0; i < this.length; i++) {
-                    if (!isVerified[i] && money.getValue() == this.arrayOfValues[i]) {
-                        if (arrayOfCounts[i] + money.getCount() > maxNotesCount) {
+                    if (!isVerified[i] && money.getValue() == this.machinesDeposit[i].getValue()) {
+                        if (machinesDeposit[i].getCount() + money.getCount() > maxNotesCount) {
                             throw new IllegalArgumentException("ОШИБКА: превышен лимит по количеству купюр номиналом "
                                     + money.getValue().getCost());
                         }
-                        tempArrayOfCounts[i] += money.getCount();
+                        tempArrayOfCounts[i] = money.getCount();
                         tempSum += money.getCount() * money.getValue().getCost();
+                        money.subtract(tempArrayOfCounts[i]);
                         isVerified[i] = true;
                     }
                 }
             }
         }
-        for (int i = 0; i < length; ++i) {
-            arrayOfCounts[i] += tempArrayOfCounts[i];
+        for (int i = 0; i < this.length; ++i) {
+            machinesDeposit[i].add(tempArrayOfCounts[i]);
         }
         sum += tempSum;
     }
 
-    public int[] subtract(int requiredSum, int requiredNoteNumber) throws IllegalArgumentException {
+    public ArrayList<Money> subtract(int requiredSum, int requiredNoteNumber) throws IllegalArgumentException {
+        ArrayList<Money> cashOut = new ArrayList<>();
         int[] tempArrayOfCounts = new int[length];
         int leftSum = requiredSum;
         for (int i = requiredNoteNumber; i > 0; i--) {
-            if (this.arrayOfCounts[i] == 0) {
+            if (this.machinesDeposit[i].getCount() == 0) {
                 continue;
             }
-            int sumOfNotesThatValue = this.arrayOfCounts[i] * this.arrayOfValues[i].getCost();
-            int rest = leftSum % this.arrayOfValues[i].getCost();
+            int sumOfNotesThatValue = this.machinesDeposit[i].getCount() * this.machinesDeposit[i].getValue().getCost();
+            int rest = leftSum % this.machinesDeposit[i].getValue().getCost();
             if (leftSum - sumOfNotesThatValue - rest > 0) {
                 leftSum -= sumOfNotesThatValue;
-                tempArrayOfCounts[i] = this.arrayOfCounts[i];
+                tempArrayOfCounts[i] = this.machinesDeposit[i].getCount();
             } else {
-                int requiredCountOfNotesThatValue = leftSum / this.arrayOfValues[i].getCost();
-                leftSum -= requiredCountOfNotesThatValue * this.arrayOfValues[i].getCost();
+                int requiredCountOfNotesThatValue = leftSum / this.machinesDeposit[i].getValue().getCost();
+                leftSum -= requiredCountOfNotesThatValue * this.machinesDeposit[i].getValue().getCost();
                 tempArrayOfCounts[i] = requiredCountOfNotesThatValue;
             }
             if (leftSum == 0) {
@@ -76,48 +84,39 @@ public class NotesBase {
             throw new IllegalArgumentException("ОШИБКА: ОШИБКА В РАСЧЁТАХ");
         }
         for (int i = 0; i < length; ++i) {
-            arrayOfCounts[i] -= tempArrayOfCounts[i];
+            if (tempArrayOfCounts[i] > 0) {
+                this.machinesDeposit[i].subtract(tempArrayOfCounts[i]);
+                cashOut.add(new Money(machinesDeposit[i].getValue(), tempArrayOfCounts[i]));
+            }
         }
-        sum -= requiredSum;
-        return tempArrayOfCounts;
+        this.sum -= requiredSum;
+        return cashOut;
     }
 
     public int getNoteCount(int index) {
-        return this.arrayOfCounts[index];
+        return this.machinesDeposit[index].getCount();
     }
 
     public int getNoteValue(int index) {
-        return this.arrayOfValues[index].getCost();
+        return this.machinesDeposit[index].getValue().getCost();
     }
 
     public int getSize() {
-        return this.arrayOfCounts.length;
+        return this.length;
     }
 
     public int getSum() {
         return this.sum;
     }
 
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("№\tНоминал\n");
-        for (int i = 0; i < length; i++) {
-            if (this.arrayOfCounts[i] != 0) {
-                sb.append(i).append(")\t").append(this.arrayOfValues[i].getCost()).append("\n");
-            }
-        }
-        return sb.toString();
-    }
-
     public void testRequiredSum(int requiredSum) throws IllegalArgumentException {
         if (requiredSum < 0) {
             throw new IllegalArgumentException("ОШИБКА: запрашиваемая сумма должна быть положительной");
         }
-        Values minNote = arrayOfValues[0];
+        Values minNote = this.machinesDeposit[0].getValue();
         for (int i = 0; i < length; i++) {
-            if (this.arrayOfCounts[i] > 0) {
-                minNote = arrayOfValues[i];
+            if (this.machinesDeposit[0].getCount() > 0) {
+                minNote = this.machinesDeposit[0].getValue();
                 break;
             }
         }
@@ -131,18 +130,19 @@ public class NotesBase {
     }
 
     public void testRequiredNote(int requiredSum, int number) throws IllegalArgumentException {
-        if (number < 0 || number >= length || this.arrayOfCounts[number] == 0) {
+        if (number < 0 || number >= length || this.machinesDeposit[number].getCount() == 0) {
             throw new IllegalArgumentException("ОШИБКА: нет такого номера");
         }
-        if (requiredSum < this.arrayOfValues[number].getCost()) {
+        if (requiredSum < this.machinesDeposit[number].getValue().getCost()) {
             throw new IllegalArgumentException("ОШИБКА: запрашиваемая сумма меньше запрашивемой купюры");
         }
-        int sumOfRequiredNotes = this.arrayOfValues[number].getCost() * this.arrayOfCounts[number];
-        if (requiredSum > sumOfRequiredNotes ||
-                (requiredSum < sumOfRequiredNotes && requiredSum % this.arrayOfValues[number].getCost() != 0)) {
+        int sumOfRequiredNotes = this.machinesDeposit[number].getValue().getCost() *
+                this.machinesDeposit[number].getCount();
+        if (requiredSum > sumOfRequiredNotes || (requiredSum < sumOfRequiredNotes &&
+                requiredSum % this.machinesDeposit[number].getValue().getCost() != 0)) {
             int cashOpportunity = 0;
             for (int i = 0; i <= number; i++) {
-                cashOpportunity += this.arrayOfCounts[i] * this.arrayOfValues[i].getCost();
+                cashOpportunity += this.machinesDeposit[i].getCount() * this.machinesDeposit[i].getValue().getCost();
             }
             if (requiredSum > cashOpportunity) {
                 throw new IllegalArgumentException("ОШИБКА: данных купюр недостаточно");
@@ -152,5 +152,44 @@ public class NotesBase {
                         "можно выдать купюрами более низкого номинала");
             }
         }
+    }
+
+    public Money[] sort(Money[] money) {
+        int nullCount = 0;
+        if (money[0] == null || money[0].getCount() == 0) {
+            ++nullCount;
+        }
+        int i = 1;
+        while (money[i] == null) {
+            if (money[i] == null || money[i].getCount() == 0) {
+                ++nullCount;
+            }
+            ++i;
+        }
+        for (; i < money.length; ++i) {
+            if (money[i] == null || money[i].getCount() == 0) {
+                ++nullCount;
+                continue;
+            }
+            if (money[i - 1] == null || money[i - 1].getCount() == 0 ||
+                    money[i].getValue().getCost() < money[i - 1].getValue().getCost()) {
+                Money temp = money[i];
+                int j = i - 1;
+                while (j >= 0) {
+                    if (money[j] == null || money[j].getCount() == 0 ||
+                            temp.getValue().getCost() < money[j].getValue().getCost()) {
+                        money[j + 1] = money[j];
+                    } else {
+                        break;
+                    }
+                    --j;
+                }
+                money[j + 1] = temp;
+            }
+        }
+        if (nullCount > 0) {
+            money = Arrays.copyOf(money, money.length - nullCount);
+        }
+        return money;
     }
 }

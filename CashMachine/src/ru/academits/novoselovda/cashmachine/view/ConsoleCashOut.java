@@ -51,7 +51,11 @@ class ConsoleCashOut {
             break;
         }
         System.out.println("Купюрами какого достоинства произвести выдачу:");
-        System.out.print(this.controller.getNotesList());
+        for (int i = 0; i < this.controller.getCashMachineNotesCount(); i++) {
+            if (this.controller.getCashMachineNoteCount(i) != 0) {
+                System.out.println(i + ") " + this.controller.getCashMachineNoteValue(i));
+            }
+        }
         while (true) {
             boolean isNeedToRepeat = true;
             System.out.print("Введите номер купюры: ");

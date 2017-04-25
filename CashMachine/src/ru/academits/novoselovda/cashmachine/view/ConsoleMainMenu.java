@@ -18,7 +18,7 @@ public class ConsoleMainMenu {
     }
 
     public ArrayList<Money> show() {
-        while(true) {
+        while (true) {
             System.out.println("Выберите операцию: ");
             System.out.println("1) Приём денег");
             System.out.println("2) Выдача денег");

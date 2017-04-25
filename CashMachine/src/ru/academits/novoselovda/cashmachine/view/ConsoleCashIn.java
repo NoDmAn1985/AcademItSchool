@@ -23,7 +23,10 @@ class ConsoleCashIn {
         new Scanner(System.in).nextLine();
         System.out.println("-----------------------------------------------------");
         System.out.println("Вы вложили:");
-        System.out.print(this.controller.showUserMoney());
+        for (int i = 0; i < this.controller.getUserNotesCount(); i++) {
+            System.out.println(i + ") " + this.controller.getUserNoteValue(i) + " - " +
+                    this.controller.getUserNoteCount(i) + " шт.");
+        }
         System.out.println("-----------------------------------------------------");
         try {
             this.controller.addMoney();
