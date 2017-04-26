@@ -250,20 +250,11 @@ public class LinkedList<T> implements List<T>, Deque<T> {
 
     @Override
     public T pollLast() {
-        if (length == 0) {
+        try {
+            return removeLast();
+        } catch (NoSuchElementException exception) {
             return null;
         }
-        T tempData = lastNode.data;
-        if (length == 1) {
-            this.firstNode = null;
-            this.lastNode = null;
-        } else {
-            this.lastNode = this.lastNode.previous;
-            this.lastNode.next = null;
-        }
-        --length;
-        ++modificationsCount;
-        return tempData;
     }
 
     @Override
@@ -332,20 +323,11 @@ public class LinkedList<T> implements List<T>, Deque<T> {
 
     @Override
     public T poll() {
-        if (length == 0) {
+        try {
+            return removeFirst();
+        } catch (NoSuchElementException exception) {
             return null;
         }
-        T tempData = firstNode.data;
-        if (length == 1) {
-            this.firstNode = null;
-            this.lastNode = null;
-        } else {
-            this.firstNode = this.firstNode.next;
-            this.firstNode.previous = null;
-        }
-        --length;
-        ++modificationsCount;
-        return tempData;
     }
 
     @Override
@@ -450,6 +432,9 @@ public class LinkedList<T> implements List<T>, Deque<T> {
 
     @Override
     public boolean addAll(Collection<? extends T> c) {
+        if (c.size() == 0) {
+            throw new NullPointerException();
+        }
         for (Object object : c) {
             addLast(objectToTypeT(object));
         }
@@ -458,27 +443,24 @@ public class LinkedList<T> implements List<T>, Deque<T> {
 
     @Override
     public boolean addAll(int index, Collection<? extends T> c) {
+        if (c.size() == 0) {
+            throw new NullPointerException();
+        }
         testOnEntrance(index);
         if (length == 0) {
             addAll(c);
             return true;
         }
-        int i = 0;
-        for (Node<T> p = this.firstNode; p != null; p = p.next) {
-            if (i == index) {
-                Node<T> tempLast = this.lastNode;
-                this.lastNode = p.previous;
-                for (Object object : c) {
-                    addLast(objectToTypeT(object));
-                }
-                this.lastNode.next = p;
-                p.previous = this.lastNode;
-                this.lastNode = tempLast;
-                return true;
-            }
-            ++i;
+        Node<T> p = findNode(index);
+        Node<T> tempLast = this.lastNode;
+        this.lastNode = p.previous;
+        for (Object object : c) {
+            addLast(objectToTypeT(object));
         }
-        return false;
+        this.lastNode.next = p;
+        p.previous = this.lastNode;
+        this.lastNode = tempLast;
+        return true;
     }
 
     @Override
@@ -520,32 +502,23 @@ public class LinkedList<T> implements List<T>, Deque<T> {
     public T get(int index) {
         testOnEntrance(index);
         Node<T> temp = findNode(index);
-        if (temp == null) {
-            return null;
-        } else {
-            return temp.data;
-        }
+        return temp.data;
     }
 
     @Override
     public T set(int index, T element) {
         testOnEntrance(index);
         Node<T> temp = findNode(index);
-        if (temp == null) {
-            return null;
-        } else {
-            temp.data = element;
-            return temp.data;
-        }
+        T tempData = temp.data;
+        temp.data = element;
+        return tempData;
     }
 
     @Override
     public void add(int index, T element) {
         testOnEntrance(index);
         Node<T> tempNext = findNode(index);
-        if (tempNext != null) {
-            insertNode(element, tempNext.previous, tempNext);
-        }
+        insertNode(element, tempNext.previous, tempNext);
     }
 
     @Override
@@ -553,7 +526,7 @@ public class LinkedList<T> implements List<T>, Deque<T> {
         testOnEntrance(index);
         Node<T> temp = findNode(index);
         removeThisNode(temp);
-        return (temp == null ? null : temp.data);
+        return temp.data;
     }
 
     @Override
@@ -605,7 +578,9 @@ public class LinkedList<T> implements List<T>, Deque<T> {
     }
 
     private Node<T> findNode(int index) {
-        if (index > length / 2) {
+        if (index == length) {
+            return null;
+        } else if (index > length / 2) {
             int i = length - 1;
             for (Node<T> p = this.lastNode; p != null; p = p.previous) {
                 if (i == index) {
@@ -622,7 +597,7 @@ public class LinkedList<T> implements List<T>, Deque<T> {
                 ++i;
             }
         }
-        return null;
+        throw new NullPointerException();
     }
 
     private void insertNode(T t, Node<T> previous, Node<T> next) {
@@ -635,30 +610,15 @@ public class LinkedList<T> implements List<T>, Deque<T> {
 
     private void removeThisNode(Node<T> node) {
         if (this.firstNode == node) {
-            if (length == 1) {
-                this.firstNode = null;
-                this.lastNode = null;
-            } else {
-                this.firstNode = node.next;
-                this.firstNode.previous = null;
-                if (this.firstNode != this.lastNode) {
-                    this.firstNode.next.previous = this.firstNode;
-                } else {
-                    this.lastNode = this.firstNode;
-                }
-            }
+            removeFirst();
         } else if (this.lastNode == node) {
-            this.lastNode = node.previous;
-            this.lastNode.next = null;
-            if (this.firstNode != this.lastNode) {
-                this.lastNode.previous.next = this.lastNode;
-            }
+            removeLast();
         } else {
             node.previous.next = node.next;
             node.next.previous = node.previous;
+            --length;
+            ++modificationsCount;
         }
-        --length;
-        ++modificationsCount;
     }
 
     @Override

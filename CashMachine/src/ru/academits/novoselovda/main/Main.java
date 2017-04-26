@@ -16,24 +16,21 @@ public class Main {
 
  */
 
-        Money[] cashMachineMoney = new Money[Values.values().length];
-//        cashMachineMoney[3] = new Money(Values.TEN, 15);
+        Money[] cashMachineMoney = new Money[3];
         cashMachineMoney[1] = new Money(Values.FIFTY, 100);
-//        cashMachineMoney[2] = new Money(Values.ONE_HUNDRED, 100);
         cashMachineMoney[0] = new Money(Values.FIVE_HUNDREDS, 90);
-        cashMachineMoney[4] = new Money(Values.ONE_THOUSAND, 200);
-//        cashMachineMoney[5] = new Money(Values.FIVE_THOUSANDS, 100);
+        cashMachineMoney[2] = new Money(Values.ONE_THOUSAND, 200);
 
-        Money[] userMoney = new Money[Values.values().length];
-        userMoney[3] = new Money(Values.TEN, 15);
-        userMoney[2] = new Money(Values.ONE_HUNDRED, 90);
+        Money[] userMoney = new Money[3];
+        userMoney[2] = new Money(Values.TEN, 15);
+        userMoney[1] = new Money(Values.ONE_HUNDRED, 190);
         userMoney[0] = new Money(Values.FIVE_HUNDREDS, 90);
 
         try {
             Controller controller = new Controller(cashMachineMoney, userMoney);
             ConsoleMainMenu cashMachine = new ConsoleMainMenu(controller);
             cashMachine.show();
-        } catch (IllegalArgumentException exception) {
+        } catch (IllegalArgumentException | NullPointerException exception) {
             System.out.println(exception.getMessage());
         }
     }

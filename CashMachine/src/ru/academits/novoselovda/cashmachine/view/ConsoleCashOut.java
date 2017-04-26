@@ -51,9 +51,9 @@ class ConsoleCashOut {
             break;
         }
         System.out.println("Купюрами какого достоинства произвести выдачу:");
-        for (int i = 0; i < this.controller.getCashMachineNotesCount(); i++) {
-            if (this.controller.getCashMachineNoteCount(i) != 0) {
-                System.out.println(i + ") " + this.controller.getCashMachineNoteValue(i));
+        for (int i = 0; i < this.controller.getCashMachineDeposit().length; i++) {
+            if (this.controller.getCashMachineDeposit()[i].getCount() != 0) {
+                System.out.println(i + ") " + this.controller.getCashMachineDeposit()[i].getValue().getCost());
             }
         }
         while (true) {

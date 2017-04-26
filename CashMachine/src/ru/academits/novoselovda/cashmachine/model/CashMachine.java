@@ -4,16 +4,15 @@ import ru.academits.novoselovda.notes.Money;
 import ru.academits.novoselovda.notes.Values;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
-public class NotesBase {
+public class CashMachine {
     private int maxNotesCount;
     private int length;
     private Money[] machinesDeposit;
     private int sum;
 
 
-    public NotesBase(Money[] startMoney, int maxNotesCount) {
+    public CashMachine(Money[] startMoney, int maxNotesCount) {
         this.maxNotesCount = maxNotesCount;
         this.length = Values.values().length;
         this.machinesDeposit = new Money[length];
@@ -22,7 +21,8 @@ public class NotesBase {
             machinesDeposit[index] = new Money(value, 0);
             ++index;
         }
-        initStartDeposit(sort(startMoney));
+        testOnMaximumAndNull(startMoney);
+        initStartDeposit(startMoney);
     }
 
     private void initStartDeposit(Money[] startMoney) {
@@ -93,16 +93,8 @@ public class NotesBase {
         return cashOut;
     }
 
-    public int getNoteCount(int index) {
-        return this.machinesDeposit[index].getCount();
-    }
-
-    public int getNoteValue(int index) {
-        return this.machinesDeposit[index].getValue().getCost();
-    }
-
-    public int getSize() {
-        return this.length;
+    public Money[] getDeposit() {
+        return this.machinesDeposit;
     }
 
     public int getSum() {
@@ -154,42 +146,15 @@ public class NotesBase {
         }
     }
 
-    public Money[] sort(Money[] money) {
-        int nullCount = 0;
-        if (money[0] == null || money[0].getCount() == 0) {
-            ++nullCount;
-        }
-        int i = 1;
-        while (money[i] == null) {
-            if (money[i] == null || money[i].getCount() == 0) {
-                ++nullCount;
+    public void testOnMaximumAndNull(Money[] testMoney) {
+        for (Money money : testMoney) {
+            if (money == null) {
+                throw new NullPointerException("ОШИБКА: нельзя передавать null (пустой элемент массива)");
             }
-            ++i;
-        }
-        for (; i < money.length; ++i) {
-            if (money[i] == null || money[i].getCount() == 0) {
-                ++nullCount;
-                continue;
-            }
-            if (money[i - 1] == null || money[i - 1].getCount() == 0 ||
-                    money[i].getValue().getCost() < money[i - 1].getValue().getCost()) {
-                Money temp = money[i];
-                int j = i - 1;
-                while (j >= 0) {
-                    if (money[j] == null || money[j].getCount() == 0 ||
-                            temp.getValue().getCost() < money[j].getValue().getCost()) {
-                        money[j + 1] = money[j];
-                    } else {
-                        break;
-                    }
-                    --j;
-                }
-                money[j + 1] = temp;
+            if (money.getCount() > maxNotesCount) {
+                throw new IllegalArgumentException("ОШИБКА: максимальное количество передаваемых купюр - " +
+                        maxNotesCount);
             }
         }
-        if (nullCount > 0) {
-            money = Arrays.copyOf(money, money.length - nullCount);
-        }
-        return money;
     }
 }

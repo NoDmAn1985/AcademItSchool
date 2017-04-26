@@ -23,9 +23,9 @@ class ConsoleCashIn {
         new Scanner(System.in).nextLine();
         System.out.println("-----------------------------------------------------");
         System.out.println("Вы вложили:");
-        for (int i = 0; i < this.controller.getUserNotesCount(); i++) {
-            System.out.println(i + ") " + this.controller.getUserNoteValue(i) + " - " +
-                    this.controller.getUserNoteCount(i) + " шт.");
+        for (int i = 0; i < this.controller.getUserMoney().length; i++) {
+            System.out.printf("%d) %4d - %3d шт.%n", i, this.controller.getUserMoney()[i].getValue().getCost(),
+                    this.controller.getUserMoney()[i].getCount());
         }
         System.out.println("-----------------------------------------------------");
         try {
