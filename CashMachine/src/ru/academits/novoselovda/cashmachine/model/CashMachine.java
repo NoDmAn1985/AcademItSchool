@@ -4,6 +4,7 @@ import ru.academits.novoselovda.notes.Money;
 import ru.academits.novoselovda.notes.Values;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class CashMachine {
     private int maxNotesCount;
@@ -94,7 +95,7 @@ public class CashMachine {
     }
 
     public Money[] getDeposit() {
-        return this.machinesDeposit;
+        return Arrays.copyOf(this.machinesDeposit, this.machinesDeposit.length);
     }
 
     public int getSum() {

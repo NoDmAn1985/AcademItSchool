@@ -498,7 +498,7 @@ public class LinkedList<T> implements List<T>, Deque<T> {
         }
         if (c.size() == 0) {
             clear();
-            return false;
+            return true;
         }
         boolean isRetain = false;
         Node<T> temp;

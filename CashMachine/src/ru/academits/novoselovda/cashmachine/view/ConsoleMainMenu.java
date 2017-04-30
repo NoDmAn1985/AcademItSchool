@@ -18,6 +18,7 @@ public class ConsoleMainMenu {
     }
 
     public ArrayList<Money> show() {
+        ArrayList<Money> moneyForUser = new ArrayList<>();
         while (true) {
             System.out.println("Выберите операцию: ");
             System.out.println("1) Приём денег");
@@ -30,12 +31,13 @@ public class ConsoleMainMenu {
                     new ConsoleCashIn(controller, status).show();
                     break;
                 case 2:
-                    return new ConsoleCashOut(controller, status).show();
+                    moneyForUser = new ConsoleCashOut(controller, status).show();
+                    break;
                 case 3:
                     status.show();
                     break;
                 case 4:
-                    return null;
+                    return moneyForUser;
                 default:
                     break;
             }
