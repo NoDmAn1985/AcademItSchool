@@ -21,10 +21,10 @@ public class LinkedList<T> implements List<T>, Deque<T> {
     }
 
     public LinkedList() {
-        length = 0;
+        this.length = 0;
         this.firstNode = null;
         this.lastNode = null;
-        modificationsCount = 0;
+        this.modificationsCount = 0;
     }
 
     @Override
@@ -65,11 +65,11 @@ public class LinkedList<T> implements List<T>, Deque<T> {
         Node<T> nextElement = LinkedList.this.firstNode;
         int nextIndex = 0;
         int previousIndex = -1;
-        int expectedModCount = modificationsCount;
+        int expectedModCount = LinkedList.this.modificationsCount;
 
         @Override
         public boolean hasNext() {
-            return nextIndex < length;
+            return nextIndex < LinkedList.this.length;
         }
 
         @Override
@@ -86,7 +86,7 @@ public class LinkedList<T> implements List<T>, Deque<T> {
         }
 
         void checkForModifications() {
-            if (modificationsCount != expectedModCount) {
+            if (LinkedList.this.modificationsCount != expectedModCount) {
                 throw new ConcurrentModificationException();
             }
         }
@@ -95,7 +95,7 @@ public class LinkedList<T> implements List<T>, Deque<T> {
     private class ListItr extends Itr implements ListIterator<T> {
         ListItr(int index) {
             super();
-            if (index != length) {
+            if (index != LinkedList.this.length) {
                 testOnEntrance(index);
             }
             nextElement = findNode(index);
@@ -132,7 +132,7 @@ public class LinkedList<T> implements List<T>, Deque<T> {
 
         @Override
         public void remove() {
-            if (length == 0) {
+            if (LinkedList.this.length == 0) {
                 throw new NoSuchElementException();
             }
             checkForModifications();
@@ -153,7 +153,7 @@ public class LinkedList<T> implements List<T>, Deque<T> {
                 nextElement = nextElement.next;
             }
             LinkedList.this.removeThisNode(temp);
-            expectedModCount = modificationsCount;
+            expectedModCount = LinkedList.this.modificationsCount;
         }
 
         @Override
@@ -167,20 +167,20 @@ public class LinkedList<T> implements List<T>, Deque<T> {
             checkForModifications();
             LinkedList.this.insertNode(t, nextElement.previous, nextElement);
             nextElement = nextElement.previous;
-            expectedModCount = modificationsCount;
+            expectedModCount = LinkedList.this.modificationsCount;
         }
     }
 
     @Override
     public void addFirst(T t) {
         this.firstNode = new Node<>(t, null, this.firstNode);
-        if (length == 0) {
+        if (this.length == 0) {
             this.lastNode = this.firstNode;
         } else {
             this.firstNode.next.previous = this.firstNode;
         }
-        ++length;
-        ++modificationsCount;
+        ++this.length;
+        ++this.modificationsCount;
     }
 
     @Override
@@ -191,8 +191,8 @@ public class LinkedList<T> implements List<T>, Deque<T> {
         } else {
             this.lastNode.previous.next = this.lastNode;
         }
-        ++length;
-        ++modificationsCount;
+        ++this.length;
+        ++this.modificationsCount;
     }
 
     @Override
@@ -209,37 +209,37 @@ public class LinkedList<T> implements List<T>, Deque<T> {
 
     @Override
     public T removeFirst() {
-        if (length == 0) {
+        if (this.length == 0) {
             throw new NoSuchElementException();
         }
-        T tempData = firstNode.data;
-        if (length == 1) {
+        T tempData = this.firstNode.data;
+        if (this.length == 1) {
             this.firstNode = null;
             this.lastNode = null;
         } else {
             this.firstNode = this.firstNode.next;
             this.firstNode.previous = null;
         }
-        --length;
-        ++modificationsCount;
+        --this.length;
+        ++this.modificationsCount;
         return tempData;
     }
 
     @Override
     public T removeLast() {
-        if (length == 0) {
+        if (this.length == 0) {
             throw new NoSuchElementException();
         }
-        T tempData = lastNode.data;
-        if (length == 1) {
+        T tempData = this.lastNode.data;
+        if (this.length == 1) {
             this.firstNode = null;
             this.lastNode = null;
         } else {
             this.lastNode = this.lastNode.previous;
             this.lastNode.next = null;
         }
-        --length;
-        ++modificationsCount;
+        --this.length;
+        ++this.modificationsCount;
         return tempData;
     }
 
@@ -250,7 +250,7 @@ public class LinkedList<T> implements List<T>, Deque<T> {
 
     @Override
     public T pollLast() {
-        if (length == 0) {
+        if (this.length == 0) {
             return null;
         }
         return removeLast();
@@ -258,7 +258,7 @@ public class LinkedList<T> implements List<T>, Deque<T> {
 
     @Override
     public T getFirst() {
-        if (length == 0) {
+        if (this.length == 0) {
             throw new NoSuchElementException();
         }
         return this.firstNode.data;
@@ -266,7 +266,7 @@ public class LinkedList<T> implements List<T>, Deque<T> {
 
     @Override
     public T getLast() {
-        if (length == 0) {
+        if (this.length == 0) {
             throw new NoSuchElementException();
         }
         return this.lastNode.data;
@@ -274,7 +274,7 @@ public class LinkedList<T> implements List<T>, Deque<T> {
 
     @Override
     public T peekFirst() {
-        if (length == 0) {
+        if (this.length == 0) {
             return null;
         }
         return this.firstNode.data;
@@ -282,7 +282,7 @@ public class LinkedList<T> implements List<T>, Deque<T> {
 
     @Override
     public T peekLast() {
-        if (length == 0) {
+        if (this.length == 0) {
             return null;
         }
         return this.lastNode.data;
@@ -322,7 +322,7 @@ public class LinkedList<T> implements List<T>, Deque<T> {
 
     @Override
     public T poll() {
-        if (length == 0) {
+        if (this.length == 0) {
             return null;
         }
         return removeFirst();
@@ -330,7 +330,7 @@ public class LinkedList<T> implements List<T>, Deque<T> {
 
     @Override
     public T element() {
-        if (length == 0) {
+        if (this.length == 0) {
             throw new NoSuchElementException();
         }
         return this.firstNode.data;
@@ -338,7 +338,7 @@ public class LinkedList<T> implements List<T>, Deque<T> {
 
     @Override
     public T peek() {
-        if (length == 0) {
+        if (this.length == 0) {
             return null;
         }
         return this.firstNode.data;
@@ -356,12 +356,12 @@ public class LinkedList<T> implements List<T>, Deque<T> {
 
     @Override
     public int size() {
-        return length;
+        return this.length;
     }
 
     @Override
     public boolean isEmpty() {
-        return length == 0;
+        return this.length == 0;
     }
 
     @Override
@@ -383,16 +383,16 @@ public class LinkedList<T> implements List<T>, Deque<T> {
     @Override
     @SuppressWarnings("unchecked")
     public <T1> T1[] toArray(T1[] a) {
-        if (a.length < length) {
-            return (T1[]) Arrays.copyOf(this.toArray(), length, a.getClass());
+        if (a.length < this.length) {
+            return (T1[]) Arrays.copyOf(this.toArray(), this.length, a.getClass());
         }
         int index = 0;
         for (Node<T> p = this.firstNode; p != null; p = p.next) {
             a[index] = (T1) p.data;
             ++index;
         }
-        if (a.length > length) {
-            a[length] = null;
+        if (a.length > this.length) {
+            a[this.length] = null;
         }
         return a;
     }
@@ -451,7 +451,7 @@ public class LinkedList<T> implements List<T>, Deque<T> {
             return false;
         }
         testOnEntrance(index);
-        if (length == 0) {
+        if (this.length == 0) {
             addAll(c);
             return true;
         }
@@ -497,8 +497,9 @@ public class LinkedList<T> implements List<T>, Deque<T> {
             throw new NullPointerException();
         }
         if (c.size() == 0) {
+            boolean isListEmpty = (this.length != 0);
             clear();
-            return true;
+            return isListEmpty;
         }
         boolean isRetain = false;
         Node<T> temp;
@@ -574,7 +575,7 @@ public class LinkedList<T> implements List<T>, Deque<T> {
     @Override
     public int lastIndexOf(Object o) {
         testZeroLength();
-        int index = length - 1;
+        int index = this.length - 1;
         for (Node<T> p = this.lastNode; p != null; p = p.previous) {
             if (Objects.equals(p.data, o)) {
                 return index;
@@ -595,22 +596,22 @@ public class LinkedList<T> implements List<T>, Deque<T> {
     }
 
     private void testOnEntrance(int index) {
-        if (index < 0 || index >= length) {
+        if (index < 0 || index >= this.length) {
             throw new IndexOutOfBoundsException();
         }
     }
 
     private void testZeroLength() {
-        if (length == 0) {
+        if (this.length == 0) {
             throw new NegativeArraySizeException();
         }
     }
 
     private Node<T> findNode(int index) {
-        if (index == length) {
+        if (index == this.length) {
             return null;
-        } else if (index > length / 2) {
-            int i = length - 1;
+        } else if (index > this.length / 2) {
+            int i = this.length - 1;
             for (Node<T> p = this.lastNode; p != null; p = p.previous) {
                 if (i == index) {
                     return p;
@@ -633,8 +634,8 @@ public class LinkedList<T> implements List<T>, Deque<T> {
         Node<T> temp = new Node<>(t, previous, next);
         previous.next = temp;
         next.previous = temp;
-        ++length;
-        ++modificationsCount;
+        ++this.length;
+        ++this.modificationsCount;
     }
 
     private void removeThisNode(Node<T> node) {
@@ -645,8 +646,8 @@ public class LinkedList<T> implements List<T>, Deque<T> {
         } else {
             node.previous.next = node.next;
             node.next.previous = node.previous;
-            --length;
-            ++modificationsCount;
+            --this.length;
+            ++this.modificationsCount;
         }
     }
 
@@ -657,7 +658,7 @@ public class LinkedList<T> implements List<T>, Deque<T> {
         for (Node<T> p = this.firstNode; p != null; p = p.next) {
             stringbuilder.append(p.data).append(", ");
         }
-        if (length > 0) {
+        if (this.length > 0) {
             stringbuilder.delete(stringbuilder.length() - 2, stringbuilder.length());
         }
         stringbuilder.append("}");

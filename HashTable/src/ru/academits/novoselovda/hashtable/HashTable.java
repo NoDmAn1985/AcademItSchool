@@ -3,36 +3,33 @@ package ru.academits.novoselovda.hashtable;
 import java.util.*;
 
 public class HashTable<T> implements Collection<T> {
-    private final int DEFAULT_CAPACITY = 20;
-    private final double CAPACITY_RATE = 1.3;
+    private final static int DEFAULT_CAPACITY = 11;
     private int capacity;
-    private Object[] table;
-    private int length;
-    private int digitsCount;
+    private List<T>[] table;
+    private int countOfElements;
 
-    public HashTable() {
-        this.capacity = DEFAULT_CAPACITY;
-        this.table = new Object[this.capacity];
-        this.length = 0;
-    }
-
+    @SuppressWarnings("unchecked")
     public HashTable(int capacity) {
         if (capacity <= 0) {
             throw new IndexOutOfBoundsException();
         }
         this.capacity = capacity;
-        this.table = new Object[this.capacity];
-        this.length = 0;
+        this.table = new LinkedList[this.capacity];
+        this.countOfElements = 0;
+    }
+
+    public HashTable() {
+        this(DEFAULT_CAPACITY);
     }
 
     @Override
     public int size() {
-        return this.length;
+        return this.countOfElements;
     }
 
     @Override
     public boolean isEmpty() {
-        return this.length == 0;
+        return this.countOfElements == 0;
     }
 
     @Override
@@ -40,17 +37,17 @@ public class HashTable<T> implements Collection<T> {
         if (o == null) {
             throw new NullPointerException();
         }
-        return (this.length != 0 && Objects.equals(this.table[getHash(o)], o));
+        int index = getHash(o);
+        return (this.countOfElements != 0 && this.table[index] != null && this.table[index].contains(o));
     }
 
     @Override
     public Object[] toArray() {
-        Object[] array = new Object[this.length];
-        if (length != 0) {
+        Object[] array = new Object[this.countOfElements];
+        if (this.countOfElements != 0) {
             int index = 0;
-            Iterator<T> iterator = new Itr();
-            while (iterator.hasNext()) {
-                array[index] = iterator.next();
+            for (T element : this) {
+                array[index] = element;
                 ++index;
             }
         }
@@ -60,14 +57,14 @@ public class HashTable<T> implements Collection<T> {
     @Override
     @SuppressWarnings("unchecked")
     public <T1> T1[] toArray(T1[] a) {
-        if (this.length != 0) {
-            T1[] tempArray = (T1[]) Arrays.copyOf(this.toArray(), this.length);
-            if (a.length < this.length) {
-                return Arrays.copyOf(tempArray, this.length);
+        if (this.countOfElements != 0) {
+            T1[] tempArray = (T1[]) Arrays.copyOf(this.toArray(), this.countOfElements);
+            if (a.length < this.countOfElements) {
+                return tempArray;
             }
-            System.arraycopy(tempArray, 0, a, 0, this.length);
-            if (a.length > this.length) {
-                a[this.length] = null;
+            System.arraycopy(tempArray, 0, a, 0, this.countOfElements);
+            if (a.length > this.countOfElements) {
+                a[this.countOfElements] = null;
             }
         }
         return a;
@@ -79,10 +76,14 @@ public class HashTable<T> implements Collection<T> {
             throw new NullPointerException();
         }
         int index = getHash(t);
-        autoResizeTable(index, t);
         if (this.table[index] == null) {
-            this.table[index] = t;
-            ++this.length;
+            this.table[index] = new LinkedList<>();
+            this.table[index].add(t);
+            ++this.countOfElements;
+            return true;
+        } else if (this.table[index] != null && !this.table[index].contains(t)) {
+            this.table[index].add(t);
+            ++this.countOfElements;
             return true;
         }
         return false;
@@ -93,11 +94,13 @@ public class HashTable<T> implements Collection<T> {
         if (o == null) {
             throw new NullPointerException();
         }
-        if (this.length != 0) {
+        if (this.countOfElements != 0) {
             int index = getHash(o);
-            if (Objects.equals(this.table[index], o)) {
-                this.table[index] = null;
-                --this.length;
+            if (this.table[index] != null && this.table[index].remove(o)) {
+                --this.countOfElements;
+                if (this.table[index].size() == 0) {
+                    this.table[index] = null;
+                }
                 return true;
             }
         }
@@ -109,12 +112,12 @@ public class HashTable<T> implements Collection<T> {
         if (c == null) {
             throw new NullPointerException();
         }
-        if (c.size() == 0 || this.length == 0) {
+        if (c.size() == 0 || this.countOfElements == 0) {
             return false;
         }
         int count = 0;
-        for (Object object : c) {
-            if (contains(object)) {
+        for (T element : this) {
+            if (c.contains(element)) {
                 ++count;
             }
         }
@@ -144,7 +147,7 @@ public class HashTable<T> implements Collection<T> {
         if (c == null) {
             throw new NullPointerException();
         }
-        if (c.size() == 0 || this.length == 0) {
+        if (c.size() == 0 || this.countOfElements == 0) {
             return false;
         }
         boolean isRemove = false;
@@ -162,14 +165,13 @@ public class HashTable<T> implements Collection<T> {
         if (c == null) {
             throw new NullPointerException();
         }
-        if (c.size() == 0 || this.length == 0) {
+        if (c.size() == 0 || this.countOfElements == 0) {
             return false;
         }
         boolean isRetain = false;
-        for (int i = 0; i < this.capacity; i++) {
-            if (this.table[i] != null && !c.contains(this.table[i])) {
-                this.table[i] = null;
-                --length;
+        for (T element : this) {
+            if (!c.contains(element)) {
+                remove(element);
                 isRetain = true;
             }
         }
@@ -178,9 +180,9 @@ public class HashTable<T> implements Collection<T> {
 
     @Override
     public void clear() {
-        if (this.length != 0) {
+        if (this.countOfElements != 0) {
             Arrays.fill(this.table, null);
-            this.length = 0;
+            this.countOfElements = 0;
         }
     }
 
@@ -190,16 +192,16 @@ public class HashTable<T> implements Collection<T> {
     }
 
     private class Itr implements Iterator<T> {
-        private int count = 0;
         private int cursor = 0;
+        private int insideCursor = 0;
 
-        {
+        Itr() {
             findNotNullCell();
         }
 
         @Override
         public boolean hasNext() {
-            return this.count <= HashTable.this.length;
+            return this.cursor < HashTable.this.table.length;
         }
 
         @Override
@@ -207,47 +209,31 @@ public class HashTable<T> implements Collection<T> {
             if (!hasNext()) {
                 throw new NoSuchElementException();
             }
-            int tempIndex = this.cursor;
-            ++this.cursor;
-            findNotNullCell();
-            return objectToTypeT(HashTable.this.table[tempIndex]);
+            T tempData;
+            if (HashTable.this.table[this.cursor].size() > 1 &&
+                    this.insideCursor < HashTable.this.table[this.cursor].size() - 1) {
+                tempData = objectToTypeT(HashTable.this.table[this.cursor].get(this.insideCursor));
+                ++this.insideCursor;
+            } else {
+                this.insideCursor = 0;
+                tempData = objectToTypeT(HashTable.this.table[this.cursor].
+                        get(HashTable.this.table[this.cursor].size() - 1));
+                ++this.cursor;
+                findNotNullCell();
+            }
+
+            return tempData;
         }
 
         private void findNotNullCell() {
-            while (this.count != HashTable.this.length && HashTable.this.table[this.cursor] == null) {
+            while (this.cursor < HashTable.this.table.length && HashTable.this.table[this.cursor] == null) {
                 ++this.cursor;
             }
-            ++this.count;
         }
     }
 
     private int getHash(Object object) {
-        return (int) Math.abs(object.hashCode()) % this.capacity;
-    }
-
-    private void resizeTable() {
-        this.capacity *= CAPACITY_RATE;
-        Object[] newKeys = new Object[this.capacity];
-        if (this.length != 0) {
-            Iterator<T> iterator = new Itr();
-            while (iterator.hasNext()) {
-                T tempData = iterator.next();
-                int newIndex = getHash(tempData);
-                if (newKeys[newIndex] == null) {
-                    newKeys[newIndex] = tempData;
-                } else {
-                    resizeTable();
-                    return;
-                }
-            }
-        }
-        this.table = Arrays.copyOf(newKeys, this.capacity);
-    }
-
-    private void autoResizeTable(int index, Object object) {
-        while (this.table[index] != null && !Objects.equals(this.table[index], object)) {
-            resizeTable();
-        }
+        return Math.abs(object.hashCode()) % this.capacity;
     }
 
     @SuppressWarnings("unchecked")
@@ -257,8 +243,13 @@ public class HashTable<T> implements Collection<T> {
 
     @Override
     public String toString() {
-        return String.format("%s, size = %d, arraySize = %d",
-                Arrays.toString(this.table), this.length, this.table.length);
+        StringBuilder sb = new StringBuilder();
+        sb.append('{');
+        for (Object element : this.table) {
+            sb.append(element).append(", ");
+        }
+        return sb.delete(sb.length() - 2, sb.length()).append("} , size = ").append(this.countOfElements).
+                append(", capacity = ").append(this.capacity).toString();
     }
 
     @Override
@@ -270,13 +261,13 @@ public class HashTable<T> implements Collection<T> {
             return false;
         }
         HashTable<?> tempTable = (HashTable<?>) o;
-        if (this.length != tempTable.length) {
+        if (this.countOfElements != tempTable.countOfElements) {
             return false;
         }
         Iterator<?> iterator1 = this.iterator();
         Iterator<?> iterator2 = tempTable.iterator();
         while (iterator1.hasNext()) {
-            if (!Objects.equals(iterator1.next(), iterator2.next())) {
+            if (!iterator1.next().equals(iterator2.next())) {
                 return false;
             }
         }

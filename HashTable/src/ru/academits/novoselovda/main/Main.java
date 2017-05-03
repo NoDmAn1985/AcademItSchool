@@ -40,6 +40,12 @@ public class Main {
         }
         System.out.println();
 
+        System.out.println("isEmpty()");
+        for (HashTable<String> table : hashTables) {
+            System.out.println(table.isEmpty() + " > " + table);
+        }
+        System.out.println();
+
         System.out.println("Новые таблицы:");
         ArrayList<String> collection2 = new ArrayList<>();
         collection2.add("2collection2 - 1x2");
@@ -105,13 +111,6 @@ public class Main {
 
         System.out.println("equals");
         System.out.println(hashTables[0].equals(hashTables[1]));
-
-
-
-
-
-
-
 
     }
 }

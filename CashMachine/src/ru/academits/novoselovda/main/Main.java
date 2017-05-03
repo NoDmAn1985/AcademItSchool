@@ -21,13 +21,8 @@ public class Main {
         cashMachineMoney[0] = new Money(Values.FIVE_HUNDREDS, 90);
         cashMachineMoney[2] = new Money(Values.ONE_THOUSAND, 200);
 
-        Money[] userMoney = new Money[3];
-        userMoney[2] = new Money(Values.TEN, 15);
-        userMoney[1] = new Money(Values.ONE_HUNDRED, 190);
-        userMoney[0] = new Money(Values.FIVE_HUNDREDS, 90);
-
         try {
-            Controller controller = new Controller(cashMachineMoney, userMoney);
+            Controller controller = new Controller(cashMachineMoney);
             ConsoleMainMenu cashMachine = new ConsoleMainMenu(controller);
             cashMachine.show();
         } catch (IllegalArgumentException | NullPointerException exception) {

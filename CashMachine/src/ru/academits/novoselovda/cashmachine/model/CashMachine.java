@@ -10,6 +10,7 @@ public class CashMachine {
     private int maxNotesCount;
     private int length;
     private Money[] machinesDeposit;
+    private Money[] userMoney;
     private int sum;
 
 
@@ -19,7 +20,7 @@ public class CashMachine {
         this.machinesDeposit = new Money[length];
         int index = 0;
         for (Values value : Values.values()) {
-            machinesDeposit[index] = new Money(value, 0);
+            this.machinesDeposit[index] = new Money(value, 0);
             ++index;
         }
         testOnMaximumAndNull(startMoney);
@@ -38,7 +39,7 @@ public class CashMachine {
             if (money != null && money.getCount() > 0) {
                 for (int i = 0; i < this.length; i++) {
                     if (!isVerified[i] && money.getValue() == this.machinesDeposit[i].getValue()) {
-                        if (machinesDeposit[i].getCount() + money.getCount() > maxNotesCount) {
+                        if (this.machinesDeposit[i].getCount() + money.getCount() > this.maxNotesCount) {
                             throw new IllegalArgumentException("ОШИБКА: превышен лимит по количеству купюр номиналом "
                                     + money.getValue().getCost());
                         }
@@ -51,16 +52,16 @@ public class CashMachine {
             }
         }
         for (int i = 0; i < this.length; ++i) {
-            machinesDeposit[i].add(tempArrayOfCounts[i]);
+            this.machinesDeposit[i].add(tempArrayOfCounts[i]);
         }
-        sum += tempSum;
+        this.sum += tempSum;
     }
 
     public ArrayList<Money> subtract(int requiredSum, int requiredNoteNumber) throws IllegalArgumentException {
         ArrayList<Money> cashOut = new ArrayList<>();
         int[] tempArrayOfCounts = new int[length];
         int leftSum = requiredSum;
-        for (int i = requiredNoteNumber; i > 0; i--) {
+        for (int i = requiredNoteNumber; i >= 0; i--) {
             if (this.machinesDeposit[i].getCount() == 0) {
                 continue;
             }
@@ -92,6 +93,23 @@ public class CashMachine {
         }
         this.sum -= requiredSum;
         return cashOut;
+    }
+
+    public void setUserMoney(int number, int count) {
+        this.userMoney[number].add(count);
+    }
+
+    public Money[] getUserMoney() {
+        return this.userMoney;
+    }
+
+    public void initUserMoney() {
+        this.userMoney = new Money[length];
+        int index = 0;
+        for (Values value : Values.values()) {
+            this.userMoney[index] = new Money(value, 0);
+            ++index;
+        }
     }
 
     public Money[] getDeposit() {

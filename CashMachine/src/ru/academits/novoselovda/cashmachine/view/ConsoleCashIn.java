@@ -8,26 +8,56 @@ import java.util.Scanner;
 class ConsoleCashIn {
     private Controller controller;
     private ConsoleStatus status;
+    private Scanner scanner;
 
     ConsoleCashIn(Controller controller, ConsoleStatus status) {
         this.status = status;
         this.controller = controller;
+        this.scanner = new Scanner(System.in);
     }
 
     void show() {
+        this.controller.initUserMoney();
         System.out.println("-----------------------------------------------------");
         System.out.println("ОПЕРАЦИЯ: Приём денег");
         System.out.println("-----------------------------------------------------");
         System.out.println("До приёма денег было:");
         this.status.show();
-        System.out.print("Вложите деньги в купюроприёмник и нажмите <ENTER>....");
-        new Scanner(System.in).nextLine();
-        System.out.println("-----------------------------------------------------");
-        System.out.println("Вы вложили:");
-        Money[] userMoney = this.controller.getUserMoney();
-        for (int i = 0; i < userMoney.length; i++) {
-            System.out.printf("%d) %4d - %3d шт.%n", i, userMoney[i].getValue().getCost(),
-                    userMoney[i].getCount());
+        System.out.println("Вложите деньги в купюроприёмник:");
+        one:
+        while (true) {
+            Money[] userMoney = this.controller.getUserMoney();
+            int index = 0;
+            for (Money money : userMoney) {
+                System.out.printf("%d) %4d - %3d шт.%n", index, money.getValue().getCost(), money.getCount());
+                ++index;
+            }
+            int number;
+            while (true) {
+                System.out.println("Введите номер купюры или \"" + index + "\" для завершения, или \"" + (index + 1) +
+                        "\" для выхода в главное меню:");
+                number = scanner.nextInt();
+                if (number >= 0 && number < index) {
+                    break;
+                } else if (number == index) {
+                    break one;
+                } else if (number == index + 1) {
+                    System.out.println("Операция была прервана");
+                    return;
+                }
+                System.out.println("ОШИБКА: нет такого номера, попробуйте ещё раз");
+            }
+            int count;
+            while (true) {
+                System.out.println("Введите количество купюр:");
+                count = scanner.nextInt();
+                if (count >= 0) {
+                    break;
+                }
+                System.out.println("ОШИБКА: число должно быть положительным, попробуйте ещё раз");
+            }
+            this.controller.setUserMoney(number, count);
+            System.out.println("-----------------------------------------------------");
         }
         System.out.println("-----------------------------------------------------");
         try {

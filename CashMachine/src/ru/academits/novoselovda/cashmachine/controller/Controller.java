@@ -6,13 +6,11 @@ import ru.academits.novoselovda.notes.Money;
 import java.util.ArrayList;
 
 public class Controller {
-    private Money[] userMoney;
     private CashMachine cashMachine;
     private final int NOTES_MAX_COUNT = 200;
 
-    public Controller(Money[] startMoney, Money[] userMoney) throws IllegalArgumentException, NullPointerException {
+    public Controller(Money[] startMoney) throws IllegalArgumentException, NullPointerException {
         this.cashMachine = new CashMachine(startMoney, NOTES_MAX_COUNT);
-        this.userMoney = userMoney;
     }
 
     public Money[] getCashMachineDeposit() {
@@ -23,13 +21,10 @@ public class Controller {
         return this.cashMachine.getSum();
     }
 
-    public Money[] getUserMoney() {
-        return this.userMoney;
-    }
-
     public void addMoney() throws IllegalArgumentException {
+        Money[] userMoney = getUserMoney();
         this.cashMachine.testOnMaximumAndNull(userMoney);
-        this.cashMachine.add(this.userMoney);
+        this.cashMachine.add(userMoney);
     }
 
     public ArrayList<Money> getCashOut(int requiredSum, int requiredNoteNumber) throws IllegalArgumentException {
@@ -42,5 +37,17 @@ public class Controller {
 
     public void testRequiredNote(int requiredSum, int requiredNoteNumber) throws IllegalArgumentException {
         this.cashMachine.testRequiredNote(requiredSum, requiredNoteNumber);
+    }
+
+    public void setUserMoney(int number, int count) {
+        this.cashMachine.setUserMoney(number, count);
+    }
+
+    public Money[] getUserMoney() {
+        return this.cashMachine.getUserMoney();
+    }
+
+    public void initUserMoney() {
+        this.cashMachine.initUserMoney();
     }
 }
