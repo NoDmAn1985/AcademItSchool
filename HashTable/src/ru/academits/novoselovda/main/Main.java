@@ -17,9 +17,10 @@ public class Main {
         }
         System.out.println();
 
-        System.out.println("add(\"add(T t)\")");
+        System.out.println("add(\"add(T t)\"), add(null)");
         for (HashTable<String> table : hashTables) {
             System.out.println(table.add("\"add(T t)\"") + " > " + table);
+            System.out.println(table.add(null) + " > " + table);
         }
         System.out.println();
 
@@ -49,18 +50,27 @@ public class Main {
         System.out.println("Новые таблицы:");
         ArrayList<String> collection2 = new ArrayList<>();
         collection2.add("2collection2 - 1x2");
+        collection2.add("2collection2 - 1x2");
         collection2.add("2collection2 - 2x2");
         collection2.add("2collection2 - 2x1");
         for (HashTable<String> table : hashTables) {
+            table.add(null);
+            table.add(null);
             table.addAll(collection1);
             table.addAll(collection2);
             System.out.println(table);
         }
         System.out.println();
 
-        System.out.println("contains(\"collection1 - 2x1\")");
+        System.out.println("contains(null)");
         for (HashTable<String> table : hashTables) {
             System.out.println(table.contains("collection1 - 2x1") + " > " + table);
+        }
+        System.out.println();
+
+        System.out.println("contains(\"2collection2 - 1x2\")");
+        for (HashTable<String> table : hashTables) {
+            System.out.println(table.contains("2collection2 - 1x2") + " > " + table);
         }
         System.out.println();
 
@@ -70,9 +80,9 @@ public class Main {
         }
         System.out.println();
 
-        System.out.println("remove(\"collection1 - 2x1\")");
+        System.out.println("remove(\"2collection2 - 2x2\")");
         for (HashTable<String> table : hashTables) {
-            System.out.println(table.remove("collection1 - 2x1") + " > " + table);
+            System.out.println(table.remove("2collection2 - 2x2") + " > " + table);
         }
         System.out.println();
 
@@ -93,6 +103,12 @@ public class Main {
         System.out.println("retainAll(collection1)");
         for (HashTable<String> table : hashTables) {
             System.out.println(table.retainAll(collection1) + " > " + table);
+        }
+        System.out.println();
+
+        System.out.println("containsAll(collection1)");
+        for (HashTable<String> table : hashTables) {
+            System.out.println(table.containsAll(collection1) + " > " + table);
         }
         System.out.println();
 

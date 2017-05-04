@@ -21,8 +21,7 @@ public class Controller {
         return this.cashMachine.getSum();
     }
 
-    public void addMoney() throws IllegalArgumentException {
-        Money[] userMoney = getUserMoney();
+    public void addMoney(Money[] userMoney) throws IllegalArgumentException {
         this.cashMachine.testOnMaximumAndNull(userMoney);
         this.cashMachine.add(userMoney);
     }
@@ -37,17 +36,5 @@ public class Controller {
 
     public void testRequiredNote(int requiredSum, int requiredNoteNumber) throws IllegalArgumentException {
         this.cashMachine.testRequiredNote(requiredSum, requiredNoteNumber);
-    }
-
-    public void setUserMoney(int number, int count) {
-        this.cashMachine.setUserMoney(number, count);
-    }
-
-    public Money[] getUserMoney() {
-        return this.cashMachine.getUserMoney();
-    }
-
-    public void initUserMoney() {
-        this.cashMachine.initUserMoney();
     }
 }

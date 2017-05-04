@@ -10,7 +10,6 @@ public class CashMachine {
     private int maxNotesCount;
     private int length;
     private Money[] machinesDeposit;
-    private Money[] userMoney;
     private int sum;
 
 
@@ -93,23 +92,6 @@ public class CashMachine {
         }
         this.sum -= requiredSum;
         return cashOut;
-    }
-
-    public void setUserMoney(int number, int count) {
-        this.userMoney[number].add(count);
-    }
-
-    public Money[] getUserMoney() {
-        return this.userMoney;
-    }
-
-    public void initUserMoney() {
-        this.userMoney = new Money[length];
-        int index = 0;
-        for (Values value : Values.values()) {
-            this.userMoney[index] = new Money(value, 0);
-            ++index;
-        }
     }
 
     public Money[] getDeposit() {

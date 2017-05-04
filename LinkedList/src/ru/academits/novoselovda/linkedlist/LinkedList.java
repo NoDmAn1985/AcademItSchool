@@ -496,10 +496,12 @@ public class LinkedList<T> implements List<T>, Deque<T> {
         if (c == null) {
             throw new NullPointerException();
         }
+        if (this.length == 0) {
+            return false;
+        }
         if (c.size() == 0) {
-            boolean isListEmpty = (this.length != 0);
             clear();
-            return isListEmpty;
+            return true;
         }
         boolean isRetain = false;
         Node<T> temp;

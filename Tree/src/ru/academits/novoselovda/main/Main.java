@@ -5,6 +5,7 @@ import ru.academits.novoselovda.tree.Tree;
 public class Main {
     public static void main(String[] args) {
         Tree<Integer> tree = new Tree<>();
+        tree.add(null);
         tree.add(123);
         tree.add(93);
         tree.add(83);
@@ -16,6 +17,7 @@ public class Main {
         tree.add(29);
         tree.add(17);
         tree.add(183);
+        tree.add(null);
         tree.add(35);
         tree.add(33);
         tree.add(37);
@@ -35,10 +37,10 @@ public class Main {
         tree.stackDepthFirstSearch();
         System.out.println("------------------------------------");
         System.out.println("contains(83)");
-        System.out.println(tree.contains(83));
+        System.out.println(tree.contains(null));
         System.out.println("------------------------------------");
         System.out.println("remove(35)");
-        System.out.println(tree.remove(35));
+        System.out.println(tree.remove(null));
         tree.breadthFirstSearch();
     }
 }

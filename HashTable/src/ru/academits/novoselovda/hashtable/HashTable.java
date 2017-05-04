@@ -6,7 +6,8 @@ public class HashTable<T> implements Collection<T> {
     private final static int DEFAULT_CAPACITY = 11;
     private int capacity;
     private List<T>[] table;
-    private int countOfElements;
+    private int elementsCount;
+    private int modificationsCount;
 
     @SuppressWarnings("unchecked")
     public HashTable(int capacity) {
@@ -15,7 +16,7 @@ public class HashTable<T> implements Collection<T> {
         }
         this.capacity = capacity;
         this.table = new LinkedList[this.capacity];
-        this.countOfElements = 0;
+        this.elementsCount = 0;
     }
 
     public HashTable() {
@@ -24,27 +25,27 @@ public class HashTable<T> implements Collection<T> {
 
     @Override
     public int size() {
-        return this.countOfElements;
+        return this.elementsCount;
     }
 
     @Override
     public boolean isEmpty() {
-        return this.countOfElements == 0;
+        return this.elementsCount == 0;
     }
 
     @Override
     public boolean contains(Object o) {
         if (o == null) {
-            throw new NullPointerException();
+            return (this.elementsCount != 0 && this.table[0] != null && this.table[0].contains(null));
         }
         int index = getHash(o);
-        return (this.countOfElements != 0 && this.table[index] != null && this.table[index].contains(o));
+        return (this.elementsCount != 0 && this.table[index] != null && this.table[index].contains(o));
     }
 
     @Override
     public Object[] toArray() {
-        Object[] array = new Object[this.countOfElements];
-        if (this.countOfElements != 0) {
+        Object[] array = new Object[this.elementsCount];
+        if (this.elementsCount != 0) {
             int index = 0;
             for (T element : this) {
                 array[index] = element;
@@ -57,14 +58,14 @@ public class HashTable<T> implements Collection<T> {
     @Override
     @SuppressWarnings("unchecked")
     public <T1> T1[] toArray(T1[] a) {
-        if (this.countOfElements != 0) {
-            T1[] tempArray = (T1[]) Arrays.copyOf(this.toArray(), this.countOfElements);
-            if (a.length < this.countOfElements) {
+        if (this.elementsCount != 0) {
+            T1[] tempArray = (T1[]) Arrays.copyOf(this.toArray(), this.elementsCount);
+            if (a.length < this.elementsCount) {
                 return tempArray;
             }
-            System.arraycopy(tempArray, 0, a, 0, this.countOfElements);
-            if (a.length > this.countOfElements) {
-                a[this.countOfElements] = null;
+            System.arraycopy(tempArray, 0, a, 0, this.elementsCount);
+            if (a.length > this.elementsCount) {
+                a[this.elementsCount] = null;
             }
         }
         return a;
@@ -72,35 +73,26 @@ public class HashTable<T> implements Collection<T> {
 
     @Override
     public boolean add(T t) {
-        if (t == null) {
-            throw new NullPointerException();
-        }
-        int index = getHash(t);
+        int index = (t == null ? 0 : getHash(t));
         if (this.table[index] == null) {
             this.table[index] = new LinkedList<>();
-            this.table[index].add(t);
-            ++this.countOfElements;
-            return true;
-        } else if (this.table[index] != null && !this.table[index].contains(t)) {
-            this.table[index].add(t);
-            ++this.countOfElements;
-            return true;
         }
-        return false;
+        if (this.table[index].contains(t)) {
+            return false;
+        }
+        this.table[index].add(t);
+        ++this.elementsCount;
+        ++this.modificationsCount;
+        return true;
     }
 
     @Override
     public boolean remove(Object o) {
-        if (o == null) {
-            throw new NullPointerException();
-        }
-        if (this.countOfElements != 0) {
-            int index = getHash(o);
+        if (this.elementsCount != 0) {
+            int index = (o == null ? 0 : getHash(o));
             if (this.table[index] != null && this.table[index].remove(o)) {
-                --this.countOfElements;
-                if (this.table[index].size() == 0) {
-                    this.table[index] = null;
-                }
+                --this.elementsCount;
+                ++this.modificationsCount;
                 return true;
             }
         }
@@ -112,16 +104,29 @@ public class HashTable<T> implements Collection<T> {
         if (c == null) {
             throw new NullPointerException();
         }
-        if (c.size() == 0 || this.countOfElements == 0) {
+        if (c.size() == 0) {
+            return true;
+        }
+        if (this.elementsCount == 0) {
             return false;
         }
         int count = 0;
+        boolean[] isVerified = new boolean[c.size()];
         for (T element : this) {
-            if (c.contains(element)) {
-                ++count;
+            int index = 0;
+            for (Object object : c) {
+                if (!isVerified[index] && Objects.equals(object, element)) {
+                    isVerified[index] = true;
+                    ++count;
+                    if (count == c.size()) {
+                        return true;
+                    }
+                    break;
+                }
+                ++index;
             }
         }
-        return count == c.size();
+        return false;
     }
 
     @Override
@@ -132,14 +137,13 @@ public class HashTable<T> implements Collection<T> {
         if (c.size() == 0) {
             return false;
         }
-        boolean isAdd = false;
+        boolean isAnyChanges = false;
         for (Object object : c) {
-            if (object != null) {
-                add(objectToTypeT(object));
-                isAdd = true;
+            if (add(objectToTypeT(object)) && !isAnyChanges) {
+                isAnyChanges = true;
             }
         }
-        return isAdd;
+        return isAnyChanges;
     }
 
     @Override
@@ -147,17 +151,16 @@ public class HashTable<T> implements Collection<T> {
         if (c == null) {
             throw new NullPointerException();
         }
-        if (c.size() == 0 || this.countOfElements == 0) {
+        if (c.size() == 0 || this.elementsCount == 0) {
             return false;
         }
-        boolean isRemove = false;
+        boolean isAnyChanges = false;
         for (Object object : c) {
-            if (object != null) {
-                remove(object);
-                isRemove = true;
+            if (remove(object) && !isAnyChanges) {
+                isAnyChanges = true;
             }
         }
-        return isRemove;
+        return isAnyChanges;
     }
 
     @Override
@@ -165,24 +168,35 @@ public class HashTable<T> implements Collection<T> {
         if (c == null) {
             throw new NullPointerException();
         }
-        if (c.size() == 0 || this.countOfElements == 0) {
+        if (this.elementsCount == 0) {
             return false;
         }
-        boolean isRetain = false;
+        if (c.size() == 0) {
+            clear();
+            return true;
+        }
+        boolean isAnyChanges = false;
         for (T element : this) {
             if (!c.contains(element)) {
-                remove(element);
-                isRetain = true;
+                if (remove(element)) {
+                    --this.modificationsCount;
+                    isAnyChanges = true;
+                }
             }
         }
-        return isRetain;
+        return isAnyChanges;
     }
 
     @Override
     public void clear() {
-        if (this.countOfElements != 0) {
-            Arrays.fill(this.table, null);
-            this.countOfElements = 0;
+        if (this.elementsCount != 0) {
+            for (List<T> row : this.table) {
+                if (row != null) {
+                    row.clear();
+                }
+            }
+            this.modificationsCount = 0;
+            this.elementsCount = 0;
         }
     }
 
@@ -194,6 +208,8 @@ public class HashTable<T> implements Collection<T> {
     private class Itr implements Iterator<T> {
         private int cursor = 0;
         private int insideCursor = 0;
+        private int expectedModificationCount = HashTable.this.modificationsCount;
+        private int length = HashTable.this.elementsCount;
 
         Itr() {
             findNotNullCell();
@@ -209,25 +225,37 @@ public class HashTable<T> implements Collection<T> {
             if (!hasNext()) {
                 throw new NoSuchElementException();
             }
+            checkForModifications();
+            if (this.insideCursor != 0 && this.length > HashTable.this.elementsCount) {
+                --this.insideCursor;
+                this.length = HashTable.this.elementsCount;
+            }
             T tempData;
-            if (HashTable.this.table[this.cursor].size() > 1 &&
-                    this.insideCursor < HashTable.this.table[this.cursor].size() - 1) {
+            if (this.insideCursor < HashTable.this.table[this.cursor].size() - 1) {
                 tempData = objectToTypeT(HashTable.this.table[this.cursor].get(this.insideCursor));
                 ++this.insideCursor;
             } else {
                 this.insideCursor = 0;
+                this.length = HashTable.this.elementsCount;
                 tempData = objectToTypeT(HashTable.this.table[this.cursor].
                         get(HashTable.this.table[this.cursor].size() - 1));
                 ++this.cursor;
                 findNotNullCell();
             }
-
             return tempData;
         }
 
         private void findNotNullCell() {
-            while (this.cursor < HashTable.this.table.length && HashTable.this.table[this.cursor] == null) {
+            while (this.cursor < HashTable.this.table.length &&
+                    (HashTable.this.table[this.cursor] == null ||
+                            HashTable.this.table[this.cursor].size() == 0)) {
                 ++this.cursor;
+            }
+        }
+
+        void checkForModifications() {
+            if (HashTable.this.modificationsCount != this.expectedModificationCount) {
+                throw new ConcurrentModificationException();
             }
         }
     }
@@ -248,7 +276,7 @@ public class HashTable<T> implements Collection<T> {
         for (Object element : this.table) {
             sb.append(element).append(", ");
         }
-        return sb.delete(sb.length() - 2, sb.length()).append("} , size = ").append(this.countOfElements).
+        return sb.delete(sb.length() - 2, sb.length()).append("} , size = ").append(this.elementsCount).
                 append(", capacity = ").append(this.capacity).toString();
     }
 
@@ -261,7 +289,7 @@ public class HashTable<T> implements Collection<T> {
             return false;
         }
         HashTable<?> tempTable = (HashTable<?>) o;
-        if (this.countOfElements != tempTable.countOfElements) {
+        if (this.elementsCount != tempTable.elementsCount) {
             return false;
         }
         Iterator<?> iterator1 = this.iterator();

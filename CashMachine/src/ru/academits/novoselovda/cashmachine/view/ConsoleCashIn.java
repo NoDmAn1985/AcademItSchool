@@ -2,6 +2,7 @@ package ru.academits.novoselovda.cashmachine.view;
 
 import ru.academits.novoselovda.cashmachine.controller.Controller;
 import ru.academits.novoselovda.notes.Money;
+import ru.academits.novoselovda.notes.Values;
 
 import java.util.Scanner;
 
@@ -17,7 +18,12 @@ class ConsoleCashIn {
     }
 
     void show() {
-        this.controller.initUserMoney();
+        Money[] userMoney = new Money[Values.values().length];
+        int index = 0;
+        for (Values value : Values.values()) {
+            userMoney[index] = new Money(value, 0);
+            ++index;
+        }
         System.out.println("-----------------------------------------------------");
         System.out.println("ОПЕРАЦИЯ: Приём денег");
         System.out.println("-----------------------------------------------------");
@@ -26,8 +32,7 @@ class ConsoleCashIn {
         System.out.println("Вложите деньги в купюроприёмник:");
         one:
         while (true) {
-            Money[] userMoney = this.controller.getUserMoney();
-            int index = 0;
+            index = 0;
             for (Money money : userMoney) {
                 System.out.printf("%d) %4d - %3d шт.%n", index, money.getValue().getCost(), money.getCount());
                 ++index;
@@ -56,12 +61,12 @@ class ConsoleCashIn {
                 }
                 System.out.println("ОШИБКА: число должно быть положительным, попробуйте ещё раз");
             }
-            this.controller.setUserMoney(number, count);
+            userMoney[number].add(count);
             System.out.println("-----------------------------------------------------");
         }
         System.out.println("-----------------------------------------------------");
         try {
-            this.controller.addMoney();
+            this.controller.addMoney(userMoney);
             System.out.println("После приёма денег:");
             this.status.show();
             System.out.println("Операция прошла успешно - деньги зачислены");

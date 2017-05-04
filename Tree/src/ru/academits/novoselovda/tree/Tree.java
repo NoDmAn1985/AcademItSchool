@@ -29,8 +29,8 @@ public class Tree<T extends Comparable<T>> {
 
         @Override
         public String toString() {
-            return "{" + value + " (left = " + (leftChild == null ? null : leftChild.value) +
-                    ", right = " + (rightChild == null ? null : rightChild.value) + ")}";
+            return "{" + value + (leftChild == null ? "" : ", left = " + leftChild.value) +
+                    (rightChild == null ? "" : ", right = " + rightChild.value) + "}";
         }
     }
 
@@ -40,82 +40,107 @@ public class Tree<T extends Comparable<T>> {
     }
 
     public boolean add(T value) {
-        if (value == null) {
-            throw new NullPointerException();
-        }
         if (this.length == 0) {
             this.root = new TreeNode<>(value);
             ++this.length;
             return true;
-        } else {
-            TreeNode<T> p = this.root;
+        }
+        TreeNode<T> p = this.root;
+        if (value == null) {
             while (p != null) {
-                int compare = this.comparator.compare(p.value, value);
-                if (compare == 0) {
-                    return false;
+                if (p.leftChild == null) {
+                    p.leftChild = new TreeNode<>(null);
+                    ++length;
+                    return true;
+                }
+                p = p.leftChild;
+            }
+        }
+        TreeNode<T> q = null;
+        while (p != null) {
+            if (p.value == null) {
+                if (q != null) {
+                    q.leftChild = new TreeNode<>(value);
+                    q.leftChild.leftChild = p;
                 } else {
-                    if (compare > 0) {
-                        if (p.leftChild == null) {
-                            p.leftChild = new TreeNode<>(value);
-                            ++this.length;
-                            return true;
-                        } else {
-                            p = p.leftChild;
-                        }
-                    } else {
-                        if (p.rightChild == null) {
-                            p.rightChild = new TreeNode<>(value);
-                            ++length;
-                            return true;
-                        } else {
-                            p = p.rightChild;
-                        }
-                    }
+                    this.root = new TreeNode<>(value);
+                    this.root.leftChild = p;
+                }
+                ++length;
+                return true;
+            }
+            int compare = this.comparator.compare(p.value, value);
+            if (compare > 0) {
+                if (p.leftChild == null) {
+                    p.leftChild = new TreeNode<>(value);
+                    ++this.length;
+                    return true;
+                } else {
+                    q = p;
+                    p = p.leftChild;
+                }
+            } else {
+                if (p.rightChild == null) {
+                    p.rightChild = new TreeNode<>(value);
+                    ++length;
+                    return true;
+                } else {
+                    q = p;
+                    p = p.rightChild;
                 }
             }
-            return false;
         }
+        return false;
     }
 
     public boolean contains(T value) {
-        if (value == null) {
-            throw new NullPointerException();
-        }
         if (this.length == 0) {
             return false;
-        } else {
-            TreeNode<T> p = this.root;
+        }
+        TreeNode<T> p = this.root;
+        if (value == null) {
+            if (length == 1) {
+                return (p.value == null);
+            }
             while (p != null) {
-                int compare = this.comparator.compare(p.value, value);
-                if (compare == 0) {
-                    return true;
+                if (p.leftChild == null) {
+                    return (p.value == null);
+                }
+                p = p.leftChild;
+            }
+        }
+        while (p != null) {
+            if (p.value == null) {
+                return false;
+            }
+            int compare = this.comparator.compare(p.value, value);
+            if (compare == 0) {
+                return true;
+            } else {
+                if (compare > 0) {
+                    p = p.leftChild;
                 } else {
-                    if (compare > 0) {
-                        p = p.leftChild;
-                    } else {
-                        p = p.rightChild;
-                    }
+                    p = p.rightChild;
                 }
             }
-            return false;
         }
+        return false;
     }
 
     public void breadthFirstSearch() {
         if (this.length == 0) {
             throw new NoSuchElementException();
-        } else {
-            Queue<TreeNode<T>> queue = new LinkedList<>();
-            queue.add(this.root);
-            while (!queue.isEmpty()) {
-                TreeNode<T> node = queue.remove();
-                System.out.println(node);
-                if (node.leftChild != null) {
-                    queue.add(node.leftChild);
-                }
-                if (node.rightChild != null) {
-                    queue.add(node.rightChild);
-                }
+        }
+        Queue<TreeNode<T>> queue = new LinkedList<>();
+        queue.add(this.root);
+        while (!queue.isEmpty()) {
+            TreeNode<T> node = queue.remove();
+            System.out.println(node);
+            if (node.leftChild != null) {
+                queue.add(node.leftChild);
+            }
+            if (node.rightChild != null) {
+                queue.add(node.rightChild);
             }
         }
     }
@@ -123,9 +148,8 @@ public class Tree<T extends Comparable<T>> {
     public void recursiveDepthFirstSearch() {
         if (this.length == 0) {
             throw new NoSuchElementException();
-        } else {
-            visitNode(this.root);
         }
+        visitNode(this.root);
     }
 
     private void visitNode(TreeNode node) {
@@ -141,68 +165,72 @@ public class Tree<T extends Comparable<T>> {
     public void stackDepthFirstSearch() {
         if (this.length == 0) {
             throw new NoSuchElementException();
-        } else {
-            Stack<TreeNode<T>> stack = new Stack<>();
-            TreeNode<T> node = this.root;
-            TreeNode<T> previousNode = null;
-            System.out.println(node);
-            stack.push(node);
-            boolean isGoingBack = false;
-            do {
-                if (!isGoingBack && node.leftChild != null) {
-                    stack.push(node);
-                    node = node.leftChild;
-                    System.out.println(node);
-                } else if (node.rightChild != null && node.rightChild != previousNode) {
-                    isGoingBack = false;
-                    node = node.rightChild;
-                    System.out.println(node);
-                } else {
-                    previousNode = node;
-                    node = stack.pop();
-                    isGoingBack = true;
-                }
-            } while (!stack.isEmpty());
+        }
+        Stack<TreeNode<T>> stack = new Stack<>();
+        Stack<TreeNode<T>> visitedNode = new Stack<>();
+        TreeNode<T> node = this.root;
+        stack.push(node);
+        stack.push(node);
+        System.out.println(node);
+        while (!stack.isEmpty()) {
+            if (node.leftChild != null && !visitedNode.contains(node.leftChild)) {
+                node = node.leftChild;
+                System.out.println(stack.push(node));
+                visitedNode.push(node);
+            } else if (node.rightChild != null && !visitedNode.contains(node.rightChild)) {
+                node = node.rightChild;
+                System.out.println(stack.push(node));
+                visitedNode.push(node);
+            } else {
+                node = stack.pop();
+            }
         }
     }
 
     public T remove(T value) {
-        if (value == null) {
-            throw new NullPointerException();
-        }
         if (this.length == 0) {
             return null;
-        } else {
-            TreeNode<T> removingNode = null;
-            TreeNode<T> fatherNode = null;
-            TreeNode<T> q = null;
-            TreeNode<T> p = this.root;
+        }
+        if (this.length == 1 &&
+                (this.root.value == null || this.comparator.compare(this.root.value, value) == 0)) {
+            this.root = null;
+            --length;
+            return null;
+        }
+        TreeNode<T> q = null;
+        TreeNode<T> p = this.root;
+        if (value == null) {
             while (p != null) {
-                int compare = this.comparator.compare(p.value, value);
-                if (compare == 0) {
-                    removingNode = p;
-                    fatherNode = q;
-                    break;
-                } else {
-                    q = p;
-                    if (compare > 0) {
-                        p = p.leftChild;
-                    } else {
-                        p = p.rightChild;
-                    }
+                if (q != null && p.leftChild == null && p.value == null) {
+                    q.leftChild = null;
+                    --length;
+                    return null;
                 }
-            }
-            if (removingNode != null) {
-                T tempData = removingNode.value;
-                if (this.length == 1) {
-                    this.root = null;
-                }
-                removeChild(fatherNode, removingNode);
-                --this.length;
-                return tempData;
+                q = p;
+                p = p.leftChild;
             }
             return null;
         }
+        while (p != null) {
+            if (p.value == null) {
+                return null;
+            }
+            int compare = this.comparator.compare(p.value, value);
+            if (compare == 0) {
+                T tempData = p.value;
+                removeChild(q, p);
+                --this.length;
+                return tempData;
+            } else {
+                q = p;
+                if (compare > 0) {
+                    p = p.leftChild;
+                } else {
+                    p = p.rightChild;
+                }
+            }
+        }
+        return null;
     }
 
     private void removeChild(TreeNode<T> fatherNode, TreeNode<T> removingNode) {
