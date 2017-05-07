@@ -30,6 +30,7 @@ class ConsoleCashIn {
         System.out.println("До приёма денег было:");
         this.status.show();
         System.out.println("Вложите деньги в купюроприёмник:");
+
         one:
         while (true) {
             index = 0;
@@ -38,6 +39,7 @@ class ConsoleCashIn {
                 ++index;
             }
             int number;
+
             while (true) {
                 System.out.println("Введите номер купюры или \"" + index + "\" для завершения, или \"" + (index + 1) +
                         "\" для выхода в главное меню:");
@@ -53,6 +55,7 @@ class ConsoleCashIn {
                 System.out.println("ОШИБКА: нет такого номера, попробуйте ещё раз");
             }
             int count;
+
             while (true) {
                 System.out.println("Введите количество купюр:");
                 count = scanner.nextInt();
@@ -64,6 +67,7 @@ class ConsoleCashIn {
             userMoney[number].add(count);
             System.out.println("-----------------------------------------------------");
         }
+
         System.out.println("-----------------------------------------------------");
         try {
             this.controller.addMoney(userMoney);

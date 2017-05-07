@@ -28,7 +28,11 @@ class ConsoleCashOut {
             try {
                 cashForUser = this.controller.getCashOut(this.requiredSum, this.requiredNoteNumber);
                 status.show();
-                System.out.println("Операция прошла успешно - возьмите деньги");
+                System.out.println("-----------------------------------------------------");
+                System.out.println("Операция прошла успешно - возьмите деньги:");
+                for (Money money : cashForUser) {
+                    System.out.printf("- %4d - %3d шт.%n", money.getValue().getCost(), money.getCount());
+                }
                 return cashForUser;
             } catch (IllegalArgumentException exception) {
                 System.out.println(exception.getMessage());
@@ -51,11 +55,13 @@ class ConsoleCashOut {
             break;
         }
         System.out.println("Купюрами какого достоинства произвести выдачу:");
+
         for (int i = 0; i < this.controller.getCashMachineDeposit().length; i++) {
             if (this.controller.getCashMachineDeposit()[i].getCount() != 0) {
                 System.out.println(i + ") " + this.controller.getCashMachineDeposit()[i].getValue().getCost());
             }
         }
+
         while (true) {
             boolean isNeedToRepeat = true;
             System.out.print("Введите номер купюры: ");
@@ -65,29 +71,28 @@ class ConsoleCashOut {
                 isNeedToRepeat = false;
             } catch (IllegalArgumentException exception) {
                 System.out.println(exception.getMessage());
-                String exceptionString = exception.getMessage();
-                if (exceptionString.contains(", но остаток")) {
-                    System.out.println("1) выдавать остаток купюрами более низкого номинала");
-                    System.out.println("2) изменить запрашиваемую купюру");
-                    System.out.println("3) отменить операцию и выйти в основное меню");
-                    while (true) {
-                        System.out.println("Введите номер ответа:");
-                        int answer = this.scanner.nextInt();
-                        switch (answer) {
-                            case 1:
-                                return true;
-                            case 2:
-                                isNeedToRepeat = true;
-                                break;
-                            case 3:
-                                return false;
-                            default:
-                                System.out.println("ОШИБКА: нет такого номера");
-                                isNeedToRepeat = false;
-                        }
-                        if (isNeedToRepeat) {
+            } catch (ArithmeticException exception) {
+                System.out.println(exception.getMessage());
+                System.out.println("1) выдавать остаток купюрами более низкого номинала");
+                System.out.println("2) изменить запрашиваемую купюру");
+                System.out.println("3) отменить операцию и выйти в основное меню");
+                while (true) {
+                    System.out.println("Введите номер ответа:");
+                    int answer = this.scanner.nextInt();
+                    switch (answer) {
+                        case 1:
+                            return true;
+                        case 2:
+                            isNeedToRepeat = true;
                             break;
-                        }
+                        case 3:
+                            return false;
+                        default:
+                            System.out.println("ОШИБКА: нет такого номера");
+                            isNeedToRepeat = false;
+                    }
+                    if (isNeedToRepeat) {
+                        break;
                     }
                 }
             }

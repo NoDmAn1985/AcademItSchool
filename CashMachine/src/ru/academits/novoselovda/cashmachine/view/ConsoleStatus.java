@@ -15,10 +15,12 @@ class ConsoleStatus {
         System.out.println("ОПЕРАЦИЯ: Статус банкомата");
         System.out.println("-----------------------------------------------------");
         Money[] machineDeposit = this.controller.getCashMachineDeposit();
+
         for (int i = 0; i < machineDeposit.length; i++) {
             System.out.printf("%d) %4d - %3d шт.%n", i, machineDeposit[i].getValue().getCost(),
                     machineDeposit[i].getCount());
         }
+
         System.out.println("Итого в банкомате: " + this.controller.getCashMachineSum());
     }
 }

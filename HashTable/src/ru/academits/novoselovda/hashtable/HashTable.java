@@ -35,9 +35,6 @@ public class HashTable<T> implements Collection<T> {
 
     @Override
     public boolean contains(Object o) {
-        if (o == null) {
-            return (this.elementsCount != 0 && this.table[0] != null && this.table[0].contains(null));
-        }
         int index = getHash(o);
         return (this.elementsCount != 0 && this.table[index] != null && this.table[index].contains(o));
     }
@@ -73,7 +70,7 @@ public class HashTable<T> implements Collection<T> {
 
     @Override
     public boolean add(T t) {
-        int index = (t == null ? 0 : getHash(t));
+        int index = getHash(t);
         if (this.table[index] == null) {
             this.table[index] = new LinkedList<>();
         }
@@ -89,7 +86,7 @@ public class HashTable<T> implements Collection<T> {
     @Override
     public boolean remove(Object o) {
         if (this.elementsCount != 0) {
-            int index = (o == null ? 0 : getHash(o));
+            int index = getHash(o);
             if (this.table[index] != null && this.table[index].remove(o)) {
                 --this.elementsCount;
                 ++this.modificationsCount;
@@ -138,8 +135,8 @@ public class HashTable<T> implements Collection<T> {
             return false;
         }
         boolean isAnyChanges = false;
-        for (Object object : c) {
-            if (add(objectToTypeT(object)) && !isAnyChanges) {
+        for (T element : c) {
+            if (add(element)) {
                 isAnyChanges = true;
             }
         }
@@ -156,7 +153,7 @@ public class HashTable<T> implements Collection<T> {
         }
         boolean isAnyChanges = false;
         for (Object object : c) {
-            if (remove(object) && !isAnyChanges) {
+            if (remove(object)) {
                 isAnyChanges = true;
             }
         }
@@ -179,7 +176,6 @@ public class HashTable<T> implements Collection<T> {
         for (T element : this) {
             if (!c.contains(element)) {
                 if (remove(element)) {
-                    --this.modificationsCount;
                     isAnyChanges = true;
                 }
             }
@@ -195,7 +191,7 @@ public class HashTable<T> implements Collection<T> {
                     row.clear();
                 }
             }
-            this.modificationsCount = 0;
+            ++this.modificationsCount;
             this.elementsCount = 0;
         }
     }
@@ -225,11 +221,15 @@ public class HashTable<T> implements Collection<T> {
             if (!hasNext()) {
                 throw new NoSuchElementException();
             }
-            checkForModifications();
-            if (this.insideCursor != 0 && this.length > HashTable.this.elementsCount) {
-                --this.insideCursor;
+            if (this.expectedModificationCount == HashTable.this.modificationsCount - 1 &&
+                    this.length > HashTable.this.elementsCount) {
                 this.length = HashTable.this.elementsCount;
+                this.expectedModificationCount = HashTable.this.modificationsCount;
+                if (this.insideCursor != 0) {
+                    --this.insideCursor;
+                }
             }
+            checkForModifications();
             T tempData;
             if (this.insideCursor < HashTable.this.table[this.cursor].size() - 1) {
                 tempData = objectToTypeT(HashTable.this.table[this.cursor].get(this.insideCursor));
@@ -255,12 +255,17 @@ public class HashTable<T> implements Collection<T> {
 
         void checkForModifications() {
             if (HashTable.this.modificationsCount != this.expectedModificationCount) {
+                System.out.println("expected " + this.expectedModificationCount);
+                System.out.println("modific " + HashTable.this.modificationsCount);
                 throw new ConcurrentModificationException();
             }
         }
     }
 
     private int getHash(Object object) {
+        if (object == null) {
+            return 0;
+        }
         return Math.abs(object.hashCode()) % this.capacity;
     }
 

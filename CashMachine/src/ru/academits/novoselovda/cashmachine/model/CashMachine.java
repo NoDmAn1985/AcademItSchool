@@ -31,35 +31,37 @@ public class CashMachine {
     }
 
     public void add(Money[] cashMoney) throws IllegalArgumentException {
-        boolean[] isVerified = new boolean[length];
+        testOnMaximumAndNull(cashMoney);
         int[] tempArrayOfCounts = new int[length];
-        int tempSum = 0;
         for (Money money : cashMoney) {
-            if (money != null && money.getCount() > 0) {
-                for (int i = 0; i < this.length; i++) {
-                    if (!isVerified[i] && money.getValue() == this.machinesDeposit[i].getValue()) {
-                        if (this.machinesDeposit[i].getCount() + money.getCount() > this.maxNotesCount) {
-                            throw new IllegalArgumentException("ОШИБКА: превышен лимит по количеству купюр номиналом "
-                                    + money.getValue().getCost());
-                        }
-                        tempArrayOfCounts[i] = money.getCount();
-                        tempSum += money.getCount() * money.getValue().getCost();
-                        money.subtract(tempArrayOfCounts[i]);
-                        isVerified[i] = true;
-                    }
-                }
+            if (money.getCount() > 0) {
+                getNotesCountToAdd(money, tempArrayOfCounts);
             }
         }
         for (int i = 0; i < this.length; ++i) {
             this.machinesDeposit[i].add(tempArrayOfCounts[i]);
+            this.sum += tempArrayOfCounts[i] * this.machinesDeposit[i].getValue().getCost();
         }
-        this.sum += tempSum;
+    }
+
+    private void getNotesCountToAdd(Money money, int[] tempArrayOfCounts) throws IllegalArgumentException {
+        Values moneyValue = money.getValue();
+        for (int i = 0; i < this.length; i++) {
+            if (moneyValue == this.machinesDeposit[i].getValue()) {
+                if (this.machinesDeposit[i].getCount() + money.getCount() > this.maxNotesCount) {
+                    throw new IllegalArgumentException("ОШИБКА: превышен лимит по количеству купюр номиналом "
+                            + moneyValue.getCost());
+                }
+                tempArrayOfCounts[i] = money.getCount();
+            }
+        }
     }
 
     public ArrayList<Money> subtract(int requiredSum, int requiredNoteNumber) throws IllegalArgumentException {
         ArrayList<Money> cashOut = new ArrayList<>();
         int[] tempArrayOfCounts = new int[length];
         int leftSum = requiredSum;
+
         for (int i = requiredNoteNumber; i >= 0; i--) {
             if (this.machinesDeposit[i].getCount() == 0) {
                 continue;
@@ -78,18 +80,21 @@ public class CashMachine {
                 break;
             }
         }
+
         if (leftSum > 0) {
             throw new IllegalArgumentException("ОШИБКА: недостаточно средств");
         }
         if (leftSum < 0) {
             throw new IllegalArgumentException("ОШИБКА: ОШИБКА В РАСЧЁТАХ");
         }
+
         for (int i = 0; i < length; ++i) {
             if (tempArrayOfCounts[i] > 0) {
                 this.machinesDeposit[i].subtract(tempArrayOfCounts[i]);
                 cashOut.add(new Money(machinesDeposit[i].getValue(), tempArrayOfCounts[i]));
             }
         }
+
         this.sum -= requiredSum;
         return cashOut;
     }
@@ -107,12 +112,14 @@ public class CashMachine {
             throw new IllegalArgumentException("ОШИБКА: запрашиваемая сумма должна быть положительной");
         }
         Values minNote = this.machinesDeposit[0].getValue();
+
         for (int i = 0; i < length; i++) {
             if (this.machinesDeposit[0].getCount() > 0) {
                 minNote = this.machinesDeposit[0].getValue();
                 break;
             }
         }
+
         if (requiredSum % minNote.getCost() > 0) {
             throw new IllegalArgumentException("ОШИБКА: запрашиваемая сумма должна быть кратна "
                     + minNote.getCost());
@@ -122,13 +129,14 @@ public class CashMachine {
         }
     }
 
-    public void testRequiredNote(int requiredSum, int number) throws IllegalArgumentException {
+    public void testRequiredNote(int requiredSum, int number) throws IllegalArgumentException, ArithmeticException {
         if (number < 0 || number >= length || this.machinesDeposit[number].getCount() == 0) {
             throw new IllegalArgumentException("ОШИБКА: нет такого номера");
         }
         if (requiredSum < this.machinesDeposit[number].getValue().getCost()) {
             throw new IllegalArgumentException("ОШИБКА: запрашиваемая сумма меньше запрашивемой купюры");
         }
+
         int sumOfRequiredNotes = this.machinesDeposit[number].getValue().getCost() *
                 this.machinesDeposit[number].getCount();
         if (requiredSum > sumOfRequiredNotes || (requiredSum < sumOfRequiredNotes &&
@@ -141,13 +149,13 @@ public class CashMachine {
                 throw new IllegalArgumentException("ОШИБКА: данных купюр недостаточно");
             }
             if (requiredSum < cashOpportunity) {
-                throw new IllegalArgumentException("ОШИБКА: данных купюр недостаточно, но остаток " +
+                throw new ArithmeticException("ОШИБКА: данных купюр недостаточно, но остаток " +
                         "можно выдать купюрами более низкого номинала");
             }
         }
     }
 
-    public void testOnMaximumAndNull(Money[] testMoney) {
+    private void testOnMaximumAndNull(Money[] testMoney) {
         for (Money money : testMoney) {
             if (money == null) {
                 throw new NullPointerException("ОШИБКА: нельзя передавать null (пустой элемент массива)");

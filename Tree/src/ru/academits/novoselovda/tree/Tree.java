@@ -167,22 +167,23 @@ public class Tree<T extends Comparable<T>> {
             throw new NoSuchElementException();
         }
         Stack<TreeNode<T>> stack = new Stack<>();
-        Stack<TreeNode<T>> visitedNode = new Stack<>();
+        TreeNode<T> previousNode = null;
         TreeNode<T> node = this.root;
-        stack.push(node);
         stack.push(node);
         System.out.println(node);
         while (!stack.isEmpty()) {
-            if (node.leftChild != null && !visitedNode.contains(node.leftChild)) {
+            if (node.leftChild != null && node.leftChild != previousNode) {
+                stack.push(node);
                 node = node.leftChild;
-                System.out.println(stack.push(node));
-                visitedNode.push(node);
-            } else if (node.rightChild != null && !visitedNode.contains(node.rightChild)) {
-                node = node.rightChild;
-                System.out.println(stack.push(node));
-                visitedNode.push(node);
-            } else {
+                System.out.println(node);
+                continue;
+            } else if (node.rightChild == null) {
+                previousNode = node;
                 node = stack.pop();
+            }
+            if (!stack.isEmpty() && node.rightChild != null) {
+                node = node.rightChild;
+                System.out.println(node);
             }
         }
     }
