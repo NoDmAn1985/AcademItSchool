@@ -36,7 +36,7 @@ public class Tree<T extends Comparable<T>> {
 
     public Tree() {
         this.length = 0;
-        this.comparator = Comparator.naturalOrder();
+        this.comparator = new MyComparator<>();
     }
 
     public boolean add(T value) {
@@ -46,29 +46,7 @@ public class Tree<T extends Comparable<T>> {
             return true;
         }
         TreeNode<T> p = this.root;
-        if (value == null) {
-            while (p != null) {
-                if (p.leftChild == null) {
-                    p.leftChild = new TreeNode<>(null);
-                    ++length;
-                    return true;
-                }
-                p = p.leftChild;
-            }
-        }
-        TreeNode<T> q = null;
         while (p != null) {
-            if (p.value == null) {
-                if (q != null) {
-                    q.leftChild = new TreeNode<>(value);
-                    q.leftChild.leftChild = p;
-                } else {
-                    this.root = new TreeNode<>(value);
-                    this.root.leftChild = p;
-                }
-                ++length;
-                return true;
-            }
             int compare = this.comparator.compare(p.value, value);
             if (compare > 0) {
                 if (p.leftChild == null) {
@@ -76,7 +54,6 @@ public class Tree<T extends Comparable<T>> {
                     ++this.length;
                     return true;
                 } else {
-                    q = p;
                     p = p.leftChild;
                 }
             } else {
@@ -85,7 +62,6 @@ public class Tree<T extends Comparable<T>> {
                     ++length;
                     return true;
                 } else {
-                    q = p;
                     p = p.rightChild;
                 }
             }
@@ -98,21 +74,7 @@ public class Tree<T extends Comparable<T>> {
             return false;
         }
         TreeNode<T> p = this.root;
-        if (value == null) {
-            if (length == 1) {
-                return (p.value == null);
-            }
-            while (p != null) {
-                if (p.leftChild == null) {
-                    return (p.value == null);
-                }
-                p = p.leftChild;
-            }
-        }
         while (p != null) {
-            if (p.value == null) {
-                return false;
-            }
             int compare = this.comparator.compare(p.value, value);
             if (compare == 0) {
                 return true;
@@ -167,23 +129,17 @@ public class Tree<T extends Comparable<T>> {
             throw new NoSuchElementException();
         }
         Stack<TreeNode<T>> stack = new Stack<>();
-        TreeNode<T> previousNode = null;
         TreeNode<T> node = this.root;
-        stack.push(node);
-        System.out.println(node);
-        while (!stack.isEmpty()) {
-            if (node.leftChild != null && node.leftChild != previousNode) {
-                stack.push(node);
-                node = node.leftChild;
-                System.out.println(node);
-                continue;
-            } else if (node.rightChild == null) {
-                previousNode = node;
+        while (node != null || !stack.isEmpty()) {
+            if (!stack.isEmpty()) {
                 node = stack.pop();
             }
-            if (!stack.isEmpty() && node.rightChild != null) {
-                node = node.rightChild;
+            while (node != null) {
                 System.out.println(node);
+                if (node.rightChild != null) {
+                    stack.push(node.rightChild);
+                }
+                node = node.leftChild;
             }
         }
     }
@@ -200,22 +156,7 @@ public class Tree<T extends Comparable<T>> {
         }
         TreeNode<T> q = null;
         TreeNode<T> p = this.root;
-        if (value == null) {
-            while (p != null) {
-                if (q != null && p.leftChild == null && p.value == null) {
-                    q.leftChild = null;
-                    --length;
-                    return null;
-                }
-                q = p;
-                p = p.leftChild;
-            }
-            return null;
-        }
         while (p != null) {
-            if (p.value == null) {
-                return null;
-            }
             int compare = this.comparator.compare(p.value, value);
             if (compare == 0) {
                 T tempData = p.value;

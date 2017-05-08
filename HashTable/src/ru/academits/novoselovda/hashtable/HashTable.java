@@ -173,11 +173,11 @@ public class HashTable<T> implements Collection<T> {
             return true;
         }
         boolean isAnyChanges = false;
-        for (T element : this) {
-            if (!c.contains(element)) {
-                if (remove(element)) {
-                    isAnyChanges = true;
-                }
+        Iterator<T> iterator = new Itr();
+        while (iterator.hasNext()) {
+            if (!c.contains(iterator.next())) {
+                iterator.remove();
+                isAnyChanges = true;
             }
         }
         return isAnyChanges;
@@ -202,18 +202,14 @@ public class HashTable<T> implements Collection<T> {
     }
 
     private class Itr implements Iterator<T> {
-        private int cursor = 0;
-        private int insideCursor = 0;
+        private int listIndex = 0;
+        private int elementIndex = -1;
+        private int count = 0;
         private int expectedModificationCount = HashTable.this.modificationsCount;
-        private int length = HashTable.this.elementsCount;
-
-        Itr() {
-            findNotNullCell();
-        }
 
         @Override
         public boolean hasNext() {
-            return this.cursor < HashTable.this.table.length;
+            return this.count < HashTable.this.elementsCount;
         }
 
         @Override
@@ -221,42 +217,39 @@ public class HashTable<T> implements Collection<T> {
             if (!hasNext()) {
                 throw new NoSuchElementException();
             }
-            if (this.expectedModificationCount == HashTable.this.modificationsCount - 1 &&
-                    this.length > HashTable.this.elementsCount) {
-                this.length = HashTable.this.elementsCount;
-                this.expectedModificationCount = HashTable.this.modificationsCount;
-                if (this.insideCursor != 0) {
-                    --this.insideCursor;
-                }
-            }
             checkForModifications();
-            T tempData;
-            if (this.insideCursor < HashTable.this.table[this.cursor].size() - 1) {
-                tempData = objectToTypeT(HashTable.this.table[this.cursor].get(this.insideCursor));
-                ++this.insideCursor;
-            } else {
-                this.insideCursor = 0;
-                this.length = HashTable.this.elementsCount;
-                tempData = objectToTypeT(HashTable.this.table[this.cursor].
-                        get(HashTable.this.table[this.cursor].size() - 1));
-                ++this.cursor;
+            if (HashTable.this.table[this.listIndex].size() == 0 ||
+                    this.elementIndex >= HashTable.this.table[this.listIndex].size() - 1) {
+                this.elementIndex = -1;
+                ++this.listIndex;
                 findNotNullCell();
             }
-            return tempData;
+            ++this.elementIndex;
+            ++this.count;
+            return HashTable.this.table[this.listIndex].get(this.elementIndex);
+        }
+
+        public void remove() {
+            if (HashTable.this.elementsCount == 0) {
+                throw new NoSuchElementException();
+            }
+            HashTable.this.table[this.listIndex].remove(this.elementIndex);
+            --this.count;
+            --this.elementIndex;
+            --HashTable.this.elementsCount;
+            ++HashTable.this.modificationsCount;
+            this.expectedModificationCount = HashTable.this.modificationsCount;
         }
 
         private void findNotNullCell() {
-            while (this.cursor < HashTable.this.table.length &&
-                    (HashTable.this.table[this.cursor] == null ||
-                            HashTable.this.table[this.cursor].size() == 0)) {
-                ++this.cursor;
+            while (HashTable.this.table[this.listIndex] == null ||
+                    HashTable.this.table[this.listIndex].size() == 0) {
+                ++this.listIndex;
             }
         }
 
         void checkForModifications() {
             if (HashTable.this.modificationsCount != this.expectedModificationCount) {
-                System.out.println("expected " + this.expectedModificationCount);
-                System.out.println("modific " + HashTable.this.modificationsCount);
                 throw new ConcurrentModificationException();
             }
         }
@@ -267,11 +260,6 @@ public class HashTable<T> implements Collection<T> {
             return 0;
         }
         return Math.abs(object.hashCode()) % this.capacity;
-    }
-
-    @SuppressWarnings("unchecked")
-    private T objectToTypeT(Object object) {
-        return (object == null ? null : (T) object);
     }
 
     @Override

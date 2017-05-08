@@ -39,7 +39,7 @@ public class Main {
         System.out.println("contains(83)");
         System.out.println(tree.contains(null));
         System.out.println("------------------------------------");
-        System.out.println("remove(35)");
+        System.out.println("remove(null)");
         System.out.println(tree.remove(null));
         tree.breadthFirstSearch();
     }
