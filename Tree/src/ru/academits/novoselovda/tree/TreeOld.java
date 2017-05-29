@@ -1,6 +1,9 @@
 package ru.academits.novoselovda.tree;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Stack;
 
 /*
 Про деревья - надо сделать класс бинарного дерева поиска.
@@ -11,7 +14,7 @@ import java.util.*;
 - обход в глубину с печатью. Дополнительно - сделать без рекурсии при помощи стека
 - удаление значения
  */
-public class Tree<T extends Comparable<T>> {
+public class TreeOld<T extends Comparable<T>> {
     private int length;
     private TreeNode<T> root;
     private Comparator<T> comparator;
@@ -34,7 +37,7 @@ public class Tree<T extends Comparable<T>> {
         }
     }
 
-    public Tree() {
+    public TreeOld() {
         this.length = 0;
         this.comparator = new MyComparator<>();
     }
@@ -177,47 +180,45 @@ public class Tree<T extends Comparable<T>> {
         if (fatherNode != null && (fatherNode.rightChild == null || fatherNode.leftChild == null)) {
             fatherNode.leftChild = removingNode.leftChild;
             fatherNode.rightChild = removingNode.rightChild;
-            return;
-        }
-
-        if (removingNode.leftChild == null && removingNode.rightChild != null) {
+        } else if (removingNode.leftChild != null) {
+            TreeNode<T> tempRightChild = removingNode.rightChild;
+            if (fatherNode == null) {
+                this.root = removingNode.leftChild;
+            } else {
+                if (fatherNode.leftChild == removingNode) {
+                    fatherNode.leftChild = removingNode.leftChild;
+                } else {
+                    fatherNode.rightChild = removingNode.leftChild;
+                }
+            }
+            if (removingNode.leftChild.rightChild != null && tempRightChild != null) {
+                TreeNode<T> node = removingNode.leftChild.rightChild;
+                while (true) {
+                    if (node.rightChild == null) {
+                        node.rightChild = tempRightChild;
+                        break;
+                    }
+                    node = node.rightChild;
+                }
+            } else {
+                removingNode.leftChild.rightChild = tempRightChild;
+            }
+        } else if (removingNode.rightChild != null) {
             if (fatherNode == null) {
                 this.root = removingNode.rightChild;
             } else {
-                if (removingNode == fatherNode.leftChild) {
-                    fatherNode.leftChild = removingNode.rightChild;
-                } else {
-                    fatherNode.rightChild = removingNode.rightChild;
-                }
+                fatherNode.rightChild = removingNode.rightChild;
             }
-            return;
-        }
-
-        if (removingNode.leftChild == null) { //чтобы идея не ругалась
-            return;
-        }
-
-        TreeNode<T> tempRightChild = removingNode.rightChild;
-        if (fatherNode == null) {
-            this.root = removingNode.leftChild;
         } else {
-            if (fatherNode.leftChild == removingNode) {
-                fatherNode.leftChild = removingNode.leftChild;
+            if (fatherNode == null) {
+                this.root = null;
             } else {
-                fatherNode.rightChild = removingNode.leftChild;
-            }
-        }
-        if (removingNode.leftChild.rightChild != null && tempRightChild != null) {
-            TreeNode<T> node = removingNode.leftChild.rightChild;
-            while (true) {
-                if (node.rightChild == null) {
-                    node.rightChild = tempRightChild;
-                    break;
+                if (fatherNode.leftChild == removingNode) {
+                    fatherNode.leftChild = null;
+                } else {
+                    fatherNode.rightChild = null;
                 }
-                node = node.rightChild;
             }
-        } else {
-            removingNode.leftChild.rightChild = tempRightChild;
         }
     }
 }

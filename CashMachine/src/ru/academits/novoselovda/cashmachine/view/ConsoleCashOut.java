@@ -2,6 +2,7 @@ package ru.academits.novoselovda.cashmachine.view;
 
 import ru.academits.novoselovda.cashmachine.controller.Controller;
 import ru.academits.novoselovda.notes.Money;
+import ru.academits.novoselovda.notes.Values;
 
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -26,7 +27,7 @@ class ConsoleCashOut {
         if (isUserWantsToCashOut()) {
             ArrayList<Money> cashForUser;
             try {
-                cashForUser = this.controller.getCashOut(this.requiredSum, this.requiredNoteNumber);
+                cashForUser = this.controller.getCashOut(this.requiredSum, Values.values()[this.requiredNoteNumber]);
                 status.show();
                 System.out.println("-----------------------------------------------------");
                 System.out.println("Операция прошла успешно - возьмите деньги:");

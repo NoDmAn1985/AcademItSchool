@@ -16,24 +16,21 @@ public class Graph<T> {
     public void breadthFirstSearch() {
         Queue<GraphNode<T>> queue = new LinkedList<>();
         boolean[] isVerifiedNodes = new boolean[this.nodes.length];
-        int lastIndex;
         for (int i = 0; i < this.nodes.length; i++) {
-            lastIndex = i;
             if (!isVerifiedNodes[i]) {
                 isVerifiedNodes[i] = true;
                 queue.add(this.nodes[i]);
                 while (!queue.isEmpty()) {
                     GraphNode<T> tempNode = queue.remove();
-                    i = tempNode.getIndex();
+                    int y = tempNode.getIndex();
                     System.out.println(tempNode);
                     for (int j = 0; j < this.table.length; ++j) {
-                        if (this.table[i][j] != 0 && !isVerifiedNodes[j]) {
+                        if (this.table[y][j] != 0 && !isVerifiedNodes[j]) {
                             isVerifiedNodes[j] = true;
                             queue.add(this.nodes[j]);
                         }
                     }
                 }
-                i = lastIndex;
             }
         }
     }

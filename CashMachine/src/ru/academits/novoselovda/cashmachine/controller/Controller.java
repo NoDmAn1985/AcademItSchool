@@ -2,12 +2,13 @@ package ru.academits.novoselovda.cashmachine.controller;
 
 import ru.academits.novoselovda.cashmachine.model.CashMachine;
 import ru.academits.novoselovda.notes.Money;
+import ru.academits.novoselovda.notes.Values;
 
 import java.util.ArrayList;
 
 public class Controller {
     private CashMachine cashMachine;
-    private final int NOTES_MAX_COUNT = 200;
+    private static final int NOTES_MAX_COUNT = 200;
 
     public Controller(Money[] startMoney) throws IllegalArgumentException, NullPointerException {
         this.cashMachine = new CashMachine(startMoney, NOTES_MAX_COUNT);
@@ -25,8 +26,8 @@ public class Controller {
         this.cashMachine.add(userMoney);
     }
 
-    public ArrayList<Money> getCashOut(int requiredSum, int requiredNoteNumber) throws IllegalArgumentException {
-        return this.cashMachine.subtract(requiredSum, requiredNoteNumber);
+    public ArrayList<Money> getCashOut(int requiredSum, Values value) throws IllegalArgumentException {
+        return this.cashMachine.subtract(requiredSum, value);
     }
 
     public void testRequiredSum(int requiredSum) throws IllegalArgumentException {

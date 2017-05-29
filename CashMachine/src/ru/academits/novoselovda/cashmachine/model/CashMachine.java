@@ -57,13 +57,14 @@ public class CashMachine {
         }
     }
 
-    public ArrayList<Money> subtract(int requiredSum, int requiredNoteNumber) throws IllegalArgumentException {
+    public ArrayList<Money> subtract(int requiredSum, Values value) throws IllegalArgumentException {
         ArrayList<Money> cashOut = new ArrayList<>();
         int[] tempArrayOfCounts = new int[length];
         int leftSum = requiredSum;
 
-        for (int i = requiredNoteNumber; i >= 0; i--) {
-            if (this.machinesDeposit[i].getCount() == 0) {
+        for (int i = Values.values().length - 1; i >= 0; i--) {
+            if (this.machinesDeposit[i].getValue().getCost() > value.getCost() ||
+                    this.machinesDeposit[i].getCount() == 0) {
                 continue;
             }
             int sumOfNotesThatValue = this.machinesDeposit[i].getCount() * this.machinesDeposit[i].getValue().getCost();
