@@ -234,8 +234,10 @@ class Menu {
         this.fieldView.showAllField();
         System.out.println("Выберите что сделать с этой ячейкой:");
         System.out.println("1) открыть");
-        System.out.println("2) поставить флаг");
-        System.out.println("3) снять флаг");
+        if (!this.control.isItFirstMove()) {
+            System.out.println("2) поставить флаг");
+            System.out.println("3) снять флаг");
+        }
         System.out.println("4) ничего, выбрать другую");
         int number;
         while (true) {
@@ -243,10 +245,10 @@ class Menu {
             if (number == 1) {
                 this.fieldView.openThisCell(y, x);
                 break;
-            } else if (number == 2) {
+            } else if (!this.control.isItFirstMove() && number == 2) {
                 this.fieldView.putFlag(y, x);
                 break;
-            } else if (number == 3) {
+            } else if (!this.control.isItFirstMove() && number == 3) {
                 this.fieldView.takeFlagOff(y, x);
                 break;
             } else if (number == 4) {

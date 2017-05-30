@@ -5,6 +5,7 @@ import ru.academits.novoselovda.minesweeper.model.About;
 import ru.academits.novoselovda.minesweeper.model.HighScore;
 
 import javax.swing.*;
+import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
@@ -22,8 +23,19 @@ public class MenuBar extends JMenuBar {
     private final String menuChangeName = "Сменить имя";
     private final String menuAboutName = "О программе";
     private final String menuExitName = "Выход";
+
+    private String restartIconPath = ".\\Minesweeper\\src\\ru\\academits\\novoselovda\\minesweeper\\resources\\restart.png";
+    private String setFieldIconPath = ".\\Minesweeper\\src\\ru\\academits\\novoselovda\\minesweeper\\resources\\options.png";
+    private String beginnerIconPath = ".\\Minesweeper\\src\\ru\\academits\\novoselovda\\minesweeper\\resources\\face_clicked.png";
+    private String amateurIconPath = ".\\Minesweeper\\src\\ru\\academits\\novoselovda\\minesweeper\\resources\\face_default.png";
+    private String professionalIconPath = ".\\Minesweeper\\src\\ru\\academits\\novoselovda\\minesweeper\\resources\\face_pressed.png";
+    private String recordsIconPath = ".\\Minesweeper\\src\\ru\\academits\\novoselovda\\minesweeper\\resources\\face_win.png";
+    private String changeIconPath = ".\\Minesweeper\\src\\ru\\academits\\novoselovda\\minesweeper\\resources\\change.png";
+
+    private final int size = 30;
+
     private final Insets myInsetsMenu = new Insets(0, 5, 0, 5);
-    private final Insets myInsetsItem = new Insets(5, -25, 5, 5);
+    private final Insets myInsetsItem = new Insets(0, 0, 0, 0);
     private final Font myFontMenu = new Font("Verdana", Font.BOLD, 14);
     private final Font myFontItem = new Font("Verdana", Font.PLAIN, 14);
 
@@ -47,7 +59,7 @@ public class MenuBar extends JMenuBar {
     }
 
     void init() {
-        JMenu menuNewGame = new JMenu(this.menuNewGameName);
+        JMenu menuNewGame = new JMenu(this.menuNewGameName, false);
         setPropertiesAndAddToMenuBar(menuNewGame);
 
         JMenuItem restartGame = new JMenuItem(this.restartGameMenuName);
@@ -57,7 +69,7 @@ public class MenuBar extends JMenuBar {
                 MenuBar.this.frameListener.needRestart();
             }
         });
-        setPropertiesAndAddToMenu(menuNewGame, restartGame);
+        setPropertiesAndAddToMenu(menuNewGame, restartGame, this.restartIconPath);
 
         menuNewGame.addSeparator();
 
@@ -75,12 +87,12 @@ public class MenuBar extends JMenuBar {
                         MenuBar.this.beginnerMinesCount).showIt(MenuBar.this.frameListener);
             }
         });
-        setPropertiesAndAddToMenu(menuNewGame, setField);
+        setPropertiesAndAddToMenu(menuNewGame, setField, this.setFieldIconPath);
 
         menuNewGame.addSeparator();
 
         JMenuItem newBeginnerGame = new JMenuItem(this.newBeginnerGameMenuName);
-        setPropertiesAndAddToMenu(menuNewGame, newBeginnerGame);
+        setPropertiesAndAddToMenu(menuNewGame, newBeginnerGame, this.beginnerIconPath);
         newBeginnerGame.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -89,7 +101,7 @@ public class MenuBar extends JMenuBar {
         });
 
         JMenuItem newAmateurGame = new JMenuItem(this.newAmateurGameMenuName);
-        setPropertiesAndAddToMenu(menuNewGame, newAmateurGame);
+        setPropertiesAndAddToMenu(menuNewGame, newAmateurGame, this.amateurIconPath);
         newAmateurGame.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -98,7 +110,7 @@ public class MenuBar extends JMenuBar {
         });
 
         JMenuItem newProfessionalGame = new JMenuItem(this.newProfessionalGameMenuName);
-        setPropertiesAndAddToMenu(menuNewGame, newProfessionalGame);
+        setPropertiesAndAddToMenu(menuNewGame, newProfessionalGame, this.professionalIconPath);
         newProfessionalGame.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -110,7 +122,7 @@ public class MenuBar extends JMenuBar {
         menuNewGame.addSeparator();
 
         JMenuItem menuHighScores = new JMenuItem(this.menuHighScoresName);
-        setPropertiesAndAddToMenu(menuNewGame, menuHighScores);
+        setPropertiesAndAddToMenu(menuNewGame, menuHighScores, this.recordsIconPath);
         menuHighScores.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -125,20 +137,18 @@ public class MenuBar extends JMenuBar {
         });
 
         JMenuItem menuChange = new JMenuItem();
-        menuChange.setText(this.menuChangeName + " (" + MenuBar.this.highScore.getUserName() +  ")");
-        setPropertiesAndAddToMenu(menuNewGame, menuChange);
+        menuChange.setText(this.menuChangeName + " (" + MenuBar.this.highScore.getUserName() + ")");
+        setPropertiesAndAddToMenu(menuNewGame, menuChange, this.changeIconPath);
         menuChange.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JMenuItem menuItem = (JMenuItem) e.getSource();
-                JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();
-                Component invoker = popupMenu.getInvoker();
-                JComponent invokerAsJComponent = (JComponent) invoker;
-                Container topLevel = invokerAsJComponent.getTopLevelAncestor();
-                MenuBar.this.highScore.setUserName(JOptionPane.showInputDialog(MenuBar.this.getParent(),
-                        "Введите своё имя:","Смена имени", JOptionPane.QUESTION_MESSAGE, null,
-                        null, "Anonymous").toString());
-                menuChange.setText(MenuBar.this.menuChangeName + " (" + MenuBar.this.highScore.getUserName() +  ")");
+                Object newName = JOptionPane.showInputDialog(MenuBar.this.getParent(),
+                        "Введите своё имя:", "Смена имени", JOptionPane.QUESTION_MESSAGE, null,
+                        null, "Anonymous");
+                if (newName != null) {
+                    MenuBar.this.highScore.setUserName((String) newName);
+                    menuChange.setText(MenuBar.this.menuChangeName + " (" + MenuBar.this.highScore.getUserName() + ")");
+                }
             }
         });
 
@@ -147,7 +157,17 @@ public class MenuBar extends JMenuBar {
         menuAbout.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                showAbout();
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+                        } catch (Exception e) {
+                            System.out.println(e.getMessage());
+                        }
+                        showAbout();
+                    }
+                });
             }
         });
 
@@ -169,9 +189,12 @@ public class MenuBar extends JMenuBar {
         this.add(menu);
     }
 
-    private void setPropertiesAndAddToMenu(JMenu menu, JMenuItem item) {
+    private void setPropertiesAndAddToMenu(JMenu menu, JMenuItem item, String iconPath) {
         item.setFont(myFontItem);
         item.setMargin(myInsetsItem);
+        Image image = new ImageIcon(iconPath).getImage();
+        Image newImage = image.getScaledInstance(this.size, this.size, java.awt.Image.SCALE_SMOOTH);
+        item.setIcon(new ImageIcon(newImage));
         menu.add(item);
     }
 

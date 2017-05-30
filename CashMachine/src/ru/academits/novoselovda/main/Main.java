@@ -25,7 +25,7 @@ public class Main {
             Controller controller = new Controller(cashMachineMoney);
             ConsoleMainMenu cashMachine = new ConsoleMainMenu(controller);
             cashMachine.show();
-        } catch (IllegalArgumentException | NullPointerException exception) {
+        } catch (IllegalArgumentException exception) {
             System.out.println(exception.getMessage());
         }
     }

@@ -142,25 +142,28 @@ public class Tree<T extends Comparable<T>> {
         }
     }
 
-    public T remove(T value) {
+    public boolean remove(T value) {
         if (this.length == 0) {
-            return null;
+            return false;
         }
-        if (this.length == 1 && this.comparator.compare(this.root.value, value) == 0) {
-            T tempData = this.root.value;
-            this.root = null;
-            --length;
-            return tempData;
+
+        if (this.length == 1) {
+            if (this.comparator.compare(this.root.value, value) == 0) {
+                this.root = null;
+                --length;
+                return true;
+            }
+            return false;
         }
+
         TreeNode<T> q = null;
         TreeNode<T> p = this.root;
         while (p != null) {
             int compare = this.comparator.compare(p.value, value);
             if (compare == 0) {
-                T tempData = p.value;
                 removeChild(q, p);
                 --this.length;
-                return tempData;
+                return true;
             } else {
                 q = p;
                 if (compare > 0) {
@@ -170,44 +173,61 @@ public class Tree<T extends Comparable<T>> {
                 }
             }
         }
-        return null;
+        return false;
     }
 
     private void removeChild(TreeNode<T> fatherNode, TreeNode<T> removingNode) {
+        //если у отца только один ребёнок
         if (fatherNode != null && (fatherNode.rightChild == null || fatherNode.leftChild == null)) {
             fatherNode.leftChild = removingNode.leftChild;
             fatherNode.rightChild = removingNode.rightChild;
             return;
         }
 
-        if (removingNode.leftChild == null && removingNode.rightChild != null) {
-            if (fatherNode == null) {
-                this.root = removingNode.rightChild;
+        //удаление листа
+        if (fatherNode != null && removingNode.leftChild == null && removingNode.rightChild == null) {
+            if (removingNode == fatherNode.leftChild) {
+                fatherNode.leftChild = null;
             } else {
-                if (removingNode == fatherNode.leftChild) {
-                    fatherNode.leftChild = removingNode.rightChild;
-                } else {
-                    fatherNode.rightChild = removingNode.rightChild;
-                }
+                fatherNode.rightChild = null;
             }
             return;
         }
 
-        if (removingNode.leftChild == null) { //чтобы идея не ругалась
+        //удаление элемента с одним ребёнком
+        if (removingNode.leftChild == null) {
+            if (fatherNode == null) {
+                this.root = removingNode.rightChild;
+            } else if (removingNode == fatherNode.leftChild) {
+                fatherNode.leftChild = removingNode.rightChild;
+            } else {
+                fatherNode.rightChild = removingNode.rightChild;
+            }
+            return;
+        }
+        if (removingNode.rightChild == null) {
+            if (fatherNode == null) {
+                this.root = removingNode.leftChild;
+            } else if (removingNode == fatherNode.leftChild) {
+                fatherNode.leftChild = removingNode.leftChild;
+            } else {
+                fatherNode.rightChild = removingNode.leftChild;
+            }
             return;
         }
 
+        //удаление элемента с двумя детьми
         TreeNode<T> tempRightChild = removingNode.rightChild;
         if (fatherNode == null) {
             this.root = removingNode.leftChild;
         } else {
-            if (fatherNode.leftChild == removingNode) {
+            if (removingNode == fatherNode.leftChild) {
                 fatherNode.leftChild = removingNode.leftChild;
             } else {
                 fatherNode.rightChild = removingNode.leftChild;
             }
         }
-        if (removingNode.leftChild.rightChild != null && tempRightChild != null) {
+        if (removingNode.leftChild.rightChild != null) {
             TreeNode<T> node = removingNode.leftChild.rightChild;
             while (true) {
                 if (node.rightChild == null) {
