@@ -4,6 +4,4 @@ public interface ViewListener {
     void needConvertTemperature(double inputData, String inputScale, String resultScale);
 
     Object[] needGetScalesList();
-
-    Object[] needGetResultScalesList(Object inputScale);
 }

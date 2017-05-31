@@ -9,8 +9,6 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.IOException;
@@ -47,7 +45,7 @@ public class FrameView implements View {
     private void initComboBox() {
         for (ViewListener listener : FrameView.this.listeners) {
             this.chooseInputScale = new JComboBox(listener.needGetScalesList());
-            this.chooseResultScale = new JComboBox(listener.needGetResultScalesList(this.chooseInputScale.getSelectedItem()));
+            this.chooseResultScale = new JComboBox(listener.needGetScalesList());
         }
     }
 
@@ -213,21 +211,9 @@ public class FrameView implements View {
             }
         });
 
-        FrameView.this.chooseInputScale.addActionListener(new ActionListener() {
-            @Override
-            @SuppressWarnings("unchecked")
-            public void actionPerformed(ActionEvent e) {
-                FrameView.this.result.setFont(FrameView.this.myFont);
-                FrameView.this.result.setText(FrameView.this.defaultResultText);
-                FrameView.this.chooseResultScale.removeAllItems();
-                String inputScale = (String) FrameView.this.chooseInputScale.getSelectedItem();
-                for (ViewListener listener : FrameView.this.listeners) {
-                    Object[] list = listener.needGetResultScalesList(inputScale);
-                    for(Object item : list) {
-                        FrameView.this.chooseResultScale.addItem(item);
-                    }
-                }
-            }
+        FrameView.this.chooseInputScale.addActionListener(e -> {
+            FrameView.this.result.setFont(FrameView.this.myFont);
+            FrameView.this.result.setText(FrameView.this.defaultResultText);
         });
 
         FrameView.this.chooseResultScale.addActionListener(e -> {

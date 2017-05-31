@@ -7,10 +7,11 @@ import java.util.Date;
 import java.util.Scanner;
 
 public class HighScore {
-    private String path = ".\\Minesweeper\\src\\ru\\academits\\novoselovda\\minesweeper\\resources\\highscore.txt";
+    private static final String PATH = ".\\Minesweeper\\src\\ru\\academits\\novoselovda\\minesweeper\\resources\\highscore.txt";
+    private static final int MAX_LETTERS_IN_USER_NAME = 10;
+    private static final int MAX_RECORDS = 20;
+
     private String userName;
-    private final int maxLettersInUserName = 10;
-    private final int maxRecords = 20;
 
     public HighScore() {
         this.userName = System.getProperty("user.name");
@@ -21,8 +22,8 @@ public class HighScore {
     }
 
     public void setUserName(String userName) {
-        if (userName.length() > this.maxLettersInUserName) {
-            this.userName = userName.substring(0, this.maxLettersInUserName);
+        if (userName.length() > MAX_LETTERS_IN_USER_NAME) {
+            this.userName = userName.substring(0, MAX_LETTERS_IN_USER_NAME);
         } else {
             this.userName = userName;
         }
@@ -34,13 +35,13 @@ public class HighScore {
         ArrayList<Integer> topScore = new ArrayList<>();
         int index = 0;
 
-        try (Scanner reader = new Scanner(new FileInputStream(this.path))) {
+        try (Scanner reader = new Scanner(new FileInputStream(PATH))) {
             while (reader.hasNext()) {
                 String text = reader.nextLine();
                 try {
                     topScore.add(Integer.parseInt(text.substring(0, text.indexOf('_'))));
                 } catch (NumberFormatException exception) {
-                    System.out.println("ОШИБКА: файл рекордов повреждён - см. " + this.path);
+                    System.out.println("ОШИБКА: файл рекордов повреждён - см. " + PATH);
                     exception.printStackTrace();
                     return;
                 }
@@ -50,7 +51,7 @@ public class HighScore {
         } catch (FileNotFoundException exception) {
         }
 
-        if (topScore.size() == this.maxRecords && score < topScore.get(this.maxRecords - 1)) {
+        if (topScore.size() == MAX_RECORDS && score < topScore.get(MAX_RECORDS - 1)) {
             return;
         }
 
@@ -60,7 +61,7 @@ public class HighScore {
                 score, this.userName, yCellCounts, xCellCounts, minesCount, time, date, score);
         topInformation.add(index, newLine);
 
-        try (PrintWriter writer = new PrintWriter(new FileWriter(this.path))) {
+        try (PrintWriter writer = new PrintWriter(new FileWriter(PATH))) {
             int i = 1;
             for (String element : topInformation) {
                 writer.println(element);
@@ -70,14 +71,14 @@ public class HighScore {
                 ++i;
             }
         } catch (IOException exception) {
-            System.out.println("ОШИБКА: файл (" + this.path + ") не доступен для записи");
+            System.out.println("ОШИБКА: файл (" + PATH + ") не доступен для записи");
             exception.printStackTrace();
         }
     }
 
     public String show() {
         StringBuilder sb = new StringBuilder();
-        try (Scanner reader = new Scanner(new FileInputStream(this.path))) {
+        try (Scanner reader = new Scanner(new FileInputStream(PATH))) {
             int index = 1;
             while (reader.hasNext()) {
                 String text = reader.nextLine();
@@ -85,7 +86,7 @@ public class HighScore {
                 ++index;
             }
         } catch (FileNotFoundException exception) {
-            System.out.println("ОШИБКА: потерян файл (" + this.path + ")");
+            System.out.println("ОШИБКА: потерян файл (" + PATH + ")");
             exception.printStackTrace();
         }
         return sb.toString();

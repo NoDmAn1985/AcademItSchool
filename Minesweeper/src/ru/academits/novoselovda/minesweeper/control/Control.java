@@ -5,9 +5,9 @@ import ru.academits.novoselovda.minesweeper.model.HighScore;
 import ru.academits.novoselovda.minesweeper.model.Timer;
 
 public class Control {
-    private final int minYCounts = 9;
-    private final int minXCounts = 9;
-    private final int minMinesCounts = 10;
+    private static final int MIN_Y_COUNTS = 9;
+    private static final int MIN_X_COUNTS = 9;
+    private static final int MIN_MINES_COUNTS = 10;
     
     private boolean isItFirstMove;
     private boolean isGameStarted;
@@ -21,7 +21,7 @@ public class Control {
     }
 
     public void setNewGameStarted(boolean gameStarted) {
-        isGameStarted = gameStarted;
+        this.isGameStarted = gameStarted;
     }
 
     private Field field;
@@ -64,15 +64,15 @@ public class Control {
     }
 
     public int getMinYCounts() {
-        return minYCounts;
+        return MIN_Y_COUNTS;
     }
 
     public int getMinXCounts() {
-        return minXCounts;
+        return MIN_X_COUNTS;
     }
 
     public int getMinMinesCounts() {
-        return minMinesCounts;
+        return MIN_MINES_COUNTS;
     }
 
     public int getCellNumber(int yPos, int xPos) {

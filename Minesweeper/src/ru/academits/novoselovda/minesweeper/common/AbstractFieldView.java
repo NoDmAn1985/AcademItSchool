@@ -77,9 +77,7 @@ public abstract class AbstractFieldView {
     private void openAllCells() {
         for (int y = 0; y < this.yCellsCount; y++) {
             final int yFinal = y;
-            new Thread(() -> {
-                openAllXCells(yFinal);
-            }).start();
+            new Thread(() -> openAllXCells(yFinal)).start();
         }
     }
 
@@ -153,5 +151,13 @@ public abstract class AbstractFieldView {
     public void takeFlagOff(int yPos, int xPos) {
         change(Signs.HIDE, yPos, xPos);
         this.control.setFlagHere(false, yPos, xPos);
+    }
+
+    public void putQuestion(int yPos, int xPos) {
+        change(Signs.QUESTION, yPos, xPos);
+    }
+
+    public void takeQuestionOff(int yPos, int xPos) {
+        change(Signs.HIDE, yPos, xPos);
     }
 }

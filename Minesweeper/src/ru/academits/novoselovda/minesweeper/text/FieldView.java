@@ -5,29 +5,27 @@ import ru.academits.novoselovda.minesweeper.common.Signs;
 import ru.academits.novoselovda.minesweeper.control.Control;
 
 public class FieldView extends AbstractFieldView {
-    private final char verticalLine = '\u2506';
-    private final char liner = '\u2219';
+    private static final char VERTICAL_LINE = '\u2506';
+    private static final char LINER = '\u2219';
     private String horizontalLine;
 
-    private final char cellZero = '\u2B1A';
-    private final char cell1 = '\u2460';
-    private final char cell2 = '\u2461';
-    private final char cell3 = '\u2462';
-    private final char cell4 = '\u2463';
-    private final char cell5 = '\u2464';
-    private final char cell6 = '\u2465';
-    private final char cell7 = '\u2466';
-    private final char cell8 = '\u2467';
-    private final char cellMine = '\u2668';
-    private final char cellFlag = '\u26A0';
-    private final char cellWrongFlag = '\u2A3B';
-    private final char cellGameOver = '\u2620';
-    private final char cellHide = '\u25A0';
-    private final char cellChosen = '\u25A3';
+    private static final char CELL_ZERO = '\u2B1A';
+    private static final char CELL_1 = '\u2460';
+    private static final char CELL_2 = '\u2461';
+    private static final char CELL_3 = '\u2462';
+    private static final char CELL_4 = '\u2463';
+    private static final char CELL_5 = '\u2464';
+    private static final char CELL_6 = '\u2465';
+    private static final char CELL_7 = '\u2466';
+    private static final char CELL_8 = '\u2467';
+    private static final char CELL_MINE = '\u2668';
+    private static final char CELL_FLAG = '\u26A0';
+    private static final char CELL_WRONG_FLAG = '\u2A3B';
+    private static final char CELL_GAME_OVER = '\u2620';
+    private static final char CELL_HIDE = '\u25A0';
+    private static final char CELL_CHOSEN = '\u25A3';
 
     private char[][] map;
-
-    private int time;
 
     FieldView(Control control) {
         this.control = control;
@@ -35,26 +33,25 @@ public class FieldView extends AbstractFieldView {
     }
 
     void showAllField() {
-        this.time = this.control.getTime();
-        System.out.println("Время прошло: " + this.time + " секунд");
+        System.out.println("Время прошло: " + this.control.getTime() + " секунд");
         System.out.println("Флагов осталось: " + this.control.getFlagsRemainCount(this.minesCount) + " шт.");
-        System.out.printf("%2s %s", " ", this.verticalLine);
+        System.out.printf("%2s %s", " ", VERTICAL_LINE);
         for (int i = 0; i < this.xCellsCount; i++) {
-            System.out.printf("%2d%2s", (i + 1), this.verticalLine);
+            System.out.printf("%2d%2s", (i + 1), VERTICAL_LINE);
         }
         System.out.println();
         System.out.println(this.horizontalLine);
         for (int y = 0; y < this.yCellsCount; ++y) {
-            System.out.printf("%2d %s", (y + 1), this.verticalLine);
+            System.out.printf("%2d %s", (y + 1), VERTICAL_LINE);
             for (int x = 0; x < this.xCellsCount; ++x) {
-                System.out.printf(" %s%s%s", this.map[y][x], this.liner, this.verticalLine);
+                System.out.printf(" %s%s%s", this.map[y][x], LINER, VERTICAL_LINE);
             }
             System.out.println(" " + (y + 1));
             System.out.println(this.horizontalLine);
         }
-        System.out.printf("%2s %s", " ", this.verticalLine);
+        System.out.printf("%2s %s", " ", VERTICAL_LINE);
         for (int i = 0; i < this.xCellsCount; i++) {
-            System.out.printf("%2d%2s", (i + 1), this.verticalLine);
+            System.out.printf("%2d%2s", (i + 1), VERTICAL_LINE);
         }
         System.out.println();
     }
@@ -63,46 +60,46 @@ public class FieldView extends AbstractFieldView {
     protected void change(Signs signs, int y, int x) {
         switch (signs) {
             case ZERO:
-                this.map[y][x] = this.cellZero;
+                this.map[y][x] = CELL_ZERO;
                 break;
             case ONE:
-                this.map[y][x] = this.cell1;
+                this.map[y][x] = CELL_1;
                 break;
             case TWO:
-                this.map[y][x] = this.cell2;
+                this.map[y][x] = CELL_2;
                 break;
             case THREE:
-                this.map[y][x] = this.cell3;
+                this.map[y][x] = CELL_3;
                 break;
             case FOUR:
-                this.map[y][x] = this.cell4;
+                this.map[y][x] = CELL_4;
                 break;
             case FIVE:
-                this.map[y][x] = this.cell5;
+                this.map[y][x] = CELL_5;
                 break;
             case SIX:
-                this.map[y][x] = this.cell6;
+                this.map[y][x] = CELL_6;
                 break;
             case SEVEN:
-                this.map[y][x] = this.cell7;
+                this.map[y][x] = CELL_7;
                 break;
             case EIGHT:
-                this.map[y][x] = this.cell8;
+                this.map[y][x] = CELL_8;
                 break;
             case MINE:
-                this.map[y][x] = this.cellMine;
+                this.map[y][x] = CELL_MINE;
                 break;
             case FLAG:
-                this.map[y][x] = this.cellFlag;
+                this.map[y][x] = CELL_FLAG;
                 break;
             case WRONG_FLAG:
-                this.map[y][x] = this.cellWrongFlag;
+                this.map[y][x] = CELL_WRONG_FLAG;
                 break;
             case GAME_OVER:
-                this.map[y][x] = this.cellGameOver;
+                this.map[y][x] = CELL_GAME_OVER;
                 break;
             default:
-                this.map[y][x] = this.cellHide;
+                this.map[y][x] = CELL_HIDE;
         }
     }
 
@@ -144,7 +141,7 @@ public class FieldView extends AbstractFieldView {
     }
 
     void setCellChosen(int yPos, int xPos) {
-        this.map[yPos][xPos] = this.cellChosen;
+        this.map[yPos][xPos] = CELL_CHOSEN;
     }
 
     void hideCell(int yPos, int xPos) {

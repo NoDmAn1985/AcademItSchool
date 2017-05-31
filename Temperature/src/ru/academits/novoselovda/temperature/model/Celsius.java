@@ -1,11 +1,22 @@
 package ru.academits.novoselovda.temperature.model;
 
-import ru.academits.novoselovda.temperature.interfaces.Scales;
+import ru.academits.novoselovda.temperature.interfaces.Convertible;
 
-public class Celsius extends AbstractScale implements Scales{
+public class Celsius implements Convertible{
+    private static final String NAME = "Гр. цельсия";
 
-    public Celsius() {
-        this.converters.put("Гр. фаренгейт", new CelsiusToFahrenheit());
-        this.converters.put("Гр. кельвин", new CelsiusToKelvin());
+    @Override
+    public String getName() {
+        return NAME;
+    }
+
+    @Override
+    public double convertTo(double degreesCelsius) {
+        return degreesCelsius;
+    }
+
+    @Override
+    public double getDegreesCelsius(double degrees) {
+        return degrees;
     }
 }

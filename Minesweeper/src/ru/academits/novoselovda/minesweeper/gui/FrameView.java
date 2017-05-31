@@ -9,22 +9,24 @@ import java.awt.*;
 public class FrameView implements View, FrameListener {
     private Control control;
 
-    private JFrame frame = new JFrame();
-    private final int cellSize = 30;
-    private final int menuHeight = 50;
-    private final int topPanelHeight = 50;
-    private final String title = "Сапёр (Minesweeper)";
-    private final String iconPath = ".\\Minesweeper\\src\\ru\\academits\\novoselovda\\minesweeper\\resources\\cell_bomb.png";
-    private int frameWidth;
-    private int frameHeight;
+    private static final int CELL_SIZE = 30;
+    private static final int MENU_HEIGHT = 50;
+    private static final int TOP_PANEL_HEIGHT = 50;
+    private static final String TITLE = "Сапёр (Minesweeper)";
+    private static final String ICON_PATH = ".\\Minesweeper\\src\\ru\\academits\\novoselovda\\minesweeper\\resources\\cell_bomb.png";
 
-    private MenuBar mainMenuBar;
+    private int frameWidth;
+
+    private JFrame frame = new JFrame();
     private FieldPanel.InsideClass field;
-    private TopPanel topPanel;
 
     private int yCellsCount;
     private int xCellsCount;
     private int minesCount;
+
+    private boolean isItFirstGame = true;
+    private int yFramePos;
+    private int xFramePos;
 
     public FrameView(Control control) {
         this.control = control;
@@ -35,53 +37,57 @@ public class FrameView implements View, FrameListener {
 
     @Override
     public void startApplication() {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-                } catch (Exception e) {
-                    System.out.println(e.getMessage());
-                }
-                FrameView.this.control.restart();
-                initFrame();
-                initComponents();
+        SwingUtilities.invokeLater(() -> {
+            try {
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
             }
+            FrameView.this.control.restart();
+            initFrame();
+            initComponents();
         });
     }
 
     private void initFrame() {
-        this.frameWidth = cellSize * xCellsCount;
-        this.frameHeight = cellSize * yCellsCount + this.menuHeight + this.topPanelHeight;
-        this.frame.setTitle(this.title);
-        this.frame.setSize(this.frameWidth, this.frameHeight);
-        this.frame.setLocationRelativeTo(null);
+        this.frameWidth = CELL_SIZE * xCellsCount;
+        int frameHeight = CELL_SIZE * yCellsCount + MENU_HEIGHT + TOP_PANEL_HEIGHT;
+        this.frame.setTitle(TITLE);
+        this.frame.setSize(this.frameWidth, frameHeight);
+        if (this.isItFirstGame) {
+            this.frame.setLocationRelativeTo(null);
+            this.isItFirstGame = false;
+        } else {
+            this.frame.setLocation(this.xFramePos, this.yFramePos);
+        }
         this.frame.setResizable(false);
         this.frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         this.frame.setVisible(true);
-        this.frame.setIconImage(new ImageIcon(iconPath).getImage());
+        this.frame.setIconImage(new ImageIcon(ICON_PATH).getImage());
     }
 
     private void initComponents() {
-        this.mainMenuBar = new MenuBar(this.control.getHighScore());
-        this.mainMenuBar.init();
-        this.mainMenuBar.addListener(this);
-        this.frame.setJMenuBar(this.mainMenuBar);
+        MenuBar mainMenuBar = new MenuBar(this.control.getHighScore());
+        mainMenuBar.init();
+        mainMenuBar.addListener(this);
+        this.frame.setJMenuBar(mainMenuBar);
 
-        this.topPanel = new TopPanel(this.frameWidth, this.topPanelHeight);
-        this.topPanel.init(this.minesCount);
-        this.topPanel.addListener(this);
-        this.topPanel.addListener(this.field);
-        this.frame.add(this.topPanel, BorderLayout.PAGE_START);
+        TopPanel topPanel = new TopPanel(this.frameWidth, TOP_PANEL_HEIGHT);
+        topPanel.init(this.minesCount);
+        topPanel.addListener(this);
+        topPanel.addListener(this.field);
+        this.frame.add(topPanel, BorderLayout.PAGE_START);
 
         this.field = new FieldPanel().new InsideClass(this.control, yCellsCount,xCellsCount, minesCount);
         this.field.init();
-        this.field.addListener(this.topPanel);
+        this.field.addListener(topPanel);
         this.frame.add(this.field, BorderLayout.CENTER);
     }
 
     @Override
     public void needStartNewGame(int yCellsCount, int xCellsCount, int minesCount) {
+        this.yFramePos = this.frame.getLocationOnScreen().y;
+        this.xFramePos = this.frame.getLocationOnScreen().x;
         this.frame.dispose();
         this.yCellsCount = yCellsCount;
         this.xCellsCount = xCellsCount;
@@ -92,6 +98,8 @@ public class FrameView implements View, FrameListener {
 
     @Override
     public void needRestart() {
+        this.yFramePos = this.frame.getLocationOnScreen().y;
+        this.xFramePos = this.frame.getLocationOnScreen().x;
         this.frame.dispose();
         this.frame = new JFrame();
         startApplication();
@@ -99,6 +107,6 @@ public class FrameView implements View, FrameListener {
 
     @Override
     public int getCellSize() {
-        return cellSize;
+        return CELL_SIZE;
     }
 }

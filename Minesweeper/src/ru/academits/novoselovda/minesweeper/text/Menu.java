@@ -8,20 +8,22 @@ import java.util.Scanner;
 class Menu {
     private final String dottedLine = "------------------------------------------------------------";
 
-    private final int yMax = 20;
-    private final int xMax = 49;
+    private static final int Y_CELLS_COUNT_MAX = 20;
+    private static final int X_CELLS_COUNT_MAX = 49;
 
-    private final int beginnerYCellsCount = 9;
-    private final int beginnerXCellsCount = 9;
-    private final int beginnerMinesCount = 10;
+    private static final int BEGINNER_Y_CELLS_COUNT = 9;
+    private static final int BEGINNER_X_CELLS_COUNT = 9;
+    private static final int BEGINNER_MINES_COUNT = 10;
 
-    private final int amateurYCellsCount = 16;
-    private final int amateurXCellsCount = 16;
-    private final int amateurMinesCount = 40;
+    private static final int AMATEUR_Y_CELLS_COUNT = 16;
+    private static final int AMATEUR_X_CELLS_COUNT = 16;
+    private static final int AMATEUR_MINES_COUNT = 40;
 
-    private final int professionalYCellsCount = 16;
-    private final int professionalXCellsCount = 30;
-    private final int professionalMinesCount = 99;
+    private static final int PROFESSIONAL_Y_CELLS_COUNT = 16;
+    private static final int PROFESSIONAL_X_CELLS_COUNT = 30;
+    private static final int PROFESSIONAL_MINES_COUNT = 99;
+
+    private Scanner scanner;
 
     private Control control;
     private FieldView fieldView;
@@ -34,10 +36,10 @@ class Menu {
         this.fieldView = fieldView;
         this.xCellsCount = this.fieldView.getXCellCount();
         this.yCellsCount = this.fieldView.getYCellCount();
+        this.scanner = new Scanner(System.in);
     }
 
     void mainMenu() {
-        Scanner scanner = new Scanner(System.in);
         while (true) {
             System.out.println(this.dottedLine);
             System.out.println("Меню:");
@@ -45,13 +47,15 @@ class Menu {
             System.out.println("2) Новая игра (поле поумолчанию)");
             if (this.control.isNewGameStarted()) {
                 System.out.println("3) Продолжить игру");
+            } else {
+                System.out.println("3) ---------------");
             }
             System.out.println("4) Рекорды");
             System.out.println("5) Сменить имя (" + this.control.getHighScore().getUserName() + ")");
             System.out.println("6) О программе");
             System.out.println("7) Выход");
             System.out.print("Введите номер: ");
-            int number = scanner.nextInt();
+            int number = this.scanner.nextInt();
             System.out.println(this.dottedLine);
             switch (number) {
                 case 1:
@@ -61,7 +65,11 @@ class Menu {
                         break;
                     }
                 case 3:
-                    return;
+                    if (this.control.isNewGameStarted()) {
+                        return;
+                    }
+                    System.out.println("ОШИБКА: нет такого номера");
+                    break;
                 case 4:
                     showHighScore();
                     break;
@@ -83,7 +91,6 @@ class Menu {
     }
 
     private boolean newGameMenu() {
-        Scanner scanner = new Scanner(System.in);
         while (true) {
             System.out.println("Новая игра:");
             System.out.println("1) Настроить поле");
@@ -92,19 +99,19 @@ class Menu {
             System.out.println("4) Новая игра (профессионал)");
             System.out.println("5) Предыдущее меню");
             System.out.print("Введите номер: ");
-            int number = scanner.nextInt();
+            int number = this.scanner.nextInt();
             switch (number) {
                 case 1:
                     setFieldMenu();
                     return true;
                 case 2:
-                    setField(this.beginnerYCellsCount, this.beginnerXCellsCount, this.beginnerMinesCount);
+                    setField(BEGINNER_Y_CELLS_COUNT, BEGINNER_X_CELLS_COUNT, BEGINNER_MINES_COUNT);
                     return true;
                 case 3:
-                    setField(this.amateurYCellsCount, this.amateurXCellsCount, this.amateurMinesCount);
+                    setField(AMATEUR_Y_CELLS_COUNT, AMATEUR_X_CELLS_COUNT, AMATEUR_MINES_COUNT);
                     return true;
                 case 4:
-                    setField(this.professionalYCellsCount, this.professionalXCellsCount, this.professionalMinesCount);
+                    setField(PROFESSIONAL_Y_CELLS_COUNT, PROFESSIONAL_X_CELLS_COUNT, PROFESSIONAL_MINES_COUNT);
                     return true;
                 case 5:
                     return false;
@@ -116,7 +123,7 @@ class Menu {
 
     private void changeUserName() {
         System.out.print("Введи своё имя или нажми << ENTER >> (чтобы остаться Anonymous): ");
-        String userName = new Scanner(System.in).nextLine();
+        String userName = this.scanner.nextLine();
         if (userName.length() < 1 || !Character.isLetter(userName.charAt(0))) {
             userName = "Anonymous";
         }
@@ -128,22 +135,21 @@ class Menu {
         int xCellsCount;
         int minesCount;
         System.out.println(this.dottedLine);
-        Scanner scanner = new Scanner(System.in);
         int yMin = this.control.getMinYCounts();
         System.out.println("Введите количество ячеек:");
-        System.out.print("- по вертикали (от : " + yMin + " до " + this.yMax + "):");
+        System.out.print("- по вертикали (от : " + yMin + " до " + Y_CELLS_COUNT_MAX + "):");
         while (true) {
-            yCellsCount = scanner.nextInt();
-            if (yCellsCount >= yMin && yCellsCount <= this.yMax) {
+            yCellsCount = this.scanner.nextInt();
+            if (yCellsCount >= yMin && yCellsCount <= Y_CELLS_COUNT_MAX) {
                 break;
             }
             System.out.println("ОШИБКА: неверные данные");
         }
         int xMin = this.control.getMinXCounts();
-        System.out.print("- по горизонтали (от : " + xMin + " до " + this.xMax + "):");
+        System.out.print("- по горизонтали (от : " + xMin + " до " + X_CELLS_COUNT_MAX + "):");
         while (true) {
-            xCellsCount = scanner.nextInt();
-            if (xCellsCount >= xMin && xCellsCount <= this.xMax) {
+            xCellsCount = this.scanner.nextInt();
+            if (xCellsCount >= xMin && xCellsCount <= X_CELLS_COUNT_MAX) {
                 break;
             }
             System.out.println("ОШИБКА: неверные данные");
@@ -152,7 +158,7 @@ class Menu {
         int minesMax = (int) (xCellsCount * yCellsCount * 0.7);
         while (true) {
             System.out.println("Введите количество мин (от : " + minesMin + " до " + minesMax + "):");
-            minesCount = scanner.nextInt();
+            minesCount = this.scanner.nextInt();
             if (minesCount >= minesMin && minesCount <= minesMax) {
                 break;
             }
@@ -172,26 +178,25 @@ class Menu {
         System.out.println("Таблица рекордов");
         System.out.print(this.control.getHighScoreList());
         System.out.print("нажмите <<ENTER>> для выхода в меню");
-        new Scanner(System.in).nextLine();
+        this.scanner.nextLine();
     }
 
     private void showAbout() {
         System.out.println("О программе");
         System.out.println(new About().toString());
         System.out.print("нажмите <<ENTER>> для выхода в меню");
-        new Scanner(System.in).nextLine();
+        this.scanner.nextLine();
     }
 
     void userMove() {
         System.out.println(this.dottedLine);
-        Scanner scanner = new Scanner(System.in);
         int y;
         int x;
         do {
             while (true) {
                 System.out.println("Введите координаты хода (или \"0\" - для вызова меню):");
                 System.out.print("- по вертикали: ");
-                y = scanner.nextInt() - 1;
+                y = this.scanner.nextInt() - 1;
                 if (y >= 0 && y < yCellsCount) {
                     break;
                 }
@@ -208,7 +213,7 @@ class Menu {
             }
             while (true) {
                 System.out.print("- по горизонтали: ");
-                x = scanner.nextInt() - 1;
+                x = this.scanner.nextInt() - 1;
                 if (x >= 0 && x < xCellsCount) {
                     break;
                 }
@@ -241,7 +246,7 @@ class Menu {
         System.out.println("4) ничего, выбрать другую");
         int number;
         while (true) {
-            number = scanner.nextInt();
+            number = this.scanner.nextInt();
             if (number == 1) {
                 this.fieldView.openThisCell(y, x);
                 break;

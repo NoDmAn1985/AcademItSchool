@@ -7,9 +7,10 @@ import java.awt.*;
 import java.awt.event.MouseListener;
 
 class MyButton extends JButton {
-    private String path = ".\\Minesweeper\\src\\ru\\academits\\novoselovda\\minesweeper\\resources\\";
+    private static final String PATH = ".\\Minesweeper\\src\\ru\\academits\\novoselovda\\minesweeper\\resources\\";
     private int yPos;
     private int xPos;
+    private boolean isQuestionHere;
 
     MyButton(MouseListener mouseListener, int yPos, int xPos) {
         if (mouseListener != null) {
@@ -56,10 +57,16 @@ class MyButton extends JButton {
             case FLAG:
                 isButtonOn = true;
                 iconPath = "cell_flag.png";
+                this.isQuestionHere = false;
                 break;
             case WRONG_FLAG:
                 isButtonOn = true;
                 iconPath = "cell_wrongflag.png";
+                break;
+            case QUESTION:
+                isButtonOn = true;
+                iconPath = "question.png";
+                this.isQuestionHere = true;
                 break;
             case GAME_OVER:
                 iconPath = "cell_gameover.png";
@@ -67,9 +74,10 @@ class MyButton extends JButton {
             default:
                 isButtonOn = true;
                 iconPath = null;
+                this.isQuestionHere = false;
         }
         if (iconPath != null) {
-            Image image = new ImageIcon((this.path + iconPath)).getImage();
+            Image image = new ImageIcon((PATH + iconPath)).getImage();
             int iconSize = this.getWidth() - 5;
             Image newImage = image.getScaledInstance(iconSize, iconSize, java.awt.Image.SCALE_SMOOTH);
             setIcon(new ImageIcon(newImage));
@@ -87,5 +95,9 @@ class MyButton extends JButton {
 
     int getXPos() {
         return xPos;
+    }
+
+    boolean isQuestionHere() {
+        return this.isQuestionHere;
     }
 }

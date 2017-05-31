@@ -8,8 +8,8 @@ import java.text.DecimalFormat;
 import java.util.TimerTask;
 
 public class MyTimerTask extends TimerTask {
-    private final int timeLimit = 999;
-    private final int timeWithRedDigits = 900;
+    private static final int TIME_LIMIT = 999;
+    private static final int TIME_WITH_RED_DIGITS = 900;
     private FieldPanelListener fieldListener;
     private Timer timer;
     private JTextField textField;
@@ -29,9 +29,9 @@ public class MyTimerTask extends TimerTask {
         }
         int seconds = this.timer.getTime();
         textField.setText(new DecimalFormat("000").format(seconds));
-        if (seconds >= this.timeLimit) {
+        if (seconds >= TIME_LIMIT) {
             MyTimerTask.this.fieldListener.needGameOver();
-        } else if (!this.isColorChanged && seconds > this.timeWithRedDigits) {
+        } else if (!this.isColorChanged && seconds > TIME_WITH_RED_DIGITS) {
             this.textField.setForeground(Color.RED);
             this.isColorChanged = true;
         }

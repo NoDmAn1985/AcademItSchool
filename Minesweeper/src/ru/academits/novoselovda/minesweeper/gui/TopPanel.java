@@ -3,7 +3,6 @@ package ru.academits.novoselovda.minesweeper.gui;
 import ru.academits.novoselovda.minesweeper.common.FieldPanelListener;
 import ru.academits.novoselovda.minesweeper.common.FrameListener;
 import ru.academits.novoselovda.minesweeper.common.TopPanelListener;
-import ru.academits.novoselovda.minesweeper.control.Control;
 import ru.academits.novoselovda.minesweeper.model.MyTimerTask;
 
 import javax.swing.*;
@@ -11,20 +10,19 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.text.DecimalFormat;
-import java.util.Timer;
 
 public class TopPanel extends JPanel implements TopPanelListener {
-    private String flagPath = ".\\Minesweeper\\src\\ru\\academits\\novoselovda\\minesweeper\\resources\\cell_flag.png";
-    private String timePath = ".\\Minesweeper\\src\\ru\\academits\\novoselovda\\minesweeper\\resources\\clocks.png";
-    private String defaultFacePath = ".\\Minesweeper\\src\\ru\\academits\\novoselovda\\minesweeper\\resources\\face_default.png";
-    private String pressedFacePath = ".\\Minesweeper\\src\\ru\\academits\\novoselovda\\minesweeper\\resources\\face_pressed.png";
-    private String winsFacePath = ".\\Minesweeper\\src\\ru\\academits\\novoselovda\\minesweeper\\resources\\face_win.png";
-    private String lostFacePath = ".\\Minesweeper\\src\\ru\\academits\\novoselovda\\minesweeper\\resources\\cell_gameover.png";
-    private String clickedFacePath = ".\\Minesweeper\\src\\ru\\academits\\novoselovda\\minesweeper\\resources\\face_clicked.png";
-    private String flagToolTip = "Осталось флагов";
-    private String faceToolTip = "Перезапустить игру";
-    private String timeToolTip = "Времени прошло";
-    private final Font myFont = new Font("Verdana", Font.BOLD, 18);
+    private static final String FLAG_PATH = ".\\Minesweeper\\src\\ru\\academits\\novoselovda\\minesweeper\\resources\\cell_flag.png";
+    private static final String TIME_PATH = ".\\Minesweeper\\src\\ru\\academits\\novoselovda\\minesweeper\\resources\\clocks.png";
+    private static final String DEFAULT_FACE_PATH = ".\\Minesweeper\\src\\ru\\academits\\novoselovda\\minesweeper\\resources\\face_default.png";
+    private static final String PRESSED_FACE_PATH = ".\\Minesweeper\\src\\ru\\academits\\novoselovda\\minesweeper\\resources\\face_pressed.png";
+    private static final String WINS_FACE_PATH = ".\\Minesweeper\\src\\ru\\academits\\novoselovda\\minesweeper\\resources\\face_win.png";
+    private static final String LOST_FACE_PATH = ".\\Minesweeper\\src\\ru\\academits\\novoselovda\\minesweeper\\resources\\cell_gameover.png";
+    private static final String CLICKED_FACE_PATH = ".\\Minesweeper\\src\\ru\\academits\\novoselovda\\minesweeper\\resources\\face_clicked.png";
+    private static final String FLAG_TOOL_TIP = "Осталось флагов";
+    private static final String FACE_TOOL_TIP = "Перезапустить игру";
+    private static final String TIME_TOOL_TIP = "Времени прошло";
+    private static final Font MY_FONT = new Font("Verdana", Font.BOLD, 18);
 
     private JTextField flagsCounter;
     private JTextField timer;
@@ -67,20 +65,20 @@ public class TopPanel extends JPanel implements TopPanelListener {
         constraints.anchor = GridBagConstraints.EAST;
         this.flagsCounter = new JTextField();
         this.flagsCounter.setColumns(3);
-        this.flagsCounter.setFont(this.myFont);
+        this.flagsCounter.setFont(MY_FONT);
         this.flagsCounter.setBackground(Color.black);
         this.flagsCounter.setForeground(Color.white);
         this.flagsCounter.setText(new DecimalFormat("000").format(minesCount));
         this.flagsCounter.setEditable(false);
         this.flagsCounter.setHorizontalAlignment(SwingConstants.CENTER);
-        this.flagsCounter.setToolTipText(this.flagToolTip);
+        this.flagsCounter.setToolTipText(FLAG_TOOL_TIP);
         add(this.flagsCounter, constraints);
 
         constraints.gridx = 3;
         constraints.weightx = 0.5;
         constraints.anchor = GridBagConstraints.WEST;
         JLabel topPanelCell3 = new JLabel();
-        Image image = new ImageIcon(flagPath).getImage();
+        Image image = new ImageIcon(FLAG_PATH).getImage();
         Image newImage = image.getScaledInstance(smallSize, smallSize, java.awt.Image.SCALE_SMOOTH);
         topPanelCell3.setIcon(new ImageIcon(newImage));
         add(topPanelCell3, constraints);
@@ -95,9 +93,9 @@ public class TopPanel extends JPanel implements TopPanelListener {
         constraints.weightx = 0.5;
         constraints.anchor = GridBagConstraints.CENTER;
         this.face = new JButton();
-        setNewFace(this.defaultFacePath);
+        setNewFace(DEFAULT_FACE_PATH);
         this.face.setMargin(new Insets(2, 2, 2, 2));
-        this.face.setToolTipText(this.faceToolTip);
+        this.face.setToolTipText(FACE_TOOL_TIP);
         this.face.addMouseListener(new MouseAdapter() {
             private Icon face;
             @Override
@@ -108,7 +106,7 @@ public class TopPanel extends JPanel implements TopPanelListener {
             @Override
             public void mousePressed(MouseEvent e) {
                 this.face = TopPanel.this.face.getIcon();
-                setNewFace(TopPanel.this.clickedFacePath);
+                setNewFace(CLICKED_FACE_PATH);
             }
 
             @Override
@@ -128,7 +126,7 @@ public class TopPanel extends JPanel implements TopPanelListener {
         constraints.weightx = 0.5;
         constraints.anchor = GridBagConstraints.EAST;
         JLabel topPanelCell7 = new JLabel();
-        image = new ImageIcon(timePath).getImage();
+        image = new ImageIcon(TIME_PATH).getImage();
         newImage = image.getScaledInstance(smallSize, smallSize, java.awt.Image.SCALE_SMOOTH);
         topPanelCell7.setIcon(new ImageIcon(newImage));
         add(topPanelCell7, constraints);
@@ -138,13 +136,13 @@ public class TopPanel extends JPanel implements TopPanelListener {
         constraints.anchor = GridBagConstraints.WEST;
         this.timer = new JTextField();
         this.timer.setColumns(3);
-        this.timer.setFont(myFont);
+        this.timer.setFont(MY_FONT);
         this.timer.setBackground(Color.black);
         this.timer.setForeground(Color.white);
         this.timer.setText("000");
         this.timer.setEditable(false);
         this.timer.setHorizontalAlignment(SwingConstants.CENTER);
-        this.timer.setToolTipText(this.timeToolTip);
+        this.timer.setToolTipText(TIME_TOOL_TIP);
         add(this.timer, constraints);
 
         constraints.gridx = 9;
@@ -168,22 +166,22 @@ public class TopPanel extends JPanel implements TopPanelListener {
 
     @Override
     public void needShowLost() {
-        setNewFace(this.lostFacePath);
+        setNewFace(LOST_FACE_PATH);
     }
 
     @Override
     public void needShowWins() {
-        setNewFace(this.winsFacePath);
+        setNewFace(WINS_FACE_PATH);
     }
 
     @Override
     public void needShowPressed() {
-        setNewFace(this.pressedFacePath);
+        setNewFace(PRESSED_FACE_PATH);
     }
 
     @Override
     public void needShowDefaultFace() {
-        setNewFace(this.defaultFacePath);
+        setNewFace(DEFAULT_FACE_PATH);
     }
 
     @Override

@@ -55,10 +55,11 @@ public class FieldPanel extends AbstractFieldView {
         private class FieldActionListener extends MouseAdapter {
 
             @Override
-            public void mouseClicked(MouseEvent e) {
+            public void mousePressed(MouseEvent e) {
                 if (isGameOver) {
                     return;
                 }
+                InsideClass.this.topPanelListener.needShowPressed();
                 MyButton button = (MyButton) e.getSource();
                 int yPos = button.getYPos();
                 int xPos = button.getXPos();
@@ -69,27 +70,11 @@ public class FieldPanel extends AbstractFieldView {
                     FieldPanel.this.openThisCell(yPos, xPos);
                     FieldPanel.InsideClass.this.topPanelListener.needUpdateFlagsCounter(
                             FieldPanel.this.control.getFlagsRemainCount(FieldPanel.this.minesCount));
-                } else if (e.getButton() == MouseEvent.BUTTON3 && !FieldPanel.this.control.isItFirstMove()) {
+                } else if (e.getButton() == MouseEvent.BUTTON3 && FieldPanel.this.control.isNewGameStarted()) {
                     rightButtonClicked(yPos, xPos);
                 }
                 if (!FieldPanel.this.control.isItFirstMove()) {
                     gameOver();
-                }
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-                if (isGameOver) {
-                    return;
-                }
-                InsideClass.this.topPanelListener.needShowPressed();
-                if (e.getButton() == MouseEvent.BUTTON3) {
-                    MyButton button = (MyButton) e.getSource();
-                    int yPos = button.getYPos();
-                    int xPos = button.getXPos();
-                    if (FieldPanel.this.control.isCellShown(yPos, xPos)) {
-                        openOrShowVariants(yPos, xPos);
-                    }
                 }
             }
 
@@ -99,7 +84,7 @@ public class FieldPanel extends AbstractFieldView {
                     return;
                 }
                 InsideClass.this.topPanelListener.needShowDefaultFace();
-                if (e.getButton() == MouseEvent.BUTTON3) {
+                if (e.getButton() == MouseEvent.BUTTON3 && FieldPanel.this.control.isNewGameStarted()) {
                     MyButton button = (MyButton) e.getSource();
                     int yPos = button.getYPos();
                     int xPos = button.getXPos();
@@ -110,12 +95,14 @@ public class FieldPanel extends AbstractFieldView {
 
         private void rightButtonClicked(int yPos, int xPos) {
             if (FieldPanel.this.control.isCellShown(yPos, xPos)) {
-                return;
-            }
-            if (FieldPanel.this.control.isFlagHere(yPos, xPos)) {
+                openOrShowVariants(yPos, xPos);
+            } else if (FieldPanel.this.control.isFlagHere(yPos, xPos)) {
                 takeFlagOff(yPos, xPos);
                 this.topPanelListener.needUpdateFlagsCounter(
                         FieldPanel.this.control.getFlagsRemainCount(FieldPanel.this.minesCount));
+                FieldPanel.this.putQuestion(yPos, xPos);
+            } else if (FieldPanel.this.map[yPos][xPos].isQuestionHere()) {
+                FieldPanel.this.takeQuestionOff(yPos, xPos);
             } else {
                 putFlag(yPos, xPos);
                 this.topPanelListener.needUpdateFlagsCounter(
