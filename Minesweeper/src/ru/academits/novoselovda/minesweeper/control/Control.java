@@ -1,5 +1,6 @@
 package ru.academits.novoselovda.minesweeper.control;
 
+import ru.academits.novoselovda.minesweeper.common.ErrorShowMessageListener;
 import ru.academits.novoselovda.minesweeper.model.Field;
 import ru.academits.novoselovda.minesweeper.model.HighScore;
 import ru.academits.novoselovda.minesweeper.model.Timer;
@@ -110,8 +111,6 @@ public class Control {
     public boolean isWin() {
         if (this.field.isWin()) {
             this.isGameStarted = false;
-            int time = getTime();
-            saveScore(this.field.getYCellsCount(), this.field.getXCellsCount(), this.field.getMinesCount(), time);
             return true;
         }
         return false;
@@ -125,15 +124,15 @@ public class Control {
         return false;
     }
 
-    private void saveScore(int yCellCounts, int xCellCounts, int minesCount, int time) {
-        this.highScore.save(yCellCounts, xCellCounts, minesCount, time);
-    }
-
-    public void setUserName(String userName) {
-        this.highScore.setUserName(userName);
+    public void saveScore(String userName, int time) {
+        this.highScore.save(userName, this.field.getYCellsCount(), this.field.getXCellsCount(), this.field.getMinesCount(), time);
     }
 
     public String getHighScoreList() {
         return this.highScore.show();
+    }
+
+    public void setListener(ErrorShowMessageListener listener) {
+        this.highScore.setListener(listener);
     }
 }

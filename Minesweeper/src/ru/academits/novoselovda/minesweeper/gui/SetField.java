@@ -3,8 +3,6 @@ package ru.academits.novoselovda.minesweeper.gui;
 import ru.academits.novoselovda.minesweeper.common.FrameListener;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;

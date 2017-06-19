@@ -8,8 +8,8 @@ import ru.academits.novoselovda.minesweeper.text.ConsoleView;
 public class Main {
     public static void main(String[] args) {
         Control control = new Control();
-//        View view = new FrameView(control);
-        View view = new ConsoleView(control);
+        View view = new FrameView(control);
+//        View view = new ConsoleView(control);
         view.startApplication();
     }
 }

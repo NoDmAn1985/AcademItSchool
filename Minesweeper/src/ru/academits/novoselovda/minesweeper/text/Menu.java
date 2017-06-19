@@ -1,11 +1,12 @@
 package ru.academits.novoselovda.minesweeper.text;
 
+import ru.academits.novoselovda.minesweeper.common.ErrorShowMessageListener;
 import ru.academits.novoselovda.minesweeper.control.Control;
 import ru.academits.novoselovda.minesweeper.model.About;
 
 import java.util.Scanner;
 
-class Menu {
+class Menu implements ErrorShowMessageListener {
     private final String dottedLine = "------------------------------------------------------------";
 
     private static final int Y_CELLS_COUNT_MAX = 20;
@@ -33,6 +34,7 @@ class Menu {
 
     Menu(Control control, FieldView fieldView) {
         this.control = control;
+        this.control.setListener(this);
         this.fieldView = fieldView;
         this.xCellsCount = this.fieldView.getXCellCount();
         this.yCellsCount = this.fieldView.getYCellCount();
@@ -51,9 +53,8 @@ class Menu {
                 System.out.println("3) ---------------");
             }
             System.out.println("4) Рекорды");
-            System.out.println("5) Сменить имя (" + this.control.getHighScore().getUserName() + ")");
-            System.out.println("6) О программе");
-            System.out.println("7) Выход");
+            System.out.println("5) О программе");
+            System.out.println("6) Выход");
             System.out.print("Введите номер: ");
             int number = this.scanner.nextInt();
             System.out.println(this.dottedLine);
@@ -74,12 +75,9 @@ class Menu {
                     showHighScore();
                     break;
                 case 5:
-                    changeUserName();
-                    break;
-                case 6:
                     showAbout();
                     break;
-                case 7:
+                case 6:
                     System.exit(0);
                 case 2:
                     this.fieldView.createField();
@@ -121,13 +119,17 @@ class Menu {
         }
     }
 
-    private void changeUserName() {
-        System.out.print("Введи своё имя или нажми << ENTER >> (чтобы остаться Anonymous): ");
+    private void saveScore() {
+        int time = this.control.getTime();
+        String defaultName = this.control.getHighScore().getUserName();
+        this.scanner.nextLine();
+        System.out.print("Введи своё имя или нажми << ENTER >> (чтобы остаться \"" +
+                defaultName + "\"): ");
         String userName = this.scanner.nextLine();
-        if (userName.length() < 1 || !Character.isLetter(userName.charAt(0))) {
-            userName = "Anonymous";
+        if (userName.length() < 1) {
+            userName = defaultName;
         }
-        this.control.setUserName(userName);
+            this.control.saveScore(userName, time);
     }
 
     private void setFieldMenu() {
@@ -232,7 +234,12 @@ class Menu {
             if (this.control.isItFirstMove() || !this.control.isCellShown(y, x)) {
                 break;
             }
-            System.out.println("ОШИБКА: ячейка уже открыта");
+            if (this.control.isAllNeighboringFlagsPutted(y, x)) {
+                this.fieldView.openNeighborCells(y, x);
+                return;
+            } else {
+                System.out.println("ОШИБКА: ячейка уже открыта и не все флаги проставлены вокруг");
+            }
         } while (true);
         this.fieldView.setCellChosen(y, x);
         System.out.println(this.dottedLine);
@@ -257,7 +264,12 @@ class Menu {
                 this.fieldView.takeFlagOff(y, x);
                 break;
             } else if (number == 4) {
-                this.fieldView.hideCell(y, x);
+                if (this.control.isFlagHere(y, x)) {
+                    this.fieldView.takeFlagOff(y, x);
+                    this.fieldView.putFlag(y, x);
+                } else {
+                    this.fieldView.hideCell(y, x);
+                }
                 break;
             }
             System.out.println("ОШИБКА: неверный номер");
@@ -274,6 +286,15 @@ class Menu {
     void gameWin() {
         System.out.println(this.dottedLine);
         System.out.println("П О Б Е Д А ! ! !");
+        System.out.println(this.dottedLine);
+        saveScore();
+        showHighScore();
+    }
+
+    @Override
+    public void needShowErrorMessage(String errorMessage) {
+        System.out.println(this.dottedLine);
+        System.out.println(errorMessage);
         System.out.println(this.dottedLine);
     }
 }

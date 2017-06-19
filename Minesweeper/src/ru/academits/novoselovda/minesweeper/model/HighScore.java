@@ -1,5 +1,6 @@
 package ru.academits.novoselovda.minesweeper.model;
 
+import ru.academits.novoselovda.minesweeper.common.ErrorShowMessageListener;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -8,10 +9,13 @@ import java.util.Scanner;
 
 public class HighScore {
     private static final String PATH = ".\\Minesweeper\\src\\ru\\academits\\novoselovda\\minesweeper\\resources\\highscore.txt";
+    private static final String TITLE = "Рекорды";
     private static final int MAX_LETTERS_IN_USER_NAME = 10;
     private static final int MAX_RECORDS = 20;
 
     private String userName;
+
+    private ErrorShowMessageListener listener;
 
     public HighScore() {
         this.userName = System.getProperty("user.name");
@@ -21,7 +25,14 @@ public class HighScore {
         return this.userName;
     }
 
-    public void setUserName(String userName) {
+    public String getTitle() {
+        return TITLE;
+    }
+
+    private void setUserName(String userName) {
+        if (userName == null) {
+            return;
+        }
         if (userName.length() > MAX_LETTERS_IN_USER_NAME) {
             this.userName = userName.substring(0, MAX_LETTERS_IN_USER_NAME);
         } else {
@@ -29,30 +40,38 @@ public class HighScore {
         }
     }
 
-    public void save(int yCellCounts, int xCellCounts, int minesCount, int time) {
+    public void save(String userName, int yCellCounts, int xCellCounts, int minesCount, int time) {
+        setUserName(userName);
         int score = (int) (10000000.0 * minesCount / (yCellCounts * xCellCounts * (time + 100)));
         ArrayList<String> topInformation = new ArrayList<>();
         ArrayList<Integer> topScore = new ArrayList<>();
-        int index = 0;
+        int index;
 
         try (Scanner reader = new Scanner(new FileInputStream(PATH))) {
             while (reader.hasNext()) {
                 String text = reader.nextLine();
+                boolean isException = false;
                 try {
                     topScore.add(Integer.parseInt(text.substring(0, text.indexOf('_'))));
-                } catch (NumberFormatException exception) {
-                    System.out.println("ОШИБКА: файл рекордов повреждён - см. " + PATH);
-                    exception.printStackTrace();
-                    return;
+                } catch (NumberFormatException | StringIndexOutOfBoundsException exception) {
+                    topScore.clear();
+                    topInformation.clear();
+                    isException = true;
                 }
-                topInformation.add(text);
-                index = getIndex(0, topScore.size() - 1, topScore, score);
+                if (!isException) {
+                    topInformation.add(text);
+                }
             }
         } catch (FileNotFoundException exception) {
+            //нет файла, и ладно, создадим новый;
         }
 
-        if (topScore.size() == MAX_RECORDS && score < topScore.get(MAX_RECORDS - 1)) {
-            return;
+        if (topScore.size() == 0) {
+            index = 0;
+        } else if (topScore.size() == MAX_RECORDS && score < topScore.get(MAX_RECORDS - 1)) {
+            index = MAX_RECORDS - 1;
+        } else {
+            index = getIndex(topScore, score);
         }
 
         String date = new SimpleDateFormat("yyyy.MM.dd HH:mm").format(new Date());
@@ -65,14 +84,13 @@ public class HighScore {
             int i = 1;
             for (String element : topInformation) {
                 writer.println(element);
-                if (i == 20) {
+                if (i == MAX_RECORDS) {
                     break;
                 }
                 ++i;
             }
         } catch (IOException exception) {
-            System.out.println("ОШИБКА: файл (" + PATH + ") не доступен для записи");
-            exception.printStackTrace();
+            this.listener.needShowErrorMessage("ОШИБКА: файл (" + PATH + ") недоступен для записи");
         }
     }
 
@@ -86,30 +104,22 @@ public class HighScore {
                 ++index;
             }
         } catch (FileNotFoundException exception) {
-            System.out.println("ОШИБКА: потерян файл (" + PATH + ")");
-            exception.printStackTrace();
+            sb.append("ОШИБКА: потерян файл (" + PATH + ")");
         }
         return sb.toString();
     }
 
 
-    private int getIndex(int left, int right, ArrayList<Integer> array, int score) {
-        if (score > array.get(left)) {
-            return left;
+    private int getIndex(ArrayList<Integer> array, int score) {
+        for (int i = 0; i < array.size(); i++) {
+            if (score > array.get(i)) {
+                return i;
+            }
         }
-        if (left == right || score == array.get(left)) {
-            return left + 1;
-        } else if (score <= array.get(right)) {
-            return right + 1;
-        }
-        int index = (left + right) / 2;
-        int average = array.get(index);
-        if (score > average) {
-            return getIndex(left, index - 1, array, score);
-        } else if (score < average) {
-            return getIndex(index + 1, right, array, score);
-        } else {
-            return index + 1;
-        }
+        return array.size();
+    }
+
+    public void setListener(ErrorShowMessageListener listener) {
+        this.listener = listener;
     }
 }

@@ -5,7 +5,7 @@ public class About {
             "разработана\n" +
             "Новоселовым Дмитрием\n" +
             "(nodman@mail.ru)\n" +
-            "в мае 2017 года";
+            "в мае-июне 2017 года";
 
     public String toString() {
         return TEXT;

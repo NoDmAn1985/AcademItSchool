@@ -5,22 +5,23 @@ import ru.academits.novoselovda.temperature.interfaces.View;
 import ru.academits.novoselovda.temperature.interfaces.ViewListener;
 import ru.academits.novoselovda.temperature.model.*;
 
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 public class Control implements ViewListener {
-    private View view;
-    private Map<String, Convertible> scales;
+    private final View view;
+    private final Map<String, Convertible> scales;
 
     public Control(View view) {
         this.view = view;
+        List<Convertible> scalesList = new LinkedList<>();
+        scalesList.add(new Celsius());
+        scalesList.add(new Kelvin());
+        scalesList.add(new Fahrenheit());
+
         this.scales = new TreeMap<>();
-        Convertible scale = new Celsius();
-        this.scales.put(scale.getName(), scale);
-        scale = new Kelvin();
-        this.scales.put(scale.getName(), scale);
-        scale = new Fahrenheit();
-        this.scales.put(scale.getName(), scale);
+        for (Convertible scale : scalesList) {
+            this.scales.put(scale.getName(), scale);
+        }
     }
 
     @Override

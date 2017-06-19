@@ -19,19 +19,9 @@ class MenuBar extends JMenuBar {
     private static final String NEW_PROFESSIONAL_GAME_MENU_NAME = "Новая игра (профессионал)";
     private static final String SET_FIELD_MENU_NAME = "Новая игра...";
     private static final String MENU_HIGH_SCORES_NAME = "Рекорды";
-    private static final String MENU_CHANGE_NAME = "Сменить имя";
     private static final String MENU_ABOUT_NAME = "О программе";
     private static final String MENU_EXIT_NAME = "Выход";
 
-    private static final String RESTART_ICON_PATH = ".\\Minesweeper\\src\\ru\\academits\\novoselovda\\minesweeper\\resources\\restart.png";
-    private static final String SET_FIELD_ICON_PATH = ".\\Minesweeper\\src\\ru\\academits\\novoselovda\\minesweeper\\resources\\options.png";
-    private static final String BEGINNER_ICON_PATH = ".\\Minesweeper\\src\\ru\\academits\\novoselovda\\minesweeper\\resources\\face_clicked.png";
-    private static final String AMATEUR_ICON_PATH = ".\\Minesweeper\\src\\ru\\academits\\novoselovda\\minesweeper\\resources\\face_default.png";
-    private static final String PROFESSIONAL_ICON_PATH = ".\\Minesweeper\\src\\ru\\academits\\novoselovda\\minesweeper\\resources\\face_pressed.png";
-    private static final String RECORDS_ICON_PATH = ".\\Minesweeper\\src\\ru\\academits\\novoselovda\\minesweeper\\resources\\face_win.png";
-    private static final String CHANGE_ICON_PATH = ".\\Minesweeper\\src\\ru\\academits\\novoselovda\\minesweeper\\resources\\change.png";
-
-    private static final int SIZE = 30;
 
     private static final Insets MY_INSETS_MENU = new Insets(0, 5, 0, 5);
     private static final Insets MY_INSETS_ITEM = new Insets(0, 0, 0, 0);
@@ -51,10 +41,12 @@ class MenuBar extends JMenuBar {
     private static final int PROFESSIONAL_MINES_COUNT = 99;
 
     private HighScore highScore;
+    private IconManger iconManger;
     private FrameListener frameListener;
 
-    MenuBar(HighScore highScore) {
+    MenuBar(HighScore highScore, IconManger iconManger) {
         this.highScore = highScore;
+        this.iconManger = iconManger;
     }
 
     void init() {
@@ -63,7 +55,7 @@ class MenuBar extends JMenuBar {
 
         JMenuItem restartGame = new JMenuItem(RESTART_GAME_MENU_NAME);
         restartGame.addActionListener(e -> MenuBar.this.frameListener.needRestart());
-        setPropertiesAndAddToMenu(menuNewGame, restartGame, RESTART_ICON_PATH);
+        setPropertiesAndAddToMenu(menuNewGame, restartGame, this.iconManger.getRestartIcon());
 
         menuNewGame.addSeparator();
 
@@ -78,22 +70,22 @@ class MenuBar extends JMenuBar {
             new SetField(topLevel, BEGINNER_Y_CELLS_COUNT, BEGINNER_X_CELLS_COUNT,
                     BEGINNER_MINES_COUNT).showIt(MenuBar.this.frameListener);
         });
-        setPropertiesAndAddToMenu(menuNewGame, setField, SET_FIELD_ICON_PATH);
+        setPropertiesAndAddToMenu(menuNewGame, setField, this.iconManger.getSetFieldIcon());
 
         menuNewGame.addSeparator();
 
         JMenuItem newBeginnerGame = new JMenuItem(NEW_BEGINNER_GAME_MENU_NAME);
-        setPropertiesAndAddToMenu(menuNewGame, newBeginnerGame, BEGINNER_ICON_PATH);
+        setPropertiesAndAddToMenu(menuNewGame, newBeginnerGame, this.iconManger.getBeginnerIcon());
         newBeginnerGame.addActionListener(e -> MenuBar.this.frameListener.needStartNewGame(BEGINNER_Y_CELLS_COUNT, BEGINNER_X_CELLS_COUNT,
                 BEGINNER_MINES_COUNT));
 
         JMenuItem newAmateurGame = new JMenuItem(NEW_AMATEUR_GAME_MENU_NAME);
-        setPropertiesAndAddToMenu(menuNewGame, newAmateurGame, AMATEUR_ICON_PATH);
+        setPropertiesAndAddToMenu(menuNewGame, newAmateurGame, this.iconManger.getAmateurIcon());
         newAmateurGame.addActionListener(e -> MenuBar.this.frameListener.needStartNewGame(AMATEUR_Y_CELLS_COUNT, AMATEUR_X_CELLS_COUNT,
                 AMATEUR_MINES_COUNT));
 
         JMenuItem newProfessionalGame = new JMenuItem(NEW_PROFESSIONAL_GAME_MENU_NAME);
-        setPropertiesAndAddToMenu(menuNewGame, newProfessionalGame, PROFESSIONAL_ICON_PATH);
+        setPropertiesAndAddToMenu(menuNewGame, newProfessionalGame, this.iconManger.getProfessionalIcon());
         newProfessionalGame.addActionListener(e -> MenuBar.this.frameListener.
                 needStartNewGame(PROFESSIONAL_Y_CELLS_COUNT, PROFESSIONAL_X_CELLS_COUNT,
                         PROFESSIONAL_MINES_COUNT));
@@ -101,7 +93,7 @@ class MenuBar extends JMenuBar {
         menuNewGame.addSeparator();
 
         JMenuItem menuHighScores = new JMenuItem(MENU_HIGH_SCORES_NAME);
-        setPropertiesAndAddToMenu(menuNewGame, menuHighScores, RECORDS_ICON_PATH);
+        setPropertiesAndAddToMenu(menuNewGame, menuHighScores, this.iconManger.getRecordsIcon());
         menuHighScores.addActionListener(e -> {
             JMenuItem menuItem = (JMenuItem) e.getSource();
             JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();
@@ -110,19 +102,6 @@ class MenuBar extends JMenuBar {
             Container topLevel = invokerAsJComponent.getTopLevelAncestor();
             JOptionPane.showMessageDialog(topLevel, MenuBar.this.highScore.show(),
                     MENU_HIGH_SCORES_NAME, JOptionPane.PLAIN_MESSAGE);
-        });
-
-        JMenuItem menuChange = new JMenuItem();
-        menuChange.setText(MENU_CHANGE_NAME + " (" + MenuBar.this.highScore.getUserName() + ")");
-        setPropertiesAndAddToMenu(menuNewGame, menuChange, CHANGE_ICON_PATH);
-        menuChange.addActionListener(e -> {
-            Object newName = JOptionPane.showInputDialog(MenuBar.this.getParent(),
-                    "Введите своё имя:", "Смена имени", JOptionPane.QUESTION_MESSAGE, null,
-                    null, "Anonymous");
-            if (newName != null) {
-                MenuBar.this.highScore.setUserName((String) newName);
-                menuChange.setText(MENU_CHANGE_NAME + " (" + MenuBar.this.highScore.getUserName() + ")");
-            }
         });
 
         JMenu menuAbout = new JMenu(MENU_ABOUT_NAME);
@@ -159,12 +138,10 @@ class MenuBar extends JMenuBar {
         this.add(menu);
     }
 
-    private void setPropertiesAndAddToMenu(JMenu menu, JMenuItem item, String iconPath) {
+    private void setPropertiesAndAddToMenu(JMenu menu, JMenuItem item, ImageIcon icon) {
         item.setFont(MY_FONT_ITEM);
         item.setMargin(MY_INSETS_ITEM);
-        Image image = new ImageIcon(iconPath).getImage();
-        Image newImage = image.getScaledInstance(SIZE, SIZE, java.awt.Image.SCALE_SMOOTH);
-        item.setIcon(new ImageIcon(newImage));
+        item.setIcon(icon);
         menu.add(item);
     }
 

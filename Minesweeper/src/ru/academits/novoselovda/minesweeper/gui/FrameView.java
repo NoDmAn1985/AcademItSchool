@@ -6,18 +6,19 @@ import ru.academits.novoselovda.minesweeper.control.Control;
 import javax.swing.*;
 import java.awt.*;
 
-public class FrameView implements View, FrameListener {
+public class FrameView implements View, FrameListener, ErrorShowMessageListener {
     private Control control;
 
     private static final int CELL_SIZE = 30;
+    private static final int MENU_ICON_SIZE = 30;
     private static final int MENU_HEIGHT = 50;
     private static final int TOP_PANEL_HEIGHT = 50;
     private static final String TITLE = "Сапёр (Minesweeper)";
-    private static final String ICON_PATH = ".\\Minesweeper\\src\\ru\\academits\\novoselovda\\minesweeper\\resources\\cell_bomb.png";
 
     private int frameWidth;
 
     private JFrame frame = new JFrame();
+    private IconManger iconManger;
     private FieldPanel.InsideClass field;
 
     private int yCellsCount;
@@ -30,6 +31,7 @@ public class FrameView implements View, FrameListener {
 
     public FrameView(Control control) {
         this.control = control;
+        this.control.setListener(this);
         this.yCellsCount = this.control.getMinYCounts();
         this.xCellsCount = this.control.getMinXCounts();
         this.minesCount = this.control.getMinMinesCounts();
@@ -55,6 +57,7 @@ public class FrameView implements View, FrameListener {
         this.frame.setTitle(TITLE);
         this.frame.setSize(this.frameWidth, frameHeight);
         if (this.isItFirstGame) {
+            iconManger = new IconManger(CELL_SIZE, MENU_ICON_SIZE, TOP_PANEL_HEIGHT);
             this.frame.setLocationRelativeTo(null);
             this.isItFirstGame = false;
         } else {
@@ -63,22 +66,22 @@ public class FrameView implements View, FrameListener {
         this.frame.setResizable(false);
         this.frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         this.frame.setVisible(true);
-        this.frame.setIconImage(new ImageIcon(ICON_PATH).getImage());
+        this.frame.setIconImage(this.iconManger.getIcon());
     }
 
     private void initComponents() {
-        MenuBar mainMenuBar = new MenuBar(this.control.getHighScore());
+        MenuBar mainMenuBar = new MenuBar(this.control.getHighScore(), this.iconManger);
         mainMenuBar.init();
         mainMenuBar.addListener(this);
         this.frame.setJMenuBar(mainMenuBar);
 
-        TopPanel topPanel = new TopPanel(this.frameWidth, TOP_PANEL_HEIGHT);
+        TopPanel topPanel = new TopPanel(this.frameWidth, TOP_PANEL_HEIGHT, this.iconManger);
         topPanel.init(this.minesCount);
         topPanel.addListener(this);
         topPanel.addListener(this.field);
         this.frame.add(topPanel, BorderLayout.PAGE_START);
 
-        this.field = new FieldPanel().new InsideClass(this.control, yCellsCount,xCellsCount, minesCount);
+        this.field = new FieldPanel().new InsideClass(this.control, yCellsCount,xCellsCount, minesCount, this.iconManger);
         this.field.init();
         this.field.addListener(topPanel);
         this.frame.add(this.field, BorderLayout.CENTER);
@@ -108,5 +111,10 @@ public class FrameView implements View, FrameListener {
     @Override
     public int getCellSize() {
         return CELL_SIZE;
+    }
+
+    @Override
+    public void needShowErrorMessage(String errorMessage) {
+        JOptionPane.showMessageDialog(this.frame, errorMessage, null, JOptionPane.ERROR_MESSAGE);
     }
 }

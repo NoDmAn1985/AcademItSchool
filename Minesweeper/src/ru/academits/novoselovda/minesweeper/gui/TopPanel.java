@@ -12,13 +12,6 @@ import java.awt.event.MouseEvent;
 import java.text.DecimalFormat;
 
 public class TopPanel extends JPanel implements TopPanelListener {
-    private static final String FLAG_PATH = ".\\Minesweeper\\src\\ru\\academits\\novoselovda\\minesweeper\\resources\\cell_flag.png";
-    private static final String TIME_PATH = ".\\Minesweeper\\src\\ru\\academits\\novoselovda\\minesweeper\\resources\\clocks.png";
-    private static final String DEFAULT_FACE_PATH = ".\\Minesweeper\\src\\ru\\academits\\novoselovda\\minesweeper\\resources\\face_default.png";
-    private static final String PRESSED_FACE_PATH = ".\\Minesweeper\\src\\ru\\academits\\novoselovda\\minesweeper\\resources\\face_pressed.png";
-    private static final String WINS_FACE_PATH = ".\\Minesweeper\\src\\ru\\academits\\novoselovda\\minesweeper\\resources\\face_win.png";
-    private static final String LOST_FACE_PATH = ".\\Minesweeper\\src\\ru\\academits\\novoselovda\\minesweeper\\resources\\cell_gameover.png";
-    private static final String CLICKED_FACE_PATH = ".\\Minesweeper\\src\\ru\\academits\\novoselovda\\minesweeper\\resources\\face_clicked.png";
     private static final String FLAG_TOOL_TIP = "Осталось флагов";
     private static final String FACE_TOOL_TIP = "Перезапустить игру";
     private static final String TIME_TOOL_TIP = "Времени прошло";
@@ -35,18 +28,18 @@ public class TopPanel extends JPanel implements TopPanelListener {
     private FieldPanelListener fieldListener;
 
     private MyTimerTask myTask;
+    private IconManger iconManger;
 
-
-    TopPanel(int panelWidth, int panelHeight) {
+    TopPanel(int panelWidth, int panelHeight, IconManger iconManger) {
         this.panelWidth = panelWidth;
         this.panelHeight = panelHeight;
+        this.iconManger = iconManger;
     }
 
     void init(int minesCount) {
         removeAll();
         setSize(this.panelWidth, this.panelHeight);
         setBorder(BorderFactory.createRaisedBevelBorder());
-        int smallSize = (int) (getHeight() * 0.7);
 
         setLayout(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
@@ -78,9 +71,7 @@ public class TopPanel extends JPanel implements TopPanelListener {
         constraints.weightx = 0.5;
         constraints.anchor = GridBagConstraints.WEST;
         JLabel topPanelCell3 = new JLabel();
-        Image image = new ImageIcon(FLAG_PATH).getImage();
-        Image newImage = image.getScaledInstance(smallSize, smallSize, java.awt.Image.SCALE_SMOOTH);
-        topPanelCell3.setIcon(new ImageIcon(newImage));
+        topPanelCell3.setIcon(this.iconManger.getTopPanelFlagIcon());
         add(topPanelCell3, constraints);
 
         constraints.gridx = 4;
@@ -93,7 +84,7 @@ public class TopPanel extends JPanel implements TopPanelListener {
         constraints.weightx = 0.5;
         constraints.anchor = GridBagConstraints.CENTER;
         this.face = new JButton();
-        setNewFace(DEFAULT_FACE_PATH);
+        this.face.setIcon(this.iconManger.getTopPanelDefaultFaceIcon());
         this.face.setMargin(new Insets(2, 2, 2, 2));
         this.face.setToolTipText(FACE_TOOL_TIP);
         this.face.addMouseListener(new MouseAdapter() {
@@ -106,7 +97,7 @@ public class TopPanel extends JPanel implements TopPanelListener {
             @Override
             public void mousePressed(MouseEvent e) {
                 this.face = TopPanel.this.face.getIcon();
-                setNewFace(CLICKED_FACE_PATH);
+                TopPanel.this.face.setIcon(TopPanel.this.iconManger.getTopPanelClickedFaceIcon());
             }
 
             @Override
@@ -126,9 +117,7 @@ public class TopPanel extends JPanel implements TopPanelListener {
         constraints.weightx = 0.5;
         constraints.anchor = GridBagConstraints.EAST;
         JLabel topPanelCell7 = new JLabel();
-        image = new ImageIcon(TIME_PATH).getImage();
-        newImage = image.getScaledInstance(smallSize, smallSize, java.awt.Image.SCALE_SMOOTH);
-        topPanelCell7.setIcon(new ImageIcon(newImage));
+        topPanelCell7.setIcon(this.iconManger.getTopPanelTimerIcon());
         add(topPanelCell7, constraints);
 
         constraints.gridx = 8;
@@ -166,33 +155,27 @@ public class TopPanel extends JPanel implements TopPanelListener {
 
     @Override
     public void needShowLost() {
-        setNewFace(LOST_FACE_PATH);
+        this.face.setIcon(this.iconManger.getTopPanelLostFaceIcon());
     }
 
     @Override
     public void needShowWins() {
-        setNewFace(WINS_FACE_PATH);
+        this.face.setIcon(this.iconManger.getTopPanelWinsFaceIcon());
     }
 
     @Override
     public void needShowPressed() {
-        setNewFace(PRESSED_FACE_PATH);
+        this.face.setIcon(this.iconManger.getTopPanelPressedFaceIcon());
     }
 
     @Override
     public void needShowDefaultFace() {
-        setNewFace(DEFAULT_FACE_PATH);
+        this.face.setIcon(this.iconManger.getTopPanelDefaultFaceIcon());
     }
 
     @Override
     public void needUpdateFlagsCounter(int count) {
         this.flagsCounter.setText(new DecimalFormat("000").format(count));
-    }
-
-    private void setNewFace(String facePath) {
-        Image image = new ImageIcon(facePath).getImage();
-        Image newImage = image.getScaledInstance(50, 50, java.awt.Image.SCALE_SMOOTH);
-        this.face.setIcon(new ImageIcon(newImage));
     }
 
     void addListener(FrameListener frameListener) {

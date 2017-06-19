@@ -7,80 +7,78 @@ import java.awt.*;
 import java.awt.event.MouseListener;
 
 class MyButton extends JButton {
-    private static final String PATH = ".\\Minesweeper\\src\\ru\\academits\\novoselovda\\minesweeper\\resources\\";
     private int yPos;
     private int xPos;
     private boolean isQuestionHere;
+    private IconManger iconManger;
 
-    MyButton(MouseListener mouseListener, int yPos, int xPos) {
+    MyButton(MouseListener mouseListener, int yPos, int xPos, IconManger iconManger) {
         if (mouseListener != null) {
             addMouseListener(mouseListener);
         }
         this.yPos = yPos;
         this.xPos = xPos;
+        this.iconManger = iconManger;
     }
 
     void change(Signs sign) {
         boolean isButtonOn = false;
-        String iconPath;
+        ImageIcon icon;
         switch (sign) {
             case ZERO:
-                iconPath = null;
+                icon = null;
                 break;
             case ONE:
-                iconPath = "cell1.png";
+                icon = this.iconManger.getCell1Icon();
                 break;
             case TWO:
-                iconPath = "cell2.png";
+                icon = this.iconManger.getCell2Icon();
                 break;
             case THREE:
-                iconPath = "cell3.png";
+                icon = this.iconManger.getCell3Icon();
                 break;
             case FOUR:
-                iconPath = "cell4.png";
+                icon = this.iconManger.getCell4Icon();
                 break;
             case FIVE:
-                iconPath = "cell5.png";
+                icon = this.iconManger.getCell5Icon();
                 break;
             case SIX:
-                iconPath = "cell6.png";
+                icon = this.iconManger.getCell6Icon();
                 break;
             case SEVEN:
-                iconPath = "cell7.png";
+                icon = this.iconManger.getCell7Icon();
                 break;
             case EIGHT:
-                iconPath = "cell8.png";
+                icon = this.iconManger.getCell8Icon();
                 break;
             case MINE:
-                iconPath = "cell_bomb.png";
+                icon = this.iconManger.getCellMineIcon();
                 break;
             case FLAG:
                 isButtonOn = true;
-                iconPath = "cell_flag.png";
+                icon = this.iconManger.getCellFlagIcon();
                 this.isQuestionHere = false;
                 break;
             case WRONG_FLAG:
                 isButtonOn = true;
-                iconPath = "cell_wrongflag.png";
+                icon = this.iconManger.getCellWrongFlagIcon();
                 break;
             case QUESTION:
                 isButtonOn = true;
-                iconPath = "question.png";
+                icon = this.iconManger.getCellQuestionIcon();
                 this.isQuestionHere = true;
                 break;
             case GAME_OVER:
-                iconPath = "cell_gameover.png";
+                icon = this.iconManger.getCellGameOverIcon();
                 break;
             default:
                 isButtonOn = true;
-                iconPath = null;
+                icon = null;
                 this.isQuestionHere = false;
         }
-        if (iconPath != null) {
-            Image image = new ImageIcon((PATH + iconPath)).getImage();
-            int iconSize = this.getWidth() - 5;
-            Image newImage = image.getScaledInstance(iconSize, iconSize, java.awt.Image.SCALE_SMOOTH);
-            setIcon(new ImageIcon(newImage));
+        if (icon != null) {
+            setIcon(icon);
             setMargin(new Insets(0, 0, 0, 0));
         } else {
             setIcon(null);

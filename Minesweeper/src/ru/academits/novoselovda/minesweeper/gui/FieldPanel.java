@@ -5,6 +5,7 @@ import ru.academits.novoselovda.minesweeper.common.FieldPanelListener;
 import ru.academits.novoselovda.minesweeper.common.Signs;
 import ru.academits.novoselovda.minesweeper.common.TopPanelListener;
 import ru.academits.novoselovda.minesweeper.control.Control;
+import ru.academits.novoselovda.minesweeper.model.HighScore;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -22,15 +23,17 @@ public class FieldPanel extends AbstractFieldView {
 
     public class InsideClass extends JPanel implements FieldPanelListener {
         private TopPanelListener topPanelListener;
+        private IconManger iconManger;
         private boolean isGameOver;
         private Border border;
 
-        InsideClass(Control control, int yCellsCount, int xCellsCount, int minesCount) {
+        InsideClass(Control control, int yCellsCount, int xCellsCount, int minesCount, IconManger iconManger) {
             FieldPanel.this.control = control;
             FieldPanel.this.yCellsCount = yCellsCount;
             FieldPanel.this.xCellsCount = xCellsCount;
             FieldPanel.this.minesCount = minesCount;
             this.border = new JButton().getBorder();
+            this.iconManger = iconManger;
         }
 
         void init() {
@@ -40,7 +43,7 @@ public class FieldPanel extends AbstractFieldView {
             FieldPanel.this.map = new MyButton[FieldPanel.this.yCellsCount][FieldPanel.this.xCellsCount];
             for (int y = 0; y < FieldPanel.this.yCellsCount; y++) {
                 for (int x = 0; x < FieldPanel.this.xCellsCount; x++) {
-                    FieldPanel.this.map[y][x] = new MyButton(new FieldActionListener(), y, x);
+                    FieldPanel.this.map[y][x] = new MyButton(new FieldActionListener(), y, x, this.iconManger);
                     add(FieldPanel.this.map[y][x]);
                 }
             }
@@ -67,10 +70,17 @@ public class FieldPanel extends AbstractFieldView {
                     if (FieldPanel.this.control.isItFirstMove()) {
                         InsideClass.this.topPanelListener.needStartTimer();
                     }
+                    if (FieldPanel.this.control.isNewGameStarted() && FieldPanel.this.control.isFlagHere(yPos, xPos)) {
+                        return;
+                    }
                     FieldPanel.this.openThisCell(yPos, xPos);
                     FieldPanel.InsideClass.this.topPanelListener.needUpdateFlagsCounter(
                             FieldPanel.this.control.getFlagsRemainCount(FieldPanel.this.minesCount));
-                } else if (e.getButton() == MouseEvent.BUTTON3 && FieldPanel.this.control.isNewGameStarted()) {
+                } else if (e.getButton() == MouseEvent.BUTTON2 && FieldPanel.this.control.isNewGameStarted() &&
+                        FieldPanel.this.control.isCellShown(yPos, xPos)) {
+                    openOrShowVariants(yPos, xPos);
+                } else if (e.getButton() == MouseEvent.BUTTON3 && FieldPanel.this.control.isNewGameStarted() &&
+                        !FieldPanel.this.control.isCellShown(yPos, xPos)) {
                     rightButtonClicked(yPos, xPos);
                 }
                 if (!FieldPanel.this.control.isItFirstMove()) {
@@ -84,7 +94,7 @@ public class FieldPanel extends AbstractFieldView {
                     return;
                 }
                 InsideClass.this.topPanelListener.needShowDefaultFace();
-                if (e.getButton() == MouseEvent.BUTTON3 && FieldPanel.this.control.isNewGameStarted()) {
+                if (e.getButton() == MouseEvent.BUTTON2 && FieldPanel.this.control.isNewGameStarted()) {
                     MyButton button = (MyButton) e.getSource();
                     int yPos = button.getYPos();
                     int xPos = button.getXPos();
@@ -94,9 +104,7 @@ public class FieldPanel extends AbstractFieldView {
         }
 
         private void rightButtonClicked(int yPos, int xPos) {
-            if (FieldPanel.this.control.isCellShown(yPos, xPos)) {
-                openOrShowVariants(yPos, xPos);
-            } else if (FieldPanel.this.control.isFlagHere(yPos, xPos)) {
+            if (FieldPanel.this.control.isFlagHere(yPos, xPos)) {
                 takeFlagOff(yPos, xPos);
                 this.topPanelListener.needUpdateFlagsCounter(
                         FieldPanel.this.control.getFlagsRemainCount(FieldPanel.this.minesCount));
@@ -112,7 +120,7 @@ public class FieldPanel extends AbstractFieldView {
 
         void openOrShowVariants(int yPos, int xPos) {
             if (FieldPanel.this.control.isAllNeighboringFlagsPutted(yPos, xPos)) {
-                openNeighborCells(yPos, xPos, true);
+                openNeighborCells(yPos, xPos);
             } else {
                 changeBorders(BorderFactory.createRaisedBevelBorder(), yPos, xPos);
             }
@@ -141,7 +149,17 @@ public class FieldPanel extends AbstractFieldView {
                     new GameOverMessage().showIt();
                     InsideClass.this.topPanelListener.needShowLost();
                 } else {
+                    FieldPanel.this.openAllCells(true);
+                    InsideClass.this.topPanelListener.needUpdateFlagsCounter(0);
                     InsideClass.this.topPanelListener.needShowWins();
+                    HighScore highScore = FieldPanel.this.control.getHighScore();
+                    int time = FieldPanel.this.control.getTime();
+                    FieldPanel.this.control.saveScore((String) JOptionPane.showInputDialog(InsideClass.this.getParent(),
+                            "Введите своё имя:", "ПОБЕДА!!! Вы обезвредили все мины",
+                            JOptionPane.QUESTION_MESSAGE, null, null,
+                            highScore.getUserName()), time);
+                    JOptionPane.showMessageDialog(InsideClass.this.getParent(), highScore.show(),
+                            highScore.getTitle(), JOptionPane.PLAIN_MESSAGE);
                 }
                 InsideClass.this.isGameOver = true;
             }

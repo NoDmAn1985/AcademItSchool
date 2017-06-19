@@ -70,32 +70,36 @@ public abstract class AbstractFieldView {
             getCellImage(yPos, xPos);
         } else {
             getCellImage(yPos, xPos);
-            openNeighborCells(yPos, xPos, true);
+            openNeighborCells(yPos, xPos);
         }
     }
 
-    private void openAllCells() {
+    public void openAllCells(boolean isWin) {
         for (int y = 0; y < this.yCellsCount; y++) {
             final int yFinal = y;
-            new Thread(() -> openAllXCells(yFinal)).start();
+            new Thread(() -> openAllXCells(isWin, yFinal)).start();
         }
     }
 
-    private void openAllXCells(int yPos) {
+    private void openAllXCells(boolean isWin, int yPos) {
         for (int x = 0; x < AbstractFieldView.this.xCellsCount; x++) {
             if (AbstractFieldView.this.control.isCellShown(yPos, x)) {
                 continue;
             }
-            if (AbstractFieldView.this.control.isFlagHere(yPos, x) &&
+            if (!isWin && AbstractFieldView.this.control.isFlagHere(yPos, x) &&
                     AbstractFieldView.this.control.getCellNumber(yPos, x) != -1) {
                 change(Signs.WRONG_FLAG, yPos, x);
             } else if (!AbstractFieldView.this.control.isFlagHere(yPos, x)) {
-                getCellImage(yPos, x);
+                if (isWin && this.control.isMineHere(yPos, x)) {
+                    change(Signs.FLAG, yPos, x);
+                } else {
+                    getCellImage(yPos, x);
+                }
             }
         }
     }
 
-    protected void openNeighborCells(int yPos, int xPos, boolean isInThread) {
+    public void openNeighborCells(int yPos, int xPos) {
         int yMin = (yPos == 0 ? yPos : yPos - 1);
         int yMax = (yPos == yCellsCount - 1 ? yPos : yPos + 1);
         int xMin = (xPos == 0 ? xPos : xPos - 1);
@@ -112,19 +116,7 @@ public abstract class AbstractFieldView {
                 }
                 getCellImage(y, x);
                 if (AbstractFieldView.this.control.isCellZero(y, x)) {
-                    if (isInThread) {
-                        final int yFinal = y;
-                        final int xFinal = x;
-                        Thread thread = new Thread(() -> openNeighborCells(yFinal, xFinal, false));
-                        thread.start();
-                        try {
-                            thread.join();
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    } else {
-                        openNeighborCells(y, x, false);
-                    }
+                        openNeighborCells(y, x);
                 }
             }
         }
@@ -136,7 +128,7 @@ public abstract class AbstractFieldView {
         } else {
             this.control.setNewGameStarted(false);
         }
-        openAllCells();
+        openAllCells(false);
     }
 
 
