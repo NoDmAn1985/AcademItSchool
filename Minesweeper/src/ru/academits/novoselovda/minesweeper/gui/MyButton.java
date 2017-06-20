@@ -10,15 +10,15 @@ class MyButton extends JButton {
     private int yPos;
     private int xPos;
     private boolean isQuestionHere;
-    private IconManger iconManger;
+    private IconManager iconManager;
 
-    MyButton(MouseListener mouseListener, int yPos, int xPos, IconManger iconManger) {
+    MyButton(MouseListener mouseListener, int yPos, int xPos, IconManager iconManager) {
         if (mouseListener != null) {
             addMouseListener(mouseListener);
         }
         this.yPos = yPos;
         this.xPos = xPos;
-        this.iconManger = iconManger;
+        this.iconManager = iconManager;
     }
 
     void change(Signs sign) {
@@ -29,48 +29,48 @@ class MyButton extends JButton {
                 icon = null;
                 break;
             case ONE:
-                icon = this.iconManger.getCell1Icon();
+                icon = this.iconManager.getCell1Icon();
                 break;
             case TWO:
-                icon = this.iconManger.getCell2Icon();
+                icon = this.iconManager.getCell2Icon();
                 break;
             case THREE:
-                icon = this.iconManger.getCell3Icon();
+                icon = this.iconManager.getCell3Icon();
                 break;
             case FOUR:
-                icon = this.iconManger.getCell4Icon();
+                icon = this.iconManager.getCell4Icon();
                 break;
             case FIVE:
-                icon = this.iconManger.getCell5Icon();
+                icon = this.iconManager.getCell5Icon();
                 break;
             case SIX:
-                icon = this.iconManger.getCell6Icon();
+                icon = this.iconManager.getCell6Icon();
                 break;
             case SEVEN:
-                icon = this.iconManger.getCell7Icon();
+                icon = this.iconManager.getCell7Icon();
                 break;
             case EIGHT:
-                icon = this.iconManger.getCell8Icon();
+                icon = this.iconManager.getCell8Icon();
                 break;
             case MINE:
-                icon = this.iconManger.getCellMineIcon();
+                icon = this.iconManager.getCellMineIcon();
                 break;
             case FLAG:
                 isButtonOn = true;
-                icon = this.iconManger.getCellFlagIcon();
+                icon = this.iconManager.getCellFlagIcon();
                 this.isQuestionHere = false;
                 break;
             case WRONG_FLAG:
                 isButtonOn = true;
-                icon = this.iconManger.getCellWrongFlagIcon();
+                icon = this.iconManager.getCellWrongFlagIcon();
                 break;
             case QUESTION:
                 isButtonOn = true;
-                icon = this.iconManger.getCellQuestionIcon();
+                icon = this.iconManager.getCellQuestionIcon();
                 this.isQuestionHere = true;
                 break;
             case GAME_OVER:
-                icon = this.iconManger.getCellGameOverIcon();
+                icon = this.iconManager.getCellGameOverIcon();
                 break;
             default:
                 isButtonOn = true;

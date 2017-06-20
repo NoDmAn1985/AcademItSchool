@@ -3,7 +3,7 @@ package ru.academits.novoselovda.minesweeper.gui;
 import javax.swing.*;
 import java.awt.*;
 
-class IconManger {
+class IconManager {
     private static final String RESOURCES_PATH = ".\\Minesweeper\\src\\ru\\academits\\novoselovda\\minesweeper\\resources\\";
     private static final String ICON_PATH = "cell_bomb.png";
     private Image icon;
@@ -61,7 +61,7 @@ class IconManger {
 
     private static final int CELL_ICON_DIFFERENCE = 5;
 
-    IconManger(int cellSize, int menuItemIconSize, int topPanelHeight) {
+    IconManager(int cellSize, int menuItemIconSize, int topPanelHeight) {
         this.icon = new ImageIcon(ICON_PATH).getImage();
         this.restartIcon = imageToIcon(RESTART_ICON_PATH, menuItemIconSize);
         this.setFieldIcon = imageToIcon(SET_FIELD_ICON_PATH, menuItemIconSize);

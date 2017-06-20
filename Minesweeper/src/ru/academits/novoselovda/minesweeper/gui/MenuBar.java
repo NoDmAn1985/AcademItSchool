@@ -41,12 +41,12 @@ class MenuBar extends JMenuBar {
     private static final int PROFESSIONAL_MINES_COUNT = 99;
 
     private HighScore highScore;
-    private IconManger iconManger;
+    private IconManager iconManager;
     private FrameListener frameListener;
 
-    MenuBar(HighScore highScore, IconManger iconManger) {
+    MenuBar(HighScore highScore, IconManager iconManager) {
         this.highScore = highScore;
-        this.iconManger = iconManger;
+        this.iconManager = iconManager;
     }
 
     void init() {
@@ -55,7 +55,7 @@ class MenuBar extends JMenuBar {
 
         JMenuItem restartGame = new JMenuItem(RESTART_GAME_MENU_NAME);
         restartGame.addActionListener(e -> MenuBar.this.frameListener.needRestart());
-        setPropertiesAndAddToMenu(menuNewGame, restartGame, this.iconManger.getRestartIcon());
+        setPropertiesAndAddToMenu(menuNewGame, restartGame, this.iconManager.getRestartIcon());
 
         menuNewGame.addSeparator();
 
@@ -70,22 +70,22 @@ class MenuBar extends JMenuBar {
             new SetField(topLevel, BEGINNER_Y_CELLS_COUNT, BEGINNER_X_CELLS_COUNT,
                     BEGINNER_MINES_COUNT).showIt(MenuBar.this.frameListener);
         });
-        setPropertiesAndAddToMenu(menuNewGame, setField, this.iconManger.getSetFieldIcon());
+        setPropertiesAndAddToMenu(menuNewGame, setField, this.iconManager.getSetFieldIcon());
 
         menuNewGame.addSeparator();
 
         JMenuItem newBeginnerGame = new JMenuItem(NEW_BEGINNER_GAME_MENU_NAME);
-        setPropertiesAndAddToMenu(menuNewGame, newBeginnerGame, this.iconManger.getBeginnerIcon());
+        setPropertiesAndAddToMenu(menuNewGame, newBeginnerGame, this.iconManager.getBeginnerIcon());
         newBeginnerGame.addActionListener(e -> MenuBar.this.frameListener.needStartNewGame(BEGINNER_Y_CELLS_COUNT, BEGINNER_X_CELLS_COUNT,
                 BEGINNER_MINES_COUNT));
 
         JMenuItem newAmateurGame = new JMenuItem(NEW_AMATEUR_GAME_MENU_NAME);
-        setPropertiesAndAddToMenu(menuNewGame, newAmateurGame, this.iconManger.getAmateurIcon());
+        setPropertiesAndAddToMenu(menuNewGame, newAmateurGame, this.iconManager.getAmateurIcon());
         newAmateurGame.addActionListener(e -> MenuBar.this.frameListener.needStartNewGame(AMATEUR_Y_CELLS_COUNT, AMATEUR_X_CELLS_COUNT,
                 AMATEUR_MINES_COUNT));
 
         JMenuItem newProfessionalGame = new JMenuItem(NEW_PROFESSIONAL_GAME_MENU_NAME);
-        setPropertiesAndAddToMenu(menuNewGame, newProfessionalGame, this.iconManger.getProfessionalIcon());
+        setPropertiesAndAddToMenu(menuNewGame, newProfessionalGame, this.iconManager.getProfessionalIcon());
         newProfessionalGame.addActionListener(e -> MenuBar.this.frameListener.
                 needStartNewGame(PROFESSIONAL_Y_CELLS_COUNT, PROFESSIONAL_X_CELLS_COUNT,
                         PROFESSIONAL_MINES_COUNT));
@@ -93,7 +93,7 @@ class MenuBar extends JMenuBar {
         menuNewGame.addSeparator();
 
         JMenuItem menuHighScores = new JMenuItem(MENU_HIGH_SCORES_NAME);
-        setPropertiesAndAddToMenu(menuNewGame, menuHighScores, this.iconManger.getRecordsIcon());
+        setPropertiesAndAddToMenu(menuNewGame, menuHighScores, this.iconManager.getRecordsIcon());
         menuHighScores.addActionListener(e -> {
             JMenuItem menuItem = (JMenuItem) e.getSource();
             JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();

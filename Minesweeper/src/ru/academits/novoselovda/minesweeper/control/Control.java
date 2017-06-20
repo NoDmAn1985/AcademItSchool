@@ -1,6 +1,7 @@
 package ru.academits.novoselovda.minesweeper.control;
 
 import ru.academits.novoselovda.minesweeper.common.ErrorShowMessageListener;
+import ru.academits.novoselovda.minesweeper.common.GameOverListener;
 import ru.academits.novoselovda.minesweeper.model.Field;
 import ru.academits.novoselovda.minesweeper.model.HighScore;
 import ru.academits.novoselovda.minesweeper.model.Timer;
@@ -9,9 +10,11 @@ public class Control {
     private static final int MIN_Y_COUNTS = 9;
     private static final int MIN_X_COUNTS = 9;
     private static final int MIN_MINES_COUNTS = 10;
-    
+
     private boolean isItFirstMove;
     private boolean isGameStarted;
+
+    private GameOverListener gameOverListener;
 
     public boolean isItFirstMove() {
         return isItFirstMove;
@@ -28,6 +31,7 @@ public class Control {
     private Field field;
     private HighScore highScore;
     private Timer timer;
+    private int saveTime;
 
     public Control() {
         this.highScore = new HighScore();
@@ -82,6 +86,23 @@ public class Control {
 
     public void setCellShown(int yPos, int xPos) {
         this.field.setCellShown(yPos, xPos);
+        if (!this.isGameStarted) {
+            return;
+        }
+        if (this.field.isLost()) {
+            this.isGameStarted = false;
+            this.gameOverListener.lost(yPos, xPos);
+        } else if (this.field.isWin()) {
+            this.saveTime = this.timer.getTime();
+            this.isGameStarted = false;
+            this.gameOverListener.win();
+            this.gameOverListener.saveScore();
+            this.gameOverListener.showHighScore();
+        }
+    }
+
+    public boolean isGameEnds() {
+        return !this.isItFirstMove && !this.isGameStarted;
     }
 
     public void setFlagHere(boolean isFlagHere, int yPos, int xPos) {
@@ -89,7 +110,7 @@ public class Control {
     }
 
     public boolean isFlagHere(int yPos, int xPos) {
-        return this.field.isFlagHere(yPos, xPos);
+        return (this.isGameStarted && this.field.isFlagHere(yPos, xPos));
     }
 
     public boolean isAllNeighboringFlagsPutted(int yPos, int xPos) {
@@ -108,31 +129,20 @@ public class Control {
         return getCellNumber(yPos, xPos) == -1;
     }
 
-    public boolean isWin() {
-        if (this.field.isWin()) {
-            this.isGameStarted = false;
-            return true;
-        }
-        return false;
-    }
-
-    public boolean isLost() {
-        if (this.field.isLost()) {
-            this.isGameStarted = false;
-            return true;
-        }
-        return false;
-    }
-
-    public void saveScore(String userName, int time) {
-        this.highScore.save(userName, this.field.getYCellsCount(), this.field.getXCellsCount(), this.field.getMinesCount(), time);
+    public void saveScore(String userName) {
+        this.highScore.save(userName, this.field.getYCellsCount(), this.field.getXCellsCount(), this.field.getMinesCount(),
+                this.saveTime);
     }
 
     public String getHighScoreList() {
         return this.highScore.show();
     }
 
-    public void setListener(ErrorShowMessageListener listener) {
+    public void setErrorMessageListener(ErrorShowMessageListener listener) {
         this.highScore.setListener(listener);
+    }
+
+    public void setGameOverListener(GameOverListener listener) {
+        this.gameOverListener = listener;
     }
 }

@@ -1,9 +1,6 @@
 package ru.academits.novoselovda.minesweeper.gui;
 
-import ru.academits.novoselovda.minesweeper.common.AbstractFieldView;
-import ru.academits.novoselovda.minesweeper.common.FieldPanelListener;
-import ru.academits.novoselovda.minesweeper.common.Signs;
-import ru.academits.novoselovda.minesweeper.common.TopPanelListener;
+import ru.academits.novoselovda.minesweeper.common.*;
 import ru.academits.novoselovda.minesweeper.control.Control;
 import ru.academits.novoselovda.minesweeper.model.HighScore;
 
@@ -21,19 +18,20 @@ public class FieldPanel extends AbstractFieldView {
         this.map[y][x].change(signs);
     }
 
-    public class InsideClass extends JPanel implements FieldPanelListener {
+    public class InsideClass extends JPanel implements GameOverListener {
         private TopPanelListener topPanelListener;
-        private IconManger iconManger;
+        private IconManager iconManager;
         private boolean isGameOver;
         private Border border;
 
-        InsideClass(Control control, int yCellsCount, int xCellsCount, int minesCount, IconManger iconManger) {
+        InsideClass(Control control, int yCellsCount, int xCellsCount, int minesCount, IconManager iconManager) {
             FieldPanel.this.control = control;
+            FieldPanel.this.control.setGameOverListener(this);
             FieldPanel.this.yCellsCount = yCellsCount;
             FieldPanel.this.xCellsCount = xCellsCount;
             FieldPanel.this.minesCount = minesCount;
             this.border = new JButton().getBorder();
-            this.iconManger = iconManger;
+            this.iconManager = iconManager;
         }
 
         void init() {
@@ -43,16 +41,43 @@ public class FieldPanel extends AbstractFieldView {
             FieldPanel.this.map = new MyButton[FieldPanel.this.yCellsCount][FieldPanel.this.xCellsCount];
             for (int y = 0; y < FieldPanel.this.yCellsCount; y++) {
                 for (int x = 0; x < FieldPanel.this.xCellsCount; x++) {
-                    FieldPanel.this.map[y][x] = new MyButton(new FieldActionListener(), y, x, this.iconManger);
+                    FieldPanel.this.map[y][x] = new MyButton(new FieldActionListener(), y, x, this.iconManager);
                     add(FieldPanel.this.map[y][x]);
                 }
             }
         }
 
         @Override
-        public void needGameOver() {
-            FieldPanel.this.gameLost(-1, -1);
-            gameOver();
+        public void win() {
+            this.topPanelListener.needStopTimer();
+            FieldPanel.this.openAllCells(true);
+            this.topPanelListener.needUpdateFlagsCounter(0);
+            this.topPanelListener.needShowWins();
+        }
+
+        @Override
+        public void saveScore() {
+            FieldPanel.this.control.saveScore((String) JOptionPane.showInputDialog(InsideClass.this.getParent(),
+                    "Введите своё имя:", "ПОБЕДА!!! Вы обезвредили все мины",
+                    JOptionPane.QUESTION_MESSAGE, null, null,
+                    FieldPanel.this.control.getHighScore().getUserName()));
+        }
+
+        @Override
+        public void showHighScore() {
+            HighScore highScore = FieldPanel.this.control.getHighScore();
+            JOptionPane.showMessageDialog(InsideClass.this.getParent(), highScore.show(),
+                    highScore.getTitle(), JOptionPane.PLAIN_MESSAGE);
+            this.isGameOver = true;
+        }
+
+        @Override
+        public void lost(int yPos, int xPos) {
+            this.topPanelListener.needStopTimer();
+            FieldPanel.this.gameLost(yPos, xPos);
+            new GameOverMessage().showIt();
+            this.topPanelListener.needShowLost();
+            this.isGameOver = true;
         }
 
         private class FieldActionListener extends MouseAdapter {
@@ -82,9 +107,6 @@ public class FieldPanel extends AbstractFieldView {
                 } else if (e.getButton() == MouseEvent.BUTTON3 && FieldPanel.this.control.isNewGameStarted() &&
                         !FieldPanel.this.control.isCellShown(yPos, xPos)) {
                     rightButtonClicked(yPos, xPos);
-                }
-                if (!FieldPanel.this.control.isItFirstMove()) {
-                    gameOver();
                 }
             }
 
@@ -138,30 +160,6 @@ public class FieldPanel extends AbstractFieldView {
                         FieldPanel.this.map[y][x].setBorder(border);
                     }
                 }
-            }
-        }
-
-        private void gameOver() {
-            boolean isLost = FieldPanel.this.control.isLost();
-            if (isLost || FieldPanel.this.control.isWin()) {
-                InsideClass.this.topPanelListener.needStopTimer();
-                if (isLost) {
-                    new GameOverMessage().showIt();
-                    InsideClass.this.topPanelListener.needShowLost();
-                } else {
-                    FieldPanel.this.openAllCells(true);
-                    InsideClass.this.topPanelListener.needUpdateFlagsCounter(0);
-                    InsideClass.this.topPanelListener.needShowWins();
-                    HighScore highScore = FieldPanel.this.control.getHighScore();
-                    int time = FieldPanel.this.control.getTime();
-                    FieldPanel.this.control.saveScore((String) JOptionPane.showInputDialog(InsideClass.this.getParent(),
-                            "Введите своё имя:", "ПОБЕДА!!! Вы обезвредили все мины",
-                            JOptionPane.QUESTION_MESSAGE, null, null,
-                            highScore.getUserName()), time);
-                    JOptionPane.showMessageDialog(InsideClass.this.getParent(), highScore.show(),
-                            highScore.getTitle(), JOptionPane.PLAIN_MESSAGE);
-                }
-                InsideClass.this.isGameOver = true;
             }
         }
 

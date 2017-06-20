@@ -1,12 +1,13 @@
 package ru.academits.novoselovda.minesweeper.text;
 
 import ru.academits.novoselovda.minesweeper.common.ErrorShowMessageListener;
+import ru.academits.novoselovda.minesweeper.common.GameOverListener;
 import ru.academits.novoselovda.minesweeper.control.Control;
 import ru.academits.novoselovda.minesweeper.model.About;
 
 import java.util.Scanner;
 
-class Menu implements ErrorShowMessageListener {
+class Menu implements ErrorShowMessageListener, GameOverListener {
     private final String dottedLine = "------------------------------------------------------------";
 
     private static final int Y_CELLS_COUNT_MAX = 20;
@@ -34,7 +35,8 @@ class Menu implements ErrorShowMessageListener {
 
     Menu(Control control, FieldView fieldView) {
         this.control = control;
-        this.control.setListener(this);
+        this.control.setErrorMessageListener(this);
+        this.control.setGameOverListener(this);
         this.fieldView = fieldView;
         this.xCellsCount = this.fieldView.getXCellCount();
         this.yCellsCount = this.fieldView.getYCellCount();
@@ -56,7 +58,14 @@ class Menu implements ErrorShowMessageListener {
             System.out.println("5) О программе");
             System.out.println("6) Выход");
             System.out.print("Введите номер: ");
-            int number = this.scanner.nextInt();
+            int number;
+            try {
+                number = Integer.parseInt(this.scanner.nextLine());
+            } catch (NumberFormatException exception) {
+                System.out.println(this.dottedLine);
+                System.out.println("ОШИБКА: должна быть цифра");
+                continue;
+            }
             System.out.println(this.dottedLine);
             switch (number) {
                 case 1:
@@ -97,7 +106,14 @@ class Menu implements ErrorShowMessageListener {
             System.out.println("4) Новая игра (профессионал)");
             System.out.println("5) Предыдущее меню");
             System.out.print("Введите номер: ");
-            int number = this.scanner.nextInt();
+            int number;
+            try {
+                number = Integer.parseInt(this.scanner.nextLine());
+            } catch (NumberFormatException exception) {
+                System.out.println(this.dottedLine);
+                System.out.println("ОШИБКА: должна быть цифра");
+                continue;
+            }
             switch (number) {
                 case 1:
                     setFieldMenu();
@@ -119,17 +135,16 @@ class Menu implements ErrorShowMessageListener {
         }
     }
 
-    private void saveScore() {
-        int time = this.control.getTime();
+    @Override
+    public void saveScore() {
         String defaultName = this.control.getHighScore().getUserName();
-        this.scanner.nextLine();
         System.out.print("Введи своё имя или нажми << ENTER >> (чтобы остаться \"" +
                 defaultName + "\"): ");
         String userName = this.scanner.nextLine();
         if (userName.length() < 1) {
             userName = defaultName;
         }
-            this.control.saveScore(userName, time);
+        this.control.saveScore(userName);
     }
 
     private void setFieldMenu() {
@@ -141,7 +156,13 @@ class Menu implements ErrorShowMessageListener {
         System.out.println("Введите количество ячеек:");
         System.out.print("- по вертикали (от : " + yMin + " до " + Y_CELLS_COUNT_MAX + "):");
         while (true) {
-            yCellsCount = this.scanner.nextInt();
+            try {
+                yCellsCount = Integer.parseInt(this.scanner.nextLine());
+            } catch (NumberFormatException exception) {
+                System.out.println(this.dottedLine);
+                System.out.println("ОШИБКА: должна быть цифра");
+                continue;
+            }
             if (yCellsCount >= yMin && yCellsCount <= Y_CELLS_COUNT_MAX) {
                 break;
             }
@@ -150,7 +171,13 @@ class Menu implements ErrorShowMessageListener {
         int xMin = this.control.getMinXCounts();
         System.out.print("- по горизонтали (от : " + xMin + " до " + X_CELLS_COUNT_MAX + "):");
         while (true) {
-            xCellsCount = this.scanner.nextInt();
+            try {
+                xCellsCount = Integer.parseInt(this.scanner.nextLine());
+            } catch (NumberFormatException exception) {
+                System.out.println(this.dottedLine);
+                System.out.println("ОШИБКА: должна быть цифра");
+                continue;
+            }
             if (xCellsCount >= xMin && xCellsCount <= X_CELLS_COUNT_MAX) {
                 break;
             }
@@ -160,7 +187,13 @@ class Menu implements ErrorShowMessageListener {
         int minesMax = (int) (xCellsCount * yCellsCount * 0.7);
         while (true) {
             System.out.println("Введите количество мин (от : " + minesMin + " до " + minesMax + "):");
-            minesCount = this.scanner.nextInt();
+            try {
+                minesCount = Integer.parseInt(this.scanner.nextLine());
+            } catch (NumberFormatException exception) {
+                System.out.println(this.dottedLine);
+                System.out.println("ОШИБКА: должна быть цифра");
+                continue;
+            }
             if (minesCount >= minesMin && minesCount <= minesMax) {
                 break;
             }
@@ -176,7 +209,8 @@ class Menu implements ErrorShowMessageListener {
         this.fieldView.createField();
     }
 
-    private void showHighScore() {
+    @Override
+    public void showHighScore() {
         System.out.println("Таблица рекордов");
         System.out.print(this.control.getHighScoreList());
         System.out.print("нажмите <<ENTER>> для выхода в меню");
@@ -198,7 +232,13 @@ class Menu implements ErrorShowMessageListener {
             while (true) {
                 System.out.println("Введите координаты хода (или \"0\" - для вызова меню):");
                 System.out.print("- по вертикали: ");
-                y = this.scanner.nextInt() - 1;
+                try {
+                    y = Integer.parseInt(this.scanner.nextLine()) - 1;
+                } catch (NumberFormatException exception) {
+                    System.out.println(this.dottedLine);
+                    System.out.println("ОШИБКА: должна быть цифра");
+                    continue;
+                }
                 if (y >= 0 && y < yCellsCount) {
                     break;
                 }
@@ -215,8 +255,13 @@ class Menu implements ErrorShowMessageListener {
             }
             while (true) {
                 System.out.print("- по горизонтали: ");
-                x = this.scanner.nextInt() - 1;
-                if (x >= 0 && x < xCellsCount) {
+                try {
+                    x = Integer.parseInt(this.scanner.nextLine()) - 1;
+                } catch (NumberFormatException exception) {
+                    System.out.println(this.dottedLine);
+                    System.out.println("ОШИБКА: должна быть цифра");
+                    continue;
+                }                if (x >= 0 && x < xCellsCount) {
                     break;
                 }
                 if (x == -1) {
@@ -253,7 +298,14 @@ class Menu implements ErrorShowMessageListener {
         System.out.println("4) ничего, выбрать другую");
         int number;
         while (true) {
-            number = this.scanner.nextInt();
+            System.out.print("Введите номер: ");
+            try {
+                number = Integer.parseInt(this.scanner.nextLine());
+            } catch (NumberFormatException exception) {
+                System.out.println(this.dottedLine);
+                System.out.println("ОШИБКА: должна быть цифра");
+                continue;
+            }
             if (number == 1) {
                 this.fieldView.openThisCell(y, x);
                 break;
@@ -276,19 +328,24 @@ class Menu implements ErrorShowMessageListener {
         }
     }
 
-    void gameLost() {
+    @Override
+    public void lost(int yPos, int xPos) {
         System.out.println(this.dottedLine);
         System.out.println("П Р О И Г Р Ы Ш Ь .");
         System.out.println(this.dottedLine);
-
+        this.fieldView.gameLost(yPos, xPos);
+        this.fieldView.showAllField();
+        System.out.println(this.dottedLine);
     }
 
-    void gameWin() {
+    @Override
+    public void win() {
         System.out.println(this.dottedLine);
         System.out.println("П О Б Е Д А ! ! !");
         System.out.println(this.dottedLine);
-        saveScore();
-        showHighScore();
+        this.fieldView.openAllCells(true);
+        this.fieldView.showAllField();
+        System.out.println(this.dottedLine);
     }
 
     @Override

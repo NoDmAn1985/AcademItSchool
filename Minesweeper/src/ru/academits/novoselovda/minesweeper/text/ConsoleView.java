@@ -21,14 +21,10 @@ public class ConsoleView implements View {
             this.fieldView.showAllField();
             while (true) {
                 this.menu.userMove();
-                this.fieldView.showAllField();
-                if (this.control.isLost()) {
-                    this.menu.gameLost();
-                    break;
-                } else if (this.control.isWin()) {
-                    this.menu.gameWin();
+                if (this.control.isGameEnds()) {
                     break;
                 }
+                this.fieldView.showAllField();
             }
         }
     }

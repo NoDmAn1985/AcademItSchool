@@ -65,7 +65,6 @@ public abstract class AbstractFieldView {
         }
         if (cellNumber == -1) {
             this.control.setCellShown(yPos, xPos);
-            gameLost(yPos, xPos);
         } else if (cellNumber > 0) {
             getCellImage(yPos, xPos);
         } else {
@@ -76,24 +75,19 @@ public abstract class AbstractFieldView {
 
     public void openAllCells(boolean isWin) {
         for (int y = 0; y < this.yCellsCount; y++) {
-            final int yFinal = y;
-            new Thread(() -> openAllXCells(isWin, yFinal)).start();
-        }
-    }
-
-    private void openAllXCells(boolean isWin, int yPos) {
-        for (int x = 0; x < AbstractFieldView.this.xCellsCount; x++) {
-            if (AbstractFieldView.this.control.isCellShown(yPos, x)) {
-                continue;
-            }
-            if (!isWin && AbstractFieldView.this.control.isFlagHere(yPos, x) &&
-                    AbstractFieldView.this.control.getCellNumber(yPos, x) != -1) {
-                change(Signs.WRONG_FLAG, yPos, x);
-            } else if (!AbstractFieldView.this.control.isFlagHere(yPos, x)) {
-                if (isWin && this.control.isMineHere(yPos, x)) {
-                    change(Signs.FLAG, yPos, x);
-                } else {
-                    getCellImage(yPos, x);
+            for (int x = 0; x < AbstractFieldView.this.xCellsCount; x++) {
+                if (AbstractFieldView.this.control.isCellShown(y, x)) {
+                    continue;
+                }
+                if (!isWin && AbstractFieldView.this.control.isFlagHere(y, x) &&
+                        AbstractFieldView.this.control.getCellNumber(y, x) != -1) {
+                    change(Signs.WRONG_FLAG, y, x);
+                } else if (!AbstractFieldView.this.control.isFlagHere(y, x)) {
+                    if (isWin && this.control.isMineHere(y, x)) {
+                        change(Signs.FLAG, y, x);
+                    } else {
+                        getCellImage(y, x);
+                    }
                 }
             }
         }

@@ -1,6 +1,5 @@
 package ru.academits.novoselovda.minesweeper.gui;
 
-import ru.academits.novoselovda.minesweeper.common.FieldPanelListener;
 import ru.academits.novoselovda.minesweeper.common.FrameListener;
 import ru.academits.novoselovda.minesweeper.common.TopPanelListener;
 import ru.academits.novoselovda.minesweeper.model.MyTimerTask;
@@ -25,15 +24,14 @@ public class TopPanel extends JPanel implements TopPanelListener {
     private int panelHeight;
 
     private FrameListener frameListener;
-    private FieldPanelListener fieldListener;
 
     private MyTimerTask myTask;
-    private IconManger iconManger;
+    private IconManager iconManager;
 
-    TopPanel(int panelWidth, int panelHeight, IconManger iconManger) {
+    TopPanel(int panelWidth, int panelHeight, IconManager iconManager) {
         this.panelWidth = panelWidth;
         this.panelHeight = panelHeight;
-        this.iconManger = iconManger;
+        this.iconManager = iconManager;
     }
 
     void init(int minesCount) {
@@ -71,7 +69,7 @@ public class TopPanel extends JPanel implements TopPanelListener {
         constraints.weightx = 0.5;
         constraints.anchor = GridBagConstraints.WEST;
         JLabel topPanelCell3 = new JLabel();
-        topPanelCell3.setIcon(this.iconManger.getTopPanelFlagIcon());
+        topPanelCell3.setIcon(this.iconManager.getTopPanelFlagIcon());
         add(topPanelCell3, constraints);
 
         constraints.gridx = 4;
@@ -84,7 +82,7 @@ public class TopPanel extends JPanel implements TopPanelListener {
         constraints.weightx = 0.5;
         constraints.anchor = GridBagConstraints.CENTER;
         this.face = new JButton();
-        this.face.setIcon(this.iconManger.getTopPanelDefaultFaceIcon());
+        this.face.setIcon(this.iconManager.getTopPanelDefaultFaceIcon());
         this.face.setMargin(new Insets(2, 2, 2, 2));
         this.face.setToolTipText(FACE_TOOL_TIP);
         this.face.addMouseListener(new MouseAdapter() {
@@ -97,7 +95,7 @@ public class TopPanel extends JPanel implements TopPanelListener {
             @Override
             public void mousePressed(MouseEvent e) {
                 this.face = TopPanel.this.face.getIcon();
-                TopPanel.this.face.setIcon(TopPanel.this.iconManger.getTopPanelClickedFaceIcon());
+                TopPanel.this.face.setIcon(TopPanel.this.iconManager.getTopPanelClickedFaceIcon());
             }
 
             @Override
@@ -117,7 +115,7 @@ public class TopPanel extends JPanel implements TopPanelListener {
         constraints.weightx = 0.5;
         constraints.anchor = GridBagConstraints.EAST;
         JLabel topPanelCell7 = new JLabel();
-        topPanelCell7.setIcon(this.iconManger.getTopPanelTimerIcon());
+        topPanelCell7.setIcon(this.iconManager.getTopPanelTimerIcon());
         add(topPanelCell7, constraints);
 
         constraints.gridx = 8;
@@ -144,7 +142,6 @@ public class TopPanel extends JPanel implements TopPanelListener {
     @Override
     public void needStartTimer() {
         this.myTask = new MyTimerTask(this.timer);
-        this.myTask.addListener(this.fieldListener);
         new java.util.Timer().schedule(this.myTask,10,100);
     }
 
@@ -155,22 +152,22 @@ public class TopPanel extends JPanel implements TopPanelListener {
 
     @Override
     public void needShowLost() {
-        this.face.setIcon(this.iconManger.getTopPanelLostFaceIcon());
+        this.face.setIcon(this.iconManager.getTopPanelLostFaceIcon());
     }
 
     @Override
     public void needShowWins() {
-        this.face.setIcon(this.iconManger.getTopPanelWinsFaceIcon());
+        this.face.setIcon(this.iconManager.getTopPanelWinsFaceIcon());
     }
 
     @Override
     public void needShowPressed() {
-        this.face.setIcon(this.iconManger.getTopPanelPressedFaceIcon());
+        this.face.setIcon(this.iconManager.getTopPanelPressedFaceIcon());
     }
 
     @Override
     public void needShowDefaultFace() {
-        this.face.setIcon(this.iconManger.getTopPanelDefaultFaceIcon());
+        this.face.setIcon(this.iconManager.getTopPanelDefaultFaceIcon());
     }
 
     @Override
@@ -181,10 +178,5 @@ public class TopPanel extends JPanel implements TopPanelListener {
     void addListener(FrameListener frameListener) {
         this.frameListener = frameListener;
     }
-
-    void addListener(FieldPanelListener fieldListener) {
-        this.fieldListener = fieldListener;
-    }
-
 
 }

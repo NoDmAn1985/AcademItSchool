@@ -18,8 +18,7 @@ public class FrameView implements View, FrameListener, ErrorShowMessageListener 
     private int frameWidth;
 
     private JFrame frame = new JFrame();
-    private IconManger iconManger;
-    private FieldPanel.InsideClass field;
+    private IconManager iconManager;
 
     private int yCellsCount;
     private int xCellsCount;
@@ -31,7 +30,7 @@ public class FrameView implements View, FrameListener, ErrorShowMessageListener 
 
     public FrameView(Control control) {
         this.control = control;
-        this.control.setListener(this);
+        this.control.setErrorMessageListener(this);
         this.yCellsCount = this.control.getMinYCounts();
         this.xCellsCount = this.control.getMinXCounts();
         this.minesCount = this.control.getMinMinesCounts();
@@ -57,7 +56,7 @@ public class FrameView implements View, FrameListener, ErrorShowMessageListener 
         this.frame.setTitle(TITLE);
         this.frame.setSize(this.frameWidth, frameHeight);
         if (this.isItFirstGame) {
-            iconManger = new IconManger(CELL_SIZE, MENU_ICON_SIZE, TOP_PANEL_HEIGHT);
+            iconManager = new IconManager(CELL_SIZE, MENU_ICON_SIZE, TOP_PANEL_HEIGHT);
             this.frame.setLocationRelativeTo(null);
             this.isItFirstGame = false;
         } else {
@@ -66,25 +65,24 @@ public class FrameView implements View, FrameListener, ErrorShowMessageListener 
         this.frame.setResizable(false);
         this.frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         this.frame.setVisible(true);
-        this.frame.setIconImage(this.iconManger.getIcon());
+        this.frame.setIconImage(this.iconManager.getIcon());
     }
 
     private void initComponents() {
-        MenuBar mainMenuBar = new MenuBar(this.control.getHighScore(), this.iconManger);
+        MenuBar mainMenuBar = new MenuBar(this.control.getHighScore(), this.iconManager);
         mainMenuBar.init();
         mainMenuBar.addListener(this);
         this.frame.setJMenuBar(mainMenuBar);
 
-        TopPanel topPanel = new TopPanel(this.frameWidth, TOP_PANEL_HEIGHT, this.iconManger);
+        TopPanel topPanel = new TopPanel(this.frameWidth, TOP_PANEL_HEIGHT, this.iconManager);
         topPanel.init(this.minesCount);
         topPanel.addListener(this);
-        topPanel.addListener(this.field);
         this.frame.add(topPanel, BorderLayout.PAGE_START);
 
-        this.field = new FieldPanel().new InsideClass(this.control, yCellsCount,xCellsCount, minesCount, this.iconManger);
-        this.field.init();
-        this.field.addListener(topPanel);
-        this.frame.add(this.field, BorderLayout.CENTER);
+        FieldPanel.InsideClass field = new FieldPanel().new InsideClass(this.control, yCellsCount,xCellsCount, minesCount, this.iconManager);
+        field.init();
+        field.addListener(topPanel);
+        this.frame.add(field, BorderLayout.CENTER);
     }
 
     @Override
